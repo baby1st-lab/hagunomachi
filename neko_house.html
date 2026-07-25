@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ねこのおうち</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
+  background:linear-gradient(#f5ecd7,#f0e4cc);display:flex;flex-direction:column;align-items:center;padding:10px}
+#hud{display:flex;gap:8px;align-items:center;width:min(440px,96vw);margin-bottom:8px}
+.badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:6px 13px;
+  font-size:13.5px;font-weight:bold;color:#7a6146;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 rgba(141,123,102,.18)}
+.badge svg{width:19px;height:19px}
+#nameBadge{flex:1;text-align:center;justify-content:center}
+
+/* ===== へや ===== */
+#room{position:relative;width:min(440px,96vw);height:340px;border:4px solid #8d7b66;border-radius:20px;overflow:hidden;
+  background:linear-gradient(#fbf3e2 62%,#e8d5b0 63%,#e0c9a0)}
+#window{position:absolute;left:22px;top:22px;width:110px;height:86px;border:5px solid #b98b5e;border-radius:12px;
+  overflow:hidden;box-shadow:inset 0 0 0 3px #8d7b66}
+#winsky{position:absolute;inset:0;transition:background 2s}
+#window::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;background:#b98b5e}
+#cushion{position:absolute;right:26px;bottom:26px;width:110px;height:44px;background:#f4d3da;border:3.5px solid #d9a3b2;
+  border-radius:50%;box-shadow:inset 0 6px 0 rgba(255,255,255,.5)}
+.toyObj{position:absolute;cursor:pointer}
+.toyObj svg{width:100%;height:auto;display:block}
+/* ねこ */
+#cat{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:150px;cursor:pointer;
+  transition:left 1.4s ease,bottom 1.4s ease}
+#cat svg{width:100%;height:auto;display:block}
+#cat.bounce{animation:cbounce .5s ease 2}
+@keyframes cbounce{50%{transform:translateX(-50%) translateY(-14px)}}
+.tail{transform-origin:8px 6px;animation:tailwag 2.4s ease-in-out infinite}
+@keyframes tailwag{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+#cat.happy .tail{animation:tailwag .5s ease-in-out infinite}
+/* 目の切替: ふだん=まんまる / うれしい=にっこり */
+#cat .eyesHappy{display:none}
+#cat.happy .eyesOpen{display:none}
+#cat.happy .eyesHappy{display:block}
+#cat.jump{animation:cjump .45s ease 3}
+@keyframes cjump{50%{transform:translateX(-50%) translateY(-22px) rotate(-4deg)}}
+.toyObj.tplay{animation:tplay .4s ease 4}
+@keyframes tplay{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg) translateY(-8px)}}
+.lovefloat{position:fixed;font-size:15px;font-weight:bold;color:#e8788a;z-index:20;pointer-events:none;
+  animation:hrise 1.3s ease-out forwards;text-shadow:0 1px 0 #fff}
+.stat.pulse .bar i{animation:barflash .5s ease 2}
+@keyframes barflash{50%{filter:brightness(1.5)}}
+/* しゃべる */
+#say{position:absolute;left:50%;top:18px;transform:translateX(-50%);max-width:86%;
+  background:rgba(255,252,244,.97);border:2.5px solid #c9ae87;border-radius:16px 16px 16px 3px;
+  font-size:13px;font-weight:bold;color:#7a6146;padding:8px 14px;display:none;z-index:5}
+.heart{position:absolute;font-size:20px;color:#e8788a;pointer-events:none;animation:hrise 1.2s ease-out forwards;z-index:6}
+@keyframes hrise{to{transform:translateY(-70px) scale(1.4);opacity:0}}
+/* ごはん */
+#bowl{position:absolute;left:30px;bottom:22px;width:74px;cursor:pointer;display:none;z-index:4}
+#bowl svg{width:100%;height:auto}
+#bowl .n{position:absolute;top:-10px;right:-6px;background:#e8937c;color:#fff;font-size:12px;font-weight:bold;
+  border-radius:999px;padding:1px 8px}
+#bowl.wiggle{animation:bwig 1s ease-in-out infinite}
+@keyframes bwig{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+
+/* ===== ステータス・ボタン ===== */
+#stats{display:flex;gap:8px;width:min(440px,96vw);margin:10px 0}
+.stat{flex:1;background:#fffaf0;border:2.5px solid #c9ae87;border-radius:14px;padding:7px 10px}
+.stat .lb{font-size:10px;font-weight:bold;color:#a58868}
+.stat .bar{height:10px;background:#f2ecdc;border:2px solid #c9ae87;border-radius:99px;overflow:hidden;margin-top:3px}
+.stat .bar i{display:block;height:100%;background:#f2b28c;border-radius:99px;transition:width .6s}
+#msg{width:min(440px,96vw);text-align:center;font-size:13px;font-weight:bold;color:#7a6146;
+  background:#fffaf0;border:2.5px solid #c9ae87;border-radius:999px;padding:8px 10px;margin-bottom:8px}
+#shopRow{display:flex;gap:8px;width:min(440px,96vw);flex-wrap:wrap}
+.shopItem{flex:1;min-width:96px;background:#fffaf0;border:2.5px solid #c9ae87;border-radius:14px;padding:8px;
+  text-align:center;cursor:pointer}
+.shopItem svg{width:44px;height:44px}
+.shopItem .nm{font-size:11px;font-weight:bold}
+.shopItem .pr{font-size:11px;color:#a58868;font-weight:bold}
+.shopItem.owned{opacity:.55;pointer-events:none}
+.shopItem.owned .pr::after{content:" ✓おうちにあるよ"}
+#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:20px}
+#parent h3{color:#7a6146;font-size:15px;margin-bottom:6px}
+#parent p{font-size:12px;color:#8d7b66;line-height:1.8}
+#parent input{font-family:inherit;font-size:15px;font-weight:bold;padding:8px 12px;border:2.5px solid #c9ae87;border-radius:12px;width:100%;margin:6px 0}
+#parent button{font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;
+  border-radius:999px;padding:9px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="badge" id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
+  <div class="badge" id="nameBadge">🐱 <span id="catName">ねこ</span></div>
+  <div class="badge" id="setBtn">⚙</div>
+</div>
+
+<div id="room">
+  <div id="window"><div id="winsky"></div></div>
+  <div id="cushion"></div>
+  <div id="say"></div>
+  <div id="bowl"><span class="n" id="bowlN">×1</span></div>
+  <div id="cat"></div>
+</div>
+
+<div id="stats">
+  <div class="stat"><div class="lb">🍚 おなか</div><div class="bar"><i id="barFood"></i></div></div>
+  <div class="stat"><div class="lb">💗 なかよし</div><div class="bar"><i id="barLove"></i></div></div>
+</div>
+<div id="msg">おしたくの「できた!」が ねこのごはんになるよ</div>
+
+<div id="shopRow">
+  <div class="shopItem" data-id="ball"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50" /></svg><div class="nm">ボール</div><div class="pr">🪙2まい</div></div>
+  <div class="shopItem" data-id="mouse"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><ellipse cx="27" cy="36" rx="16" ry="12" fill="#ddd7f0"/><circle cx="16" cy="26" r="6" fill="#ddd7f0"/><circle cx="14" cy="25" r="1.5" fill="#8d7b66"/><path d="M43 36 q10 -4 12 -12" fill="none"/></svg><div class="nm">ねずみのおもちゃ</div><div class="pr">🪙3まい</div></div>
+  <div class="shopItem" data-id="tower"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="24" y="30" width="12" height="24" fill="#e8c99e"/><ellipse cx="30" cy="28" rx="18" ry="7" fill="#d3e7cb"/><ellipse cx="30" cy="10" rx="12" ry="5" fill="#d3e7cb"/><rect x="26" y="12" width="8" height="14" fill="#e8c99e"/></svg><div class="nm">キャットタワー</div><div class="pr">🪙5まい</div></div>
+</div>
+
+<div id="parent"><div class="inner">
+  <h3>ねこのなまえ</h3>
+  <p>お子さんと一緒に決めて入力してください(あとから変更OK)。ごはんは「おしたくボードのできた!」で届きます。このねこは、おなかがすいても弱ったり死んだりしません(甘えん坊になるだけ)。</p>
+  <input type="text" id="nameInput" maxlength="8" placeholder="例: ゆず">
+  <button onclick="saveName()">きめた!</button>
+</div></div>
+
+<script>
+/* ===== 財布(共有) & ごはんキュー(ボード連携) ===== */
+function wGet(){ try{ return Math.max(0, JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0); }catch(e){ return 0; } }
+function wSet(n){ try{ localStorage.setItem("yucoin_wallet_v1", JSON.stringify({n:Math.max(0,n)})); }catch(e){} refreshCoin(); }
+function feedsPending(){ try{ return parseInt(localStorage.getItem("neko_feed_v1")||"0",10); }catch(e){ return 0; } }
+function feedsSet(n){ try{ localStorage.setItem("neko_feed_v1", String(Math.max(0,n))); }catch(e){} }
+function refreshCoin(){ q("coinN").textContent = wGet(); }
+var COIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>';
+
+/* ===== ねこの状態 ===== */
+var neko = { name:"", fedTotal:0, lastFed:0, love:30, toys:{}, lastSeen:0 };
+function load(){ try{ var s=localStorage.getItem("neko_v1"); if(s){ var o=JSON.parse(s);
+  ["name","fedTotal","lastFed","love","toys","lastSeen"].forEach(function(k){ if(o[k]!==undefined) neko[k]=o[k]; }); } }catch(e){} }
+function save(){ try{ localStorage.setItem("neko_v1", JSON.stringify(neko)); }catch(e){} }
+load();
+
+var audioCtx=null;
+function q(id){ return document.getElementById(id); }
+function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  var o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t||"triangle"; o.frequency.value=f;
+  g.gain.setValueAtTime(.05,audioCtx.currentTime+(w||0)); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
+  o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
+function purr(){ blip(160,.3,0,"sawtooth"); blip(150,.3,.25,"sawtooth"); blip(160,.3,.5,"sawtooth"); }
+
+/* ===== ねこの絵(成長3段階・ぬい画風) ===== */
+function catSVG(){
+  var stage = neko.fedTotal >= 30 ? 2 : (neko.fedTotal >= 10 ? 1 : 0);
+  var scale = [0.78, 0.92, 1.05][stage];
+  var ribbon = stage >= 1 ? '<path d="M52 34 l-7 -5 v10 Z M52 34 l7 -5 v10 Z" fill="#e8788a" stroke="#8d7b66" stroke-width="2.5"/><circle cx="52" cy="34" r="3" fill="#f4d3da" stroke="#8d7b66" stroke-width="2"/>' : '';
+  var fluff = stage === 2 ? '<path d="M20 78 q-8 4 -10 12 M100 78 q8 4 10 12" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linecap="round"/>' : '';
+  var hungry = hoursSinceFed() > 6;
+  var eyesOpen = hungry
+    ? '<g class="eyesOpen"><path d="M42 46 q4 3 8 0 M70 46 q4 3 8 0" fill="none" stroke="#5a4a38" stroke-width="3.5" stroke-linecap="round"/></g>'
+    : '<g class="eyesOpen"><circle cx="46" cy="44" r="4" fill="#5a4a38" stroke="none"/><circle cx="74" cy="44" r="4" fill="#5a4a38" stroke="none"/><circle cx="47.5" cy="42.5" r="1.4" fill="#fff" stroke="none"/><circle cx="75.5" cy="42.5" r="1.4" fill="#fff" stroke="none"/></g>';
+  var eyes = eyesOpen +
+    '<g class="eyesHappy"><path d="M42 44 q4 -5 8 0 M70 44 q4 -5 8 0" fill="none" stroke="#5a4a38" stroke-width="3.5" stroke-linecap="round"/></g>';
+  return '<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" style="transform:scale('+scale+');transform-origin:bottom center">' +
+    '<g stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">' +
+    '<path class="tail" d="M96 72 q18 -6 16 -24" fill="none" stroke-width="7"/>' +
+    '<ellipse cx="60" cy="74" rx="38" ry="24" fill="#f0e3c8"/>' + fluff +
+    '<circle cx="60" cy="40" r="28" fill="#f0e3c8"/>' +
+    '<path d="M38 22 L34 6 L50 14 Z" fill="#f0e3c8"/><path d="M82 22 L86 6 L70 14 Z" fill="#f0e3c8"/>' +
+    '<path d="M40 20 L37 9 L48 15 Z" fill="#f4d3da" stroke="none"/><path d="M80 20 L83 9 L72 15 Z" fill="#f4d3da" stroke="none"/>' +
+    eyes +
+    '<path d="M57 52 q3 3 6 0 M60 52 v-3" fill="none" stroke-width="2.5"/>' +
+    '<ellipse cx="60" cy="50" rx="3" ry="2.2" fill="#e8937c" stroke="none"/>' +
+    '<circle cx="36" cy="52" r="4" fill="#f4b8b8" stroke="none"/><circle cx="84" cy="52" r="4" fill="#f4b8b8" stroke="none"/>' +
+    '<path d="M26 46 h-12 M28 52 h-13 M92 46 h12 M90 52 h13" stroke-width="2"/>' +
+    '<ellipse cx="60" cy="80" rx="16" ry="11" fill="#fff7ec" stroke="none"/>' +
+    ribbon + '</g></svg>';
+}
+function hoursSinceFed(){ return neko.lastFed ? (Date.now()-neko.lastFed)/3600000 : 99; }
+
+/* ===== 描画 ===== */
+var BOWL='<svg viewBox="0 0 80 50" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><path d="M10 22 H70 L64 42 Q40 48 16 42 Z" fill="#a5c9e8"/><ellipse cx="40" cy="20" rx="26" ry="7" fill="#e8c99e"/></svg>';
+function render(){
+  q("catName").textContent = neko.name || "ねこ";
+  q("cat").innerHTML = catSVG();
+  var food = Math.max(6, 100 - hoursSinceFed()*12);
+  q("barFood").style.width = Math.min(100, food) + "%";
+  q("barLove").style.width = Math.min(100, neko.love) + "%";
+  var p = feedsPending();
+  if (p > 0){ q("bowl").style.display="block"; q("bowl").classList.add("wiggle");
+    q("bowl").innerHTML = BOWL + '<span class="n">×'+p+'</span>'; }
+  else q("bowl").style.display="none";
+  renderToys(); refreshCoin();
+}
+var TOYDEFS = {
+  ball:  { x:"18%", b:"18px", w:36, svg:'<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50"/></svg>' },
+  mouse: { x:"64%", b:"14px", w:42, svg:'<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><ellipse cx="27" cy="36" rx="16" ry="12" fill="#ddd7f0"/><circle cx="16" cy="26" r="6" fill="#ddd7f0"/><circle cx="14" cy="25" r="1.5" fill="#8d7b66"/><path d="M43 36 q10 -4 12 -12" fill="none"/></svg>' },
+  tower: { x:"76%", b:"120px", w:84, svg:'<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="24" y="30" width="12" height="26" fill="#e8c99e"/><ellipse cx="30" cy="28" rx="18" ry="7" fill="#d3e7cb"/><ellipse cx="30" cy="10" rx="12" ry="5" fill="#d3e7cb"/><rect x="26" y="12" width="8" height="14" fill="#e8c99e"/></svg>' }
+};
+function renderToys(){
+  document.querySelectorAll(".toyObj").forEach(function(e){ e.remove(); });
+  Object.keys(neko.toys).forEach(function(id){
+    var d = TOYDEFS[id]; if(!d) return;
+    var e = document.createElement("div");
+    e.className = "toyObj"; e.innerHTML = d.svg;
+    e.style.left = d.x; e.style.bottom = d.b; e.style.width = d.w+"px";
+    e.onclick = function(){ playWith(id, e); };
+    q("room").appendChild(e);
+  });
+  document.querySelectorAll(".shopItem").forEach(function(el){
+    el.classList.toggle("owned", !!neko.toys[el.dataset.id]);
+  });
+}
+
+/* ねこの吹き出しでお知らせ(コメントは全部ここから) */
+function catSay(text, ms){
+  var s = q("say"); s.textContent = text; s.style.display = "block";
+  clearTimeout(s._t); s._t = setTimeout(function(){ s.style.display="none"; }, ms || 4200);
+}
+
+/* ===== しゃべる(時間帯で変わる・押しつけない) ===== */
+function sayLine(){
+  var h = new Date().getHours();
+  var n = neko.name || "ねこ";
+  var lines;
+  if (h >= 6 && h < 9) lines = ["おはようにゃ! きょうも いっしょに がんばろ", "あさの おしたく、おうえんしてるにゃ"];
+  else if (h >= 17 && h < 19) lines = ["そろそろ おふろの じゅんびかにゃ?", "おふろから かえったら あそぼうにゃ"];
+  else if (h >= 19 && h < 21) lines = ["どうが、きりのいいところで おしまいして おふろいこ? まってるにゃ", "はやく もどってきたら いっぱい あそべるにゃ"];
+  else if (h >= 21 || h < 6) lines = ["…zzz(そっと なでてもいいよ)", "きょうも いっぱい がんばったにゃ。おやすみ"];
+  else lines = ["ひなたぼっこ びよりだにゃ", "できた!が とどくの、たのしみに してるにゃ"];
+  if (hoursSinceFed() > 6) lines.push("おなか すいたにゃ〜(できた!が ごはんになるよ)");
+  var t = lines[Math.floor(Math.random()*lines.length)];
+  var s = q("say"); s.textContent = t; s.style.display = "block";
+  clearTimeout(s._t); s._t = setTimeout(function(){ s.style.display="none"; }, 4200);
+}
+
+/* ===== ふれあい ===== */
+q("cat").onclick = function(){
+  var c = q("cat");
+  c.classList.add("happy","bounce");
+  setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
+  setTimeout(function(){ c.classList.remove("happy"); }, 3000);
+  loveUp(1);
+  purr();
+  var r = c.getBoundingClientRect();
+  for (var i=0;i<3;i++){
+    var hh = document.createElement("div");
+    hh.className="heart"; hh.textContent="💗";
+    hh.style.left=(r.left + 40 + Math.random()*60)+"px";
+    hh.style.top=(r.top + 10)+"px";
+    document.body.appendChild(hh);
+    setTimeout(function(el){return function(){el.remove();};}(hh),1200);
+  }
+  render(); sayLine();
+};
+q("bowl").onclick = function(){
+  var p = feedsPending();
+  if (p <= 0) return;
+  feedsSet(0);
+  neko.fedTotal += p; neko.lastFed = Date.now();
+  neko.love = Math.min(100, neko.love + p*3); save();
+  catSay("🍚 もぐもぐ… できた!のごはん "+p+"こ、ぜんぶたべたにゃ! ありがとにゃ");
+  blip(523,.1); blip(659,.1,.12); blip(784,.15,.24); purr();
+  var c=q("cat"); c.classList.add("happy");
+  setTimeout(function(){ c.classList.remove("happy"); render(); }, 2500);
+  render();
+};
+/* なかよし度アップの見えるエフェクト */
+function loveUp(n){
+  neko.love = Math.min(100, neko.love + n); save();
+  q("barLove").style.width = Math.min(100, neko.love) + "%";
+  var st = q("barLove").closest(".stat");
+  st.classList.add("pulse"); setTimeout(function(){ st.classList.remove("pulse"); }, 1100);
+  var c = q("cat").getBoundingClientRect();
+  var f = document.createElement("div");
+  f.className = "lovefloat"; f.textContent = "なかよし +" + n + " 💗";
+  f.style.left = (c.left + c.width/2 - 30) + "px";
+  f.style.top = (c.top - 6) + "px";
+  document.body.appendChild(f);
+  setTimeout(function(){ f.remove(); }, 1300);
+}
+
+function playWith(id, el){
+  var c=q("cat");
+  c.classList.add("happy");
+  c.style.left = el.style.left; // ねこがおもちゃへかけていく
+  blip(523,.08); blip(659,.08,.1);
+  // 到着したら: ジャンプではしゃぐ+おもちゃも跳ねる+メロディ
+  setTimeout(function(){
+    c.classList.add("jump");
+    el.classList.add("tplay");
+    [659,784,880,784,988,880].forEach(function(f2,i){ blip(f2,.09,i*.14); });
+    try{navigator.vibrate&&navigator.vibrate([30,30,30]);}catch(e){}
+    loveUp(2);
+    catSay(["たのしいにゃ〜!!","これ だいすきにゃ!","もういっかい あそぼ!"][Math.floor(Math.random()*3)]);
+  }, 1450);
+  setTimeout(function(){
+    c.classList.remove("jump");
+    el.classList.remove("tplay");
+    c.style.left="50%";
+  }, 3300);
+  setTimeout(function(){ c.classList.remove("happy"); render(); }, 4600);
+}
+
+/* ===== おみせ ===== */
+var PRICES = { ball:2, mouse:3, tower:5 };
+document.querySelectorAll(".shopItem").forEach(function(el){
+  el.onclick = function(){
+    var id = el.dataset.id;
+    if (neko.toys[id]) return;
+    var price = PRICES[id];
+    if (wGet() < price){ catSay("お湯コインが たりないにゃ… あと"+(price-wGet())+"まい ためてきてにゃ"); blip(300,.15); return; }
+    wSet(wGet()-price);
+    neko.toys[id] = true; save();
+    render();
+    var c=q("cat");
+    c.classList.add("happy","bounce");
+    setTimeout(function(){ c.classList.remove("bounce"); },1100);
+    setTimeout(function(){ c.classList.remove("happy"); },3000);
+    loveUp(3);
+    catSay("🎁 わーい! かってくれて ありがとにゃ!! タップすると あそぶにゃ〜", 5000);
+    blip(523,.1); blip(659,.1,.12); blip(1047,.2,.24); purr();
+  };
+});
+
+/* ===== まど(現実の時間と連動) ===== */
+(function(){
+  var h = new Date().getHours();
+  var sky = q("winsky");
+  if (h >= 19 || h < 5) sky.style.background = "linear-gradient(#454f6e,#5c688c)";
+  else if (h >= 16) sky.style.background = "linear-gradient(#f6d3b0,#fbeedd)";
+  else sky.style.background = "linear-gradient(#cfe4f2,#e8f3fa)";
+})();
+
+/* ===== なまえ・初期化 ===== */
+function saveName(){
+  var v = q("nameInput").value.trim();
+  if (!v){ return; }
+  neko.name = v; save();
+  q("parent").style.display = "none";
+  render();
+  catSay(v + "だにゃ! きょうから うちのこに なるにゃ🐱 よろしくにゃ!", 6000);
+}
+q("setBtn").onclick = function(){ q("nameInput").value = neko.name; q("parent").style.display = "flex"; };
+
+/* おうちのひと用: コインバッジ1.5秒ながおしで+3(テスト・特別支給) */
+(function(){
+  var t=null, b=q("coinBadge");
+  function down(){ t=setTimeout(function(){ wSet(wGet()+3);
+    catSay("🪙 おうちのひとから コイン+3 とどいたにゃ!"); blip(1047,.12); },1500); }
+  function up(){ clearTimeout(t); }
+  b.addEventListener("mousedown",down); b.addEventListener("mouseup",up); b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
+})();
+
+q("coinIco").innerHTML = COIN;
+render();
+if (!neko.name) q("parent").style.display = "flex";
+else setTimeout(sayLine, 800);
+document.addEventListener("visibilitychange", function(){ if(!document.hidden){ render(); } });
+setInterval(render, 60000);
+setInterval(sayLine, 45000);
+</script>
+</body>
+</html>

@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>おしたくボード & おでかけタイマー</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
+  background:linear-gradient(#dcedf5,#e8f3f7 40%,#f0ead6);transition:background 1s}
+/* 夜モード: 部屋の明かりでボードを見ている雰囲気 */
+body.night{background:linear-gradient(#454f6e,#57628a 40%,#6a688a)}
+body.night #hud{background:rgba(69,79,110,.94)}
+body.night .tab{background:#e8e2d2;border-color:#9a8f78}
+body.night #boardTitle{color:#8a6a3f}
+#tscene.night{background:linear-gradient(#8a93b8,#aab6d4 58%,#b9cfae 59%,#adc4a0 66%)}
+#tscene.night .cl{opacity:.45}
+
+/* ===== HUD・タブ ===== */
+#hud{position:sticky;top:0;z-index:9;background:rgba(220,237,245,.94);backdrop-filter:blur(4px);
+  display:flex;gap:8px;padding:10px 12px;align-items:center}
+#coinBadge{background:#fffaf0;border:2.5px solid #c9ae87;border-radius:999px;padding:5px 12px;
+  font-size:14px;font-weight:bold;color:#7a6146;display:flex;align-items:center;gap:5px;
+  box-shadow:0 3px 0 rgba(141,123,102,.15)}
+#coinBadge svg{width:20px;height:20px}
+#coinBadge.pulse{animation:cpulse .5s}
+@keyframes cpulse{50%{transform:scale(1.2)}}
+.tab{flex:1;text-align:center;font-size:13px;font-weight:bold;color:#a58868;background:#fffaf0;
+  border:2.5px solid #c9ae87;border-radius:999px;padding:8px 0;cursor:pointer;box-shadow:0 3px 0 rgba(141,123,102,.15)}
+.tab.on{background:#f2b28c;color:#fff;border-color:#e09a72}
+#parentBtn{flex:none;font-size:10px;padding:8px 10px;position:relative;overflow:hidden}
+#pbGauge{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(242,178,140,.45)}
+
+/* ===== おしたくボード ===== */
+#boardWrap{max-width:480px;margin:12px auto 40px;padding:0 14px}
+#modeRow{display:flex;gap:8px;margin-bottom:10px}
+#modeRow button{flex:1;font-family:inherit;font-size:14px;font-weight:bold;border:2.5px solid #c9ae87;
+  border-radius:999px;padding:9px 0;cursor:pointer;background:#fffaf0;color:#a58868}
+#modeRow button.on{background:#f9e3a8;border-color:#dcc06e;color:#7a6146}
+#board{background:#fffdf6;border:12px solid #c9a274;outline:4px solid #8d7b66;border-radius:8px;
+  box-shadow:0 8px 18px rgba(141,123,102,.3);padding:12px 12px 14px}
+#boardTitle{text-align:center;font-size:17px;font-weight:bold;letter-spacing:.25em;color:#a5713f;
+  border-bottom:3px dashed #e5d3b2;padding-bottom:8px}
+#boardHead{display:flex;justify-content:space-between;font-size:10px;font-weight:bold;color:#b89a6e;
+  padding:6px 8px 0 66px}
+.rrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:2px dotted #f0e4cc;cursor:pointer}
+.rrow:last-child{border-bottom:none}
+.rrow .picto{width:50px;flex:none;background:#fff;border:2.5px solid #e5d3b2;border-radius:10px;padding:3px 3px 1px}
+.rrow .picto svg{width:100%;height:auto;display:block}
+.pname{font-size:7.5px;font-weight:bold;color:#a58868;text-align:center;line-height:1.15;word-break:break-all}
+.rail{position:relative;flex:1;height:54px}
+.rail .line{position:absolute;left:8px;right:8px;top:62%;height:3.5px;background:#c9ae87;border-radius:3px}
+.rail .cap{position:absolute;top:62%;width:9px;height:9px;border:3px solid #a58868;border-radius:50%;
+  background:#fffdf6;transform:translateY(-42%)}
+.rail .cap.l{left:2px}.rail .cap.r{right:2px}
+.charm{position:absolute;left:6px;bottom:8px;width:46px;z-index:2;transform:scaleX(-1)}
+.charm svg{width:100%;height:auto;display:block}
+.charm.go{transition:left 2s linear}
+.rrow.done .charm{left:calc(100% - 52px)}
+.rmaru{position:absolute;right:-4px;top:-8px;width:30px;display:none;z-index:3}
+.rmaru svg{width:100%;height:auto}
+.rrow.done .rmaru{display:block}
+.rmaru.fresh{animation:maruin .5s cubic-bezier(.3,1.6,.6,1)}
+@keyframes maruin{0%{transform:scale(.1) rotate(-120deg)}100%{transform:scale(1) rotate(0)}}
+.charm.driving svg circle[fill="#ddd7f0"]{stroke-dasharray:5 5;transform-box:fill-box;
+  transform-origin:center;animation:wheel .4s linear infinite}
+@keyframes wheel{to{transform:rotate(-360deg)}}
+.charm.driving svg{animation:dbounce .32s ease-in-out infinite}
+@keyframes dbounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+#perfect{margin-top:12px;display:none}
+#perfect .inner{background:#fdf5df;border:3px dashed #eeca6e;border-radius:18px;padding:14px;text-align:center;
+  font-weight:bold;color:#b8912e}
+.flycoin{position:fixed;width:34px;z-index:50;pointer-events:none;transition:all .8s cubic-bezier(.4,-0.1,.6,1)}
+.flycoin svg{width:100%;height:auto}
+
+/* ===== おでかけタイマー(パララックス走行) ===== */
+#ticketPage{display:none;max-width:480px;margin:10px auto 40px;padding:0 14px}
+#tscene{position:relative;height:250px;border:3.5px solid #c9ae87;border-radius:20px 20px 0 0;overflow:hidden;
+  background:linear-gradient(#cfe4f2,#e8f3fa 58%,#d3e7cb 59%,#cfe3c4 66%)}
+#tscene.evening{background:linear-gradient(#f6d3b0,#fbeedd 58%,#d3e7cb 59%,#cfe3c4 66%)}
+#tsun{position:absolute;top:12px;left:16px;width:38px}
+.cl{position:absolute;width:76px;height:22px;background:#fff;border-radius:999px;opacity:.9}
+.cl::before{content:"";position:absolute;left:14px;top:-12px;width:30px;height:30px;background:#fff;border-radius:50%}
+.cl::after{content:"";position:absolute;right:14px;top:-8px;width:22px;height:22px;background:#fff;border-radius:50%}
+.mv{animation-play-state:paused!important}
+#tscene.running .mv{animation-play-state:running!important}
+.cl.c1{top:14%;animation:drift 26s linear infinite}
+.cl.c2{top:30%;transform:scale(.7);animation:drift 17s linear infinite;animation-delay:-8s}
+@keyframes drift{from{left:105%}to{left:-25%}}
+#road2{position:absolute;left:0;right:0;bottom:0;height:34%;background:#e9e0cc;border-top:3px solid #c9ae87}
+#dash{position:absolute;top:50%;left:0;width:200%;height:4px;
+  background:repeating-linear-gradient(90deg,#fffaf0 0 34px,transparent 34px 78px);
+  animation:slide 1s linear infinite}
+.grassrow{position:absolute;left:0;width:200%;height:14px;
+  background:repeating-linear-gradient(90deg,transparent 0 26px,#9ec98e 26px 30px,#8bb381 30px 33px,transparent 33px 60px);
+  animation:slide 1.6s linear infinite}
+.g1{bottom:33%}.g2{bottom:2%;animation-duration:.9s;height:18px;opacity:.8}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#dest{position:absolute;right:7%;bottom:32%;width:130px;transform-origin:bottom right;
+  transform:scale(.22);opacity:.85}
+#dest svg{width:100%;height:auto;display:block}
+#tcar2{position:absolute;left:14%;bottom:5%;width:74px;z-index:3;transform:scaleX(-1)}
+#tcar2 svg{width:100%;height:auto;display:block}
+#tcar2.driving svg circle[fill="#ddd7f0"]{stroke-dasharray:5 5;transform-box:fill-box;
+  transform-origin:center;animation:wheel .4s linear infinite}
+#tcar2.driving svg{animation:dbounce .32s ease-in-out infinite}
+#tbanner{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5;
+  background:rgba(255,250,240,.96);border:2.5px solid #c9ae87;border-radius:999px;
+  font-size:13px;font-weight:bold;color:#7a6146;padding:6px 18px;white-space:nowrap;display:none}
+#story{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:6;
+  background:rgba(255,250,240,.97);border:3px solid #c9ae87;border-radius:16px;
+  padding:8px 12px 7px;text-align:center;display:none;box-shadow:0 6px 14px rgba(122,97,70,.3)}
+#story.pop{animation:spop .5s cubic-bezier(.3,1.5,.6,1)}
+@keyframes spop{0%{transform:translate(-50%,-50%) scale(.3)}100%{transform:translate(-50%,-50%) scale(1)}}
+#story .ssvg{width:78px;margin:0 auto}
+#story .ssvg svg{width:100%;height:auto;display:block}
+#story .scap{font-size:11.5px;font-weight:bold;color:#7a6146;margin-top:3px;white-space:nowrap}
+#tinfo{background:#fffaf0;border:3.5px solid #c9ae87;border-top:none;border-radius:0 0 20px 20px;
+  padding:14px;text-align:center}
+#tbig{font-size:16px;font-weight:bold;min-height:1.5em}
+#barWrap{position:relative;margin:24px 0 10px}
+#tbar{height:14px;background:#f2ecdc;border:2.5px solid #c9ae87;border-radius:999px;overflow:hidden}
+#tfill{height:100%;width:0%;background:linear-gradient(90deg,#a8cf9e,#cfe0a0);border-radius:999px}
+#saIco{position:absolute;left:50%;top:-20px;transform:translateX(-50%);width:30px}
+#goalIco{position:absolute;right:-4px;top:-20px;width:30px}
+#saIco svg,#goalIco svg{width:100%;height:auto;display:block}
+#tcar2{transition:left 2.5s ease,transform 2.5s ease}
+#maruBadge{background:rgba(255,250,240,.95);border:2.5px solid #d9a3b2;border-radius:999px;padding:6px 12px;
+  font-size:13.5px;font-weight:bold;color:#b86a7c;display:flex;align-items:center;gap:4px}
+#maruBadge.pulse{animation:mpulse .5s ease}
+@keyframes mpulse{50%{transform:scale(1.18)}}
+#stretchBtn{font-size:16px;padding:6px 14px;border-radius:999px;border:2.5px solid #dcc06e;background:#fdf6dd;cursor:pointer}
+#stretchBtn.on{background:#f2d98a}
+.rrow.stretchrow{border-color:#e8cf7a;background:#fffbe8}
+#stretchAddPanel{background:#fffbe8;border:3px dashed #e8cf7a;border-radius:16px;padding:10px 12px;margin-top:8px}
+.sgttl{font-size:13px;font-weight:bold;color:#a5842e;text-align:center;margin-bottom:6px}
+.sgchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.sgchip{font-family:inherit;font-size:14px;font-weight:bold;color:#7a6146;background:#fff;
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 14px;cursor:pointer}
+.sgchip:active{transform:scale(.95)}
+.sgfree{display:flex;gap:6px;margin-top:8px}
+.sgfree input{flex:1;font-family:inherit;font-size:15px;font-weight:bold;padding:8px 12px;
+  border:2.5px solid #c9ae87;border-radius:12px;min-width:0}
+.sgok{font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;
+  color:#7a6146;border-radius:999px;padding:8px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer}
+/* ボードのねこ(吹き出しの外に体つきで。タップでねこのおうちへ。21時をすぎると丸まって寝る) */
+#boardNeko{display:flex;align-items:flex-end;gap:8px;width:100%;margin:4px 0 12px;padding:0}
+#bnFace{flex:0 0 62px;cursor:pointer}
+#bnFace svg{width:62px;height:auto;display:block}
+#bnFace:active svg{transform:scale(.93)}
+#bnBubble{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:16px 16px 16px 4px;
+  padding:9px 13px;flex:1;margin-bottom:8px}
+#boardNeko .nmsg{font-size:13px;font-weight:bold;color:#7a6146;line-height:1.5}
+#papaCard{width:100%;margin:10px 0 0;background:rgba(255,250,240,.9);border:2.5px solid #d8c9ab;border-radius:16px;overflow:hidden}
+#papaHead{font-size:13px;font-weight:bold;color:#8d7b66;padding:9px 14px;cursor:pointer;display:flex;gap:6px;align-items:center}
+#papaHead #papaArrow{margin-left:auto;transition:transform .2s}
+#papaCard.open #papaArrow{transform:rotate(90deg)}
+#papaRows{padding:0 10px 10px}
+.prow{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid #e8dcc4;border-radius:12px;padding:7px 12px;margin-top:6px;font-size:13px;font-weight:bold;color:#7a6146;cursor:pointer}
+.prow.done{opacity:.45;text-decoration:line-through}
+.prow .chk{margin-left:auto;font-size:16px}
+#bonusRow{display:none;justify-content:center;gap:10px;margin:8px 0}
+#bonusRow .bc{width:38px;transition:all .6s}
+#bonusRow .bc svg{width:100%;height:auto;display:block}
+#bonusRow .bc .meter{height:5px;background:#f2ecdc;border:1.5px solid #c9ae87;border-radius:99px;margin-top:2px;overflow:hidden}
+#bonusRow .bc .meter i{display:block;height:100%;width:100%;background:#e8937c;transition:width 1s linear}
+#bonusRow .bc.lost{opacity:.15;transform:scale(.7) rotate(20deg);filter:grayscale(1)}
+#tbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+#tbtns button,#tbtns a{font-family:inherit;font-size:15px;font-weight:bold;border:none;border-radius:999px;
+  padding:12px 22px;cursor:pointer;background:#f2b28c;color:#fff;box-shadow:0 4px 0 #d99a75;text-decoration:none;display:inline-block}
+#tbtns a.gacha{background:#8fc7e8;box-shadow:0 4px 0 #6da7c9}
+
+/* ===== せってい ===== */
+#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
+#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:400px;width:100%;padding:18px;max-height:88vh;overflow-y:auto}
+#parent h3{color:#7a6146;font-size:15px;margin:14px 0 6px}
+#parent p{font-size:12px;color:#8d7b66;line-height:1.8}
+#parent .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center;font-size:12px}
+#parent button{font-family:inherit;font-size:12px;font-weight:bold;border:none;background:#cfe0ee;color:#5a6a7a;
+  border-radius:999px;padding:8px 13px;box-shadow:0 3px 0 #aec4d6;cursor:pointer}
+#parent button.on{background:#f2b28c;color:#fff;box-shadow:0 3px 0 #d99a75}
+#parent button.close{background:#f2d98a;color:#7a6146;box-shadow:0 3px 0 #dcc06e;margin-top:12px}
+.tedit{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px dashed #e5d9c2}
+.tedit .ico{width:38px;flex:none;background:#fff;border:2px solid #e5d3b2;border-radius:8px;padding:2px;cursor:pointer}
+.tedit .ico svg{width:100%;height:auto;display:block}
+.tedit input{flex:1;min-width:0;font-family:inherit;font-size:13px;font-weight:bold;color:#5a4a38;
+  border:none;border-bottom:2px dashed #dcc9a2;background:transparent;padding:2px}
+.tedit button{padding:6px 9px!important;font-size:12px!important}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(122,97,70,.92);color:#fff;
+  font-size:13px;font-weight:bold;border-radius:999px;padding:9px 20px;z-index:70;display:none;max-width:90vw;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
+  <div id="maruBadge">🌸× <span id="maruN">0</span></div>
+  <div class="tab on" id="tabTask">🚗 おしたく</div>
+  <div class="tab" id="tabTicket">🛣 おでかけ</div>
+  <a class="tab" id="tabCal" href="mitooshi_calendar.html" style="text-decoration:none;color:inherit">📅 カレンダー</a>
+  <div class="tab" id="parentBtn"><span id="pbGauge"></span><span>せってい<br>(ながおし)</span></div>
+</div>
+
+<div id="taskPage">
+  <div id="boardWrap">
+    <div id="modeRow">
+      <button id="modeAsa">☀ あさ</button>
+      <button id="modeYoru">🌙 よる</button>
+      <button id="stretchBtn" title="おかわりチャレンジ">⭐</button>
+    </div>
+    <div id="boardNeko"><span id="bnFace" title="ねこのおうちへ"></span><div id="bnBubble"><span class="nmsg" id="bnMsg"></span></div></div>
+    <div id="board">
+      <div id="boardTitle">きょうの おしたく</div>
+      <div id="boardHead"><span>◀ まだ</span><span>できた! ▶</span></div>
+      <div id="rows"></div>
+    </div>
+    <div id="perfect"><div class="inner">🎉 ぜんぶできた! きょうも パーフェクト!</div></div>
+    <div id="papaCard">
+      <div id="papaHead" onclick="togglePapa()">👔 パパのおしたく <span id="papaCount"></span><span id="papaArrow">▸</span></div>
+      <div id="papaRows" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div id="ticketPage">
+  <div id="tscene">
+    <div id="tsun"></div>
+    <div class="cl c1 mv"></div><div class="cl c2 mv"></div>
+    <div id="dest"></div>
+    <div id="road2"><div id="dash" class="mv"></div></div>
+    <div class="grassrow g1 mv"></div><div class="grassrow g2 mv"></div>
+    <div id="tcar2"></div>
+    <div id="tbanner"></div>
+    <div id="story"><div class="ssvg"></div><div class="scap"></div></div>
+  </div>
+  <div id="tinfo">
+    <div id="tbig">しゅっぱつすると SAによって おふろへむかうよ</div>
+    <div id="barWrap"><div id="tbar"><div id="tfill"></div></div>
+      <div id="saIco"></div><div id="goalIco"></div></div>
+    <div id="bonusRow"></div>
+    <div id="tbtns">
+      <button id="startBtn">🚗 しゅっぱつ!(<span id="minLbl">10</span>ぷん)</button>
+      <button id="lastVidBtn" style="display:none">🎬 さいごの どうがに する!</button>
+      <button id="doneBtn" style="display:none">おしまいできた!</button>
+      <a class="gacha" id="gachaLink" href="ofuro_gacha.html" style="display:none">♨ おふろガチャへ!</a>
+    </div>
+  </div>
+</div>
+
+<div id="parent"><div class="inner">
+  <h3>せってい(おうちのひと)</h3>
+  <p><b>おしたくボード</b>: タスク1個できるたびに、お湯コイン+1(ガチャと共通の財布)。
+  <b>おでかけタイマー</b>: 出発→中間のSA(ごはん・給油休憩)→おふろに到着。到着後はボーナスコイン3枚が3分ごとに1枚ずつ減るので、早く「おしまい!」できるほどガチャがたくさん回せます。</p>
+  <div class="row">お湯コイン: <b id="pCoin">0</b>まい
+    <button onclick="grantCoin(1)">+1(がんばったね)</button>
+    <button onclick="grantCoin(-1)">-1</button></div>
+  <h3>タイマー</h3>
+  <div class="row">
+    <button data-min="5">5分</button><button data-min="10">10分</button>
+    <button data-min="15">15分</button><button data-min="20">20分</button>
+    <button id="saToggle">SAあり</button>
+  </div>
+  <h3>のりもの</h3>
+  <div class="row" id="vehAsaRow"></div>
+  <div class="row" id="vehYoruRow"></div>
+  <h3>☀ あさのタスク(タップで絵を変更/↑↓で並べ替え)</h3>
+  <div id="editAsa"></div>
+  <div class="row"><button onclick="addTask('asa')">+ タスク追加</button></div>
+  <h3>🌙 よるのタスク</h3>
+  <div id="editYoru"></div>
+  <div class="row"><button onclick="addTask('yoru')">+ タスク追加</button></div>
+  <div class="row" style="margin-top:10px"><button onclick="resetToday()">きょうの「できた」をリセット</button></div>
+  <button class="close" onclick="closeParent()">とじる</button>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ===== スプライト ===== */
+var CAR='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 52 V46 Q8 40 16 40 L24 40 Q30 26 43 26 L51 26 Q61 26 65 40 Q72 40 72 47 V52 Z" fill="#f4d3da"/><path d="M30 40 Q34 30 43 30 L49 30 Q56 30 59 40 Z" fill="#cfe0ee"/><circle cx="20" cy="54" r="7" fill="#ddd7f0"/><circle cx="60" cy="54" r="7" fill="#ddd7f0"/><circle cx="35" cy="45" r="2" fill="#8d7b66"/><circle cx="45" cy="45" r="2" fill="#8d7b66"/><ellipse cx="28" cy="48" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="52" cy="48" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 46 q3 3 6 0"/></svg>';
+var FIRE='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="20" width="8" height="6" rx="2" fill="#f9e3a8"/><path d="M6 52 V30 Q6 26 10 26 H24 Q28 26 28 30 V36 H70 Q74 36 74 40 V52 Z" fill="#f4d3da"/><rect x="11" y="31" width="12" height="9" rx="3" fill="#cfe0ee"/><path d="M34 32 H74 M34 26 H74 M40 26 V32 M50 26 V32 M60 26 V32 M70 26 V32"/><circle cx="20" cy="54" r="7" fill="#ddd7f0"/><circle cx="58" cy="54" r="7" fill="#ddd7f0"/><circle cx="42" cy="42" r="2" fill="#8d7b66"/><circle cx="52" cy="42" r="2" fill="#8d7b66"/><ellipse cx="36" cy="46" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="58" cy="46" rx="3" ry="2" fill="#f4b8b8"/><path d="M44 45 q3 3 6 0"/></svg>';
+var BUS='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="22" width="68" height="32" rx="10" fill="#f9e3a8"/><rect x="12" y="28" width="11" height="10" rx="3" fill="#cfe0ee"/><rect x="28" y="28" width="11" height="10" rx="3" fill="#cfe0ee"/><circle cx="20" cy="56" r="6" fill="#ddd7f0"/><circle cx="58" cy="56" r="6" fill="#ddd7f0"/><circle cx="52" cy="36" r="2" fill="#8d7b66"/><circle cx="62" cy="36" r="2" fill="#8d7b66"/><ellipse cx="47" cy="43" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="67" cy="43" rx="3" ry="2" fill="#f4b8b8"/><path d="M54 41 q3 3 6 0"/></svg>';
+var TRAIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="16" y="18" width="10" height="8" rx="3" fill="#f4d3da"/><rect x="6" y="26" width="30" height="26" rx="6" fill="#cfe0ee"/><rect x="44" y="26" width="30" height="26" rx="6" fill="#cfe0ee"/><path d="M36 44 H44"/><rect x="49" y="32" width="8" height="8" rx="2" fill="#fff7ec"/><rect x="61" y="32" width="8" height="8" rx="2" fill="#fff7ec"/><circle cx="14" cy="56" r="5" fill="#ddd7f0"/><circle cx="28" cy="56" r="5" fill="#ddd7f0"/><circle cx="52" cy="56" r="5" fill="#ddd7f0"/><circle cx="66" cy="56" r="5" fill="#ddd7f0"/><circle cx="16" cy="36" r="2" fill="#8d7b66"/><circle cx="26" cy="36" r="2" fill="#8d7b66"/><ellipse cx="12" cy="42" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="30" cy="42" rx="3" ry="2" fill="#f4b8b8"/><path d="M18 41 q3 3 6 0"/></svg>';
+var DUCK='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M12 46 Q10 34 24 34 L58 34 Q70 34 68 44 Q64 58 40 58 Q16 58 12 46 Z" fill="#f9e3a8"/><circle cx="30" cy="26" r="14" fill="#f9e3a8"/><path d="M24 30 Q30 35 36 30 Q30 26 24 30 Z" fill="#f5c9a8"/><circle cx="24" cy="23" r="2" fill="#8d7b66"/><circle cx="36" cy="23" r="2" fill="#8d7b66"/><ellipse cx="18" cy="29" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="42" cy="29" rx="3" ry="2" fill="#f4b8b8"/><path d="M40 42 Q54 38 56 48 Q48 54 40 50 Z" fill="#fff7ec"/></svg>';
+var STARCAR='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M26 40 Q30 26 43 26 H51 Q61 26 65 40 Z" fill="#f4d3da"/><path d="M8 47 Q8 40 16 40 H64 Q72 40 72 47 Z" fill="#f9e3a8"/><path d="M8 47 H72 V50 Q72 53 68 53 H12 Q8 53 8 50 Z" fill="#cfe0ee"/><path d="M32 38 Q35 30 43 30 H49 Q55 30 58 38 Z" fill="#fff7ec"/><circle cx="20" cy="55" r="7" fill="#ddd7f0"/><circle cx="60" cy="55" r="7" fill="#ddd7f0"/><path d="M66 8 l2.5 5 5 2.5 -5 2.5 -2.5 5 -2.5 -5 -5 -2.5 5 -2.5 Z" fill="#f9e3a8"/><circle cx="34" cy="44" r="2" fill="#8d7b66"/><circle cx="46" cy="44" r="2" fill="#8d7b66"/><ellipse cx="27" cy="47" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="53" cy="47" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 45 q3 3 6 0"/></svg>';
+var CARS=[CAR,FIRE,BUS,TRAIN,DUCK,STARCAR];
+var SUN='<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g stroke="#eccf92" stroke-width="3" stroke-linecap="round"><line x1="30" y1="3" x2="30" y2="11"/><line x1="30" y1="49" x2="30" y2="57"/><line x1="3" y1="30" x2="11" y2="30"/><line x1="49" y1="30" x2="57" y2="30"/><line x1="11" y1="11" x2="17" y2="17"/><line x1="43" y1="43" x2="49" y2="49"/><line x1="49" y1="11" x2="43" y2="17"/><line x1="17" y1="43" x2="11" y2="49"/></g><circle cx="30" cy="30" r="13" fill="#f9e3a8" stroke="#eccf92" stroke-width="3"/></svg>';
+var COIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>';
+var HANAMARU='<svg viewBox="0 0 80 80" fill="none" stroke="#e8937c" stroke-linecap="round" stroke-linejoin="round"><g stroke-width="4" fill="#fdf0e8"><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(45 40 40)"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(90 40 40)"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(135 40 40)"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(180 40 40)"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(225 40 40)"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(270 40 40)"/><ellipse cx="40" cy="13.5" rx="6.5" ry="11.5" transform="rotate(315 40 40)"/></g><path d="M40 40 a4 4 0 0 1 4 4 a8 8 0 0 1 -8 8 a12 12 0 0 1 -12 -12 a16 16 0 0 1 16 -16 a19 19 0 0 1 17 12" stroke-width="5"/></svg>';
+var SENTO='<svg viewBox="0 0 130 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="100" y="8" width="12" height="36" rx="4" fill="#c9a274"/><path d="M103 4 q3 -3 6 0 M101 0 q4 -4 8 0" stroke="#b8c2d8" fill="none" opacity=".9"/><rect x="12" y="42" width="106" height="52" rx="8" fill="#fff7ec"/><path d="M6 44 L65 16 L124 44 Z" fill="#a5c9e8"/><rect x="32" y="52" width="26" height="42" rx="4" fill="#cfe0ee"/><path d="M70 52 h36 v22 h-36 Z" fill="#f4d3da"/><text x="88" y="70" text-anchor="middle" font-size="17" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text><path d="M84 44 q3 -6 0 -10 M92 44 q3 -6 0 -10" stroke="#b8c2d8"/></svg>';
+var SA='<svg viewBox="0 0 130 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="40" width="80" height="54" rx="8" fill="#fff7ec"/><rect x="10" y="28" width="80" height="18" rx="9" fill="#a8cf9e"/><text x="50" y="42" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff" font-family="sans-serif">SA</text><rect x="22" y="56" width="20" height="20" rx="4" fill="#cfe0ee"/><rect x="56" y="56" width="20" height="38" rx="4" fill="#f0e3c8"/><rect x="98" y="52" width="20" height="34" rx="5" fill="#f4d3da"/><rect x="104" y="58" width="8" height="10" rx="2" fill="#fff7ec"/><path d="M118 56 q8 2 6 12 v10" fill="none"/><circle cx="46" cy="50" r="1.5" fill="#8d7b66"/></svg>';
+var BIKE='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><g transform="translate(80,0) scale(-1,1)"><circle cx="22" cy="56" r="13" fill="#ddd7f0"/><circle cx="58" cy="56" r="13" fill="#ddd7f0"/><path d="M22 56 L34 34 H52 L58 56 M34 34 L44 56 H22"/><path d="M30 28 H40 M34 28 V34"/><path d="M52 34 L48 24 H56"/><rect x="8" y="26" width="14" height="11" rx="3" fill="#f0e3c8"/><path d="M15 37 L26 44"/><path d="M44 30 h8" stroke="#f4b8b8" stroke-width="5"/></g></svg>';
+var MOON='<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><path d="M38 7a24 24 0 1 0 15 41a20 20 0 0 1 -15 -41Z" fill="#f4ecc8" stroke="#d8cfa0" stroke-width="3" stroke-linejoin="round"/></svg>';
+var YOEN='<svg viewBox="0 0 130 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><line x1="115" y1="4" x2="115" y2="40"/><path d="M115 6 h14 l-4 6 4 6 h-14 Z" fill="#f4b8b8"/><rect x="10" y="40" width="100" height="54" rx="8" fill="#fff7ec"/><path d="M4 42 L60 14 L116 42 Z" fill="#f5c9a8"/><circle cx="60" cy="34" r="8" fill="#fff7ec"/><path d="M60 30 v4 h3"/><rect x="24" y="56" width="18" height="18" rx="4" fill="#cfe0ee"/><rect x="78" y="56" width="18" height="18" rx="4" fill="#cfe0ee"/><rect x="50" y="58" width="20" height="36" rx="4" fill="#f0e3c8"/><circle cx="65" cy="77" r="1.5" fill="#8d7b66"/></svg>';
+/* タスクの絵(8種) */
+var ICONS={
+ kigae:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M28 14 L14 24 L20 36 L26 32 V66 H54 V32 L60 36 L66 24 L52 14 Q46 22 40 22 Q34 22 28 14 Z" fill="#cfe0ee"/><circle cx="40" cy="40" r="6" fill="#fff7ec"/><path d="M34 52 h12"/></svg>',
+ hamigaki:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 30 Q22 16 34 16 Q46 16 46 30 Q46 40 42 46 Q40 62 34 62 Q28 62 30 46 Q22 40 22 30 Z" fill="#fff7ec"/><rect x="50" y="8" width="10" height="40" rx="5" fill="#f4d3da"/><rect x="48" y="8" width="14" height="14" rx="4" fill="#cfe0ee"/><path d="M50 12 h10 M50 17 h10"/><circle cx="30" cy="30" r="2" fill="#8d7b66"/><circle cx="38" cy="30" r="2" fill="#8d7b66"/><path d="M31 37 q3 3 6 0"/></svg>',
+ gohan:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 38 H66 Q66 56 52 62 H28 Q14 56 14 38 Z" fill="#f4d3da"/><path d="M20 38 Q20 26 30 24 Q28 30 34 32 Q34 24 42 22 Q42 28 46 30 Q48 24 56 26 Q60 30 60 38" fill="#fff7ec"/><path d="M30 10 q4 4 0 8 M42 8 q4 4 0 8"/></svg>',
+ ofuro:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 40 H70 V46 Q70 60 56 62 H24 Q10 60 10 46 Z" fill="#cfe0ee"/><path d="M10 40 Q24 34 40 40 Q56 46 70 40" stroke="#8d7b66" fill="none"/><circle cx="26" cy="22" r="5" fill="#fff7ec"/><circle cx="38" cy="14" r="4" fill="#fff7ec"/><circle cx="48" cy="24" r="3.5" fill="#fff7ec"/><path d="M20 66 v4 M60 66 v4"/></svg>',
+ toilet:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 14 H50 V38 H22 Z" fill="#fff7ec"/><path d="M22 38 Q22 52 36 52 H44 Q58 52 58 40 V34 H50" fill="#cfe0ee"/><rect x="30" y="52" width="14" height="10" fill="#fff7ec"/><rect x="22" y="62" width="30" height="6" rx="3" fill="#f0e3c8"/><rect x="12" y="16" width="10" height="14" rx="3" fill="#f4d3da"/><path d="M14 20 q4 3 0 6"/></svg>',
+ youchien:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="18" y="24" width="44" height="44" rx="12" fill="#b7d9a8"/><path d="M28 24 Q28 12 40 12 Q52 12 52 24" fill="none"/><rect x="28" y="36" width="24" height="18" rx="6" fill="#fff7ec"/><path d="M18 40 Q12 42 14 50 M62 40 Q68 42 66 50"/></svg>',
+ kumon:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="18" width="40" height="50" rx="6" fill="#fff7ec"/><path d="M22 30 h24 M22 40 h24 M22 50 h16"/><path d="M48 62 L62 24 L70 27 L56 65 L46 68 Z" fill="#f9e3a8"/><path d="M62 24 L70 27 L72 21 Q70 16 65 18 Z" fill="#f4d3da"/></svg>',
+ oekaki:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 60 Q30 48 44 56 Q58 64 68 54"/><rect x="20" y="14" width="12" height="34" rx="5" fill="#f4b8b8"/><path d="M20 22 h12"/><rect x="40" y="10" width="12" height="38" rx="5" fill="#a5c9e8"/><path d="M40 18 h12"/></svg>',
+ katazuke:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="34" width="56" height="30" rx="6" fill="#f0e3c8"/><path d="M12 42 H68"/><circle cx="30" cy="26" r="9" fill="#f4d3da"/><rect x="44" y="18" width="16" height="16" rx="4" fill="#cfe0ee"/><path d="M40 8 q6 6 0 10" stroke="#a8cf9e"/></svg>',
+ nenne:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M46 8 a20 20 0 1 0 14 34 a16 16 0 0 1 -14 -34 Z" fill="#f9e3a8"/><rect x="10" y="48" width="60" height="18" rx="9" fill="#cfe0ee"/><rect x="10" y="44" width="24" height="12" rx="6" fill="#fff7ec"/><path d="M52 20 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/></svg>',
+ ehon:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M12 20 Q26 13 40 20 V62 Q26 55 12 62 Z" fill="#cfe0ee"/><path d="M68 20 Q54 13 40 20 V62 Q54 55 68 62 Z" fill="#f4d3da"/><path d="M19 28 Q28 24 34 27 M19 36 Q28 32 34 35 M46 27 Q54 24 61 28"/><path d="M52 34 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/></svg>'
+};
+/* 物語カード用の絵 */
+var GENKAN='<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="8" width="34" height="58" rx="4" fill="#f5c9a8"/><circle cx="42" cy="38" r="3" fill="#f9e3a8"/><rect x="12" y="66" width="56" height="8" rx="4" fill="#f0e3c8"/><path d="M54 58 q4 -6 10 -4 q4 2 3 6 q-6 3 -13 -2 Z" fill="#cfe0ee"/><path d="M56 50 q3 -5 8 -4 q4 1 3 5 q-5 3 -11 -1 Z" fill="#cfe0ee"/></svg>';
+var NOREN='<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 14 H72"/><path d="M12 14 h17 v34 q-8 4 -17 0 Z" fill="#a5c9e8"/><path d="M32 14 h16 v40 q-8 4 -16 0 Z" fill="#a5c9e8"/><path d="M51 14 h17 v34 q-9 4 -17 0 Z" fill="#a5c9e8"/><text x="40" y="42" text-anchor="middle" font-size="16" font-weight="bold" fill="#fff" font-family="sans-serif">ゆ</text><path d="M20 70 q6 -4 12 0 M46 70 q6 -4 12 0"/></svg>';
+var UKETSUKE='<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="44" width="64" height="26" rx="5" fill="#e8c99e"/><path d="M8 52 H72"/><circle cx="26" cy="26" r="10" fill="#f5c9a8"/><path d="M16 25 a10 10 0 0 1 20 0 c-2 -6 -6 -8 -10 -8 c-4 0 -8 2 -10 8 Z" fill="#8d7b66" fill-opacity=".55"/><circle cx="23" cy="27" r="1.5" fill="#8d7b66"/><circle cx="29" cy="27" r="1.5" fill="#8d7b66"/><path d="M24 31 q2 2 4 0"/><path d="M52 36 a8 8 0 0 1 16 0 Z" fill="#f9e3a8"/><circle cx="60" cy="26" r="2.5" fill="#f9e3a8"/><path d="M50 40 h20"/></svg>';
+var DATSUI='<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 38 H66 L60 68 H20 Z" fill="#e8c99e"/><path d="M20 46 H60 M18 56 H62"/><path d="M30 24 L24 28 L27 34 L30 32 V38 H50 V32 L53 34 L56 28 L50 24 Q45 29 40 29 Q35 29 30 24 Z" fill="#cfe0ee"/></svg>';
+var RAMUNE='<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="34" rx="20" ry="16" fill="#cfe0ee" stroke="#8d7b66" stroke-width="3"/><ellipse cx="30" cy="26" rx="20" ry="12" fill="#e8f1f8" stroke="#8d7b66" stroke-width="3"/><path d="M30 20 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff" stroke="#8d7b66" stroke-width="2"/></svg>';
+var VEH={ car:CAR, bike:BIKE, bus:BUS, train:TRAIN, fire:FIRE, duck:DUCK };
+var VEHNAMES={ car:"くるま", bike:"じてんしゃ", bus:"バス", train:"でんしゃ", fire:"しょうぼうしゃ", duck:"あひる" };
+var ICONKEYS=Object.keys(ICONS);
+
+/* ===== 共通財布(お湯コイン: ガチャと共有) ===== */
+function walletGet(){ try{ return Math.max(0, JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0); }catch(e){ return 0; } }
+function walletSet(n){ try{ localStorage.setItem("yucoin_wallet_v1", JSON.stringify({n:Math.max(0,n)})); }catch(e){} refreshCoin(); }
+function walletAdd(k){ walletSet(walletGet()+k); }
+function refreshCoin(){
+  q("coinN").textContent = walletGet();
+  var pc = q("pCoin"); if(pc) pc.textContent = walletGet();
+}
+
+/* ===== 状態 ===== */
+var DEFAULT_TASKS = {
+  asa: [ {id:"a1",name:"おきがえ",icon:"kigae"}, {id:"a2",name:"ごはん",icon:"gohan"},
+         {id:"a3",name:"はみがき",icon:"hamigaki"}, {id:"a4",name:"ほいくえんじゅんび",icon:"youchien"} ],
+  yoru:[ {id:"y1",name:"ごはん",icon:"gohan"}, {id:"y2",name:"おふろ",icon:"ofuro"},
+         {id:"y3",name:"はみがき",icon:"hamigaki"}, {id:"y4",name:"おかたづけ",icon:"katazuke"},
+         {id:"y5",name:"えほん",icon:"ehon"} ]
+};
+var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:true,
+  vehAsa:"bike", vehYoru:"car" };
+function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
+  ["date","tasks","done","timerMin","saOn","vehAsa","vehYoru"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
+load();
+if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+// 旧デフォルトの「ねんね」は「えほん」に移行(寝る直前は画面を見せない設計)
+(store.tasks.yoru||[]).forEach(function(t){ if(t.id==="y5" && t.name==="ねんね"){ t.name="えほん"; t.icon="ehon"; } });
+// うちは幼稚園ではなく保育園(2026-07-22修正)
+(store.tasks.asa||[]).forEach(function(t){ if(t.name==="ようちえんじゅんび"){ t.name="ほいくえんじゅんび"; } });
+// パパのおしたく(初期リスト。妻の指摘=バッグ準備は子どもとチェック)
+if (!store.papa) store.papa = { d:"", done:[] };
+var PAPA_TASKS = [
+  ["🥤","すいとう・コップを セット"],
+  ["📒","れんらくちょうを よむ(LINEの1画面)"],
+  ["🎒","ほいくえんバッグを こどもと チェック"],
+  ["👕","おきがえ ほじゅう(上下・肌着・靴下×3+ビニール袋)"],
+  ["🗑","ゴミだし(あさ)"]
+];
+function papaToday_(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function renderPapa(){
+  if (store.papa.d !== papaToday_()){ store.papa.d = papaToday_(); store.papa.done = []; save(); }
+  var pr = document.getElementById("papaRows"); pr.innerHTML = "";
+  var doneN = 0;
+  PAPA_TASKS.forEach(function(t, i){
+    var done = store.papa.done.indexOf(i) !== -1;
+    if (done) doneN++;
+    var row = document.createElement("div");
+    row.className = "prow" + (done ? " done" : "");
+    row.innerHTML = "<span>"+t[0]+"</span><span>"+t[1]+"</span><span class='chk'>"+(done?"✅":"⬜")+"</span>";
+    row.onclick = function(){
+      var ix = store.papa.done.indexOf(i);
+      if (ix === -1) store.papa.done.push(i); else store.papa.done.splice(ix,1);
+      save(); renderPapa();
+    };
+    pr.appendChild(row);
+  });
+  document.getElementById("papaCount").textContent = doneN + "/" + PAPA_TASKS.length;
+}
+function togglePapa(){
+  var c = document.getElementById("papaCard"), r = document.getElementById("papaRows");
+  var open = r.style.display !== "none";
+  r.style.display = open ? "none" : "block";
+  c.classList.toggle("open", !open);
+}
+renderPapa();
+
+/* ⭐おかわりチャレンジ: 常時表示しない。余裕がある日だけ⭐で普通のタスクと同じ
+   レール(車が走る)としてボードに追加される。翌日は自動で消える */
+if (!store.stretch) store.stretch = { d:"", on:false, extra:[] };
+if (!store.stretch.extra) store.stretch.extra = [];
+var STRETCH_TASKS = [ {id:"s0",name:"くもん",icon:"kumon",stretch:true},
+                      {id:"s1",name:"おえかき",icon:"oekaki",stretch:true},
+                      {id:"s2",name:"ごほんを よむ",icon:"ehon",stretch:true} ];
+function stretchList(){
+  if (store.stretch.d !== papaToday_()){ store.stretch = { d:papaToday_(), on:false, extra:[] }; save(); }
+  if (!store.stretch.on) return [];
+  var extras = (store.stretch.extra||[]).map(function(nm, i){
+    return { id:"sx"+i, name:nm, icon:"oekaki", stretch:true };
+  });
+  return STRETCH_TASKS.concat(extras);
+}
+/* 彼の「もっとふやしたい!」を受ける(その日限り・翌日自動で消える)
+   promptダイアログは環境によりブロックされるため、インラインのパネル方式(v2) */
+var STRETCH_SUGGEST = ["トイレ","リュックのじゅんび","ドライヤー","おてつだい","ぬりえ","ダンス","おふとんならべ"];
+function addStretchExtra_(nm){
+  if (!nm || !nm.trim()) return;
+  store.stretch.extra.push(nm.trim().slice(0, 12)); save();
+  blip(784,.1); blip(1047,.12,.12);
+  try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}
+  renderBoard();
+}
+function addStretchTask(){
+  var old = document.getElementById("stretchAddPanel");
+  if (old){ old.remove(); return; }
+  var p = document.createElement("div");
+  p.id = "stretchAddPanel";
+  var chips = STRETCH_SUGGEST.map(function(s){
+    return '<button class="sgchip" data-n="'+s+'">'+s+'</button>';
+  }).join("");
+  p.innerHTML = '<div class="sgttl">なにを ふやす?(きょうだけ)</div>'+
+    '<div class="sgchips">'+chips+'</div>'+
+    '<div class="sgfree"><input type="text" id="sgInput" maxlength="12" placeholder="じぶんで かく">'+
+    '<button class="sgok" id="sgOk">ついか!</button></div>';
+  document.getElementById("rows").appendChild(p);
+  p.querySelectorAll(".sgchip").forEach(function(b){
+    b.onclick = function(){ addStretchExtra_(b.dataset.n); };
+  });
+  document.getElementById("sgOk").onclick = function(){
+    addStretchExtra_(document.getElementById("sgInput").value);
+  };
+  p.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+document.getElementById("stretchBtn").onclick = function(){
+  if (store.stretch.d !== papaToday_()) store.stretch = { d:papaToday_(), on:false };
+  store.stretch.on = !store.stretch.on; save();
+  document.getElementById("stretchBtn").classList.toggle("on", store.stretch.on);
+  blip(659,.08);
+  renderBoard();
+};
+document.getElementById("stretchBtn").classList.toggle("on", store.stretch.on && store.stretch.d===papaToday_());
+if (store.maru === undefined) store.maru = 0;
+q("maruN").textContent = store.maru;
+var today = new Date().toISOString().slice(0,10);
+if (store.date !== today){ store.date = today; store.done = {asa:{},yoru:{}}; save(); }
+var mode = (new Date().getHours() < 11) ? "asa" : "yoru";
+
+var audioCtx=null;
+function q(id){ return document.getElementById(id); }
+function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  var o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t||"square"; o.frequency.value=f;
+  g.gain.setValueAtTime(.06,audioCtx.currentTime+(w||0)); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
+  o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
+function fanfare(){ [523,659,784,1047].forEach(function(f,i){ blip(f,.16,i*.11,"triangle"); }); try{navigator.vibrate&&navigator.vibrate([60,40,120]);}catch(e){} }
+function confetti(n){ var cols=["#f4d3da","#cfe0ee","#d3e7cb","#f9e3a8","#ddd7f0","#f5c9a8"];
+  for(var i=0;i<n;i++){ var c=document.createElement("div");
+    c.style.cssText="position:fixed;width:10px;height:14px;border-radius:3px;z-index:80;pointer-events:none;left:"+
+    (Math.random()*100)+"vw;top:-20px;background:"+cols[i%cols.length]+
+    ";animation:cfall "+(1.4+Math.random()*1.4)+"s linear "+(Math.random()*.4)+"s forwards";
+    document.body.appendChild(c); setTimeout(function(el){return function(){el.remove();};}(c),3400); }
+  if(!q("cfallstyle")){ var st=document.createElement("style"); st.id="cfallstyle";
+    st.textContent="@keyframes cfall{to{transform:translateY(110vh) rotate(720deg)}}"; document.head.appendChild(st); } }
+function toast(t){ var e=q("toast"); e.textContent=t; e.style.display="block";
+  clearTimeout(e._t); e._t=setTimeout(function(){ e.style.display="none"; },2600); }
+
+/* ===== おしたくボード ===== */
+function renderBoard(newId){
+  q("modeAsa").className = mode==="asa"?"on":"";
+  q("modeYoru").className = mode==="yoru"?"on":"";
+  q("boardTitle").textContent = (mode==="asa"?"☀ あさ":"🌙 よる") + "の おしたく";
+  var wrap=q("rows"); wrap.innerHTML="";
+  var list=store.tasks[mode].concat(stretchList());
+  list.forEach(function(t,i){
+    var done = !!store.done[mode][t.id];
+    var d=document.createElement("div");
+    d.className="rrow"+(done?" done":"")+(t.stretch?" stretchrow":"");
+    d.innerHTML='<div class="picto">'+(ICONS[t.icon]||ICONS.kigae)+'<div class="pname">'+t.name+'</div></div>'+
+      '<div class="rail"><div class="line"></div><div class="cap l"></div><div class="cap r"></div>'+
+      '<div class="charm">'+CARS[i%CARS.length]+'</div>'+
+      '<div class="rmaru'+(t.id===newId?" fresh":"")+'">'+HANAMARU+'</div></div>';
+    if(!done) d.onclick=function(){ completeTask(t,d); };
+    wrap.appendChild(d);
+  });
+  if (store.stretch.on){
+    var ar=document.createElement("div");
+    ar.className="rrow stretchrow"; ar.style.cssText="justify-content:center;border-style:dashed;cursor:pointer";
+    ar.innerHTML='<span style="font-weight:bold;color:#a5842e;font-size:15px;padding:6px 0">＋ じぶんで ふやす(きょうだけ)</span>';
+    ar.onclick=addStretchTask;
+    wrap.appendChild(ar);
+  }
+  renderBoardNeko(list);
+  var all=list.length>0 && list.every(function(t){ return store.done[mode][t.id]; });
+  q("perfect").querySelector(".inner").textContent = mode==="asa"
+    ? "🎉 ぜんぶできた! いってらっしゃい!"
+    : "🌙 ぜんぶできた! えほんをよんだら、おふとんで おやすみなさい";
+  q("perfect").style.display = all? "block":"none";
+}
+var rolling=false;
+function completeTask(t,row){
+  if(rolling || store.done[mode][t.id]) return; rolling=true;
+  var charm=row.querySelector(".charm");
+  charm.classList.add("go","driving");
+  charm.style.left="calc(100% - 52px)";
+  blip(440,.1,0); blip(494,.1,.5); blip(523,.1,1); blip(587,.1,1.5);
+  try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}
+  setTimeout(function(){
+    store.done[mode][t.id]=true; save();
+    blip(784,.12); blip(1047,.16,.12,"triangle");
+    // お湯コインが飛んでいく
+    var fc=document.createElement("div");
+    fc.className="flycoin"; fc.innerHTML=COIN;
+    var r=row.getBoundingClientRect(), b=q("coinBadge").getBoundingClientRect();
+    fc.style.left=(r.right-50)+"px"; fc.style.top=r.top+"px";
+    document.body.appendChild(fc);
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      fc.style.left=b.left+"px"; fc.style.top=b.top+"px"; fc.style.transform="scale(.5)"; fc.style.opacity=".5";
+    });});
+    setTimeout(function(){ fc.remove(); walletAdd(1);
+      q("coinBadge").classList.add("pulse");
+      setTimeout(function(){ q("coinBadge").classList.remove("pulse"); },500);
+      blip(1175,.1,0,"triangle");
+    },820);
+    // ねこのごはんキューに+1(できた!=ごはん。neko_house.htmlが受け取る)
+    try{ localStorage.setItem("neko_feed_v1",
+      String(parseInt(localStorage.getItem("neko_feed_v1")||"0",10)+1)); }catch(e){}
+    // はなまる累計(シール帳のデジタル版。長期目標への2段目)
+    store.maru = (store.maru||0) + 1; save();
+    q("maruN").textContent = store.maru;
+    q("maruBadge").classList.add("pulse");
+    setTimeout(function(){ q("maruBadge").classList.remove("pulse"); },600);
+    if (store.maru % 25 === 0){
+      setTimeout(function(){ toast("🌸 はなまる "+store.maru+"こ たっせい! かぞくで おいわいしよう!"); confetti(40); fanfare(); },1200);
+    }
+    renderBoard(t.id); // 今できた行だけ、はなまるが回って出る
+    if(!t.stretch){
+      var list=store.tasks[mode];
+      var all=list.every(function(x){ return store.done[mode][x.id]; });
+      if(all){ setTimeout(function(){ fanfare(); confetti(30); },900); }
+    }
+    rolling=false;
+  }, 2100);
+}
+q("modeAsa").onclick=function(){ mode="asa"; renderBoard(); updateTrip(); };
+q("modeYoru").onclick=function(){ mode="yoru"; renderBoard(); updateTrip(); };
+
+/* ===== ボードのねこ: 次のタスクを教える。21時以降は寝る(はやく終える動機) ===== */
+var NEKO_AWAKE='<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M82 62 q16 -6 12 -24" fill="none" stroke-width="6"/><ellipse cx="52" cy="60" rx="30" ry="18" fill="#f0e3c8"/><ellipse cx="52" cy="66" rx="14" ry="9" fill="#fff7ec" stroke="none"/><circle cx="32" cy="34" r="20" fill="#f0e3c8"/><path d="M18 22 L13 6 L28 13 Z" fill="#f0e3c8"/><path d="M46 22 L51 6 L36 13 Z" fill="#f0e3c8"/><path d="M19 19 L16 10 L25 14 Z" fill="#f4d3da" stroke="none"/><path d="M45 19 L48 10 L39 14 Z" fill="#f4d3da" stroke="none"/><circle cx="26" cy="32" r="3.2" fill="#5a4a38" stroke="none"/><circle cx="38" cy="32" r="3.2" fill="#5a4a38" stroke="none"/><circle cx="27.2" cy="30.8" r="1.1" fill="#fff" stroke="none"/><circle cx="39.2" cy="30.8" r="1.1" fill="#fff" stroke="none"/><ellipse cx="32" cy="37" rx="2.2" ry="1.6" fill="#e8937c" stroke="none"/><path d="M29 40 q3 3 6 0" fill="none" stroke-width="2.2"/><circle cx="17" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="47" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><path d="M12 32 h-8 M13 37 h-8 M52 32 h8 M51 37 h8" stroke-width="1.8"/></svg>';
+var NEKO_SLEEP='<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="50" cy="48" r="26" fill="#f0e3c8"/><path d="M26 60 q26 16 50 2" fill="none" stroke-width="6"/><path d="M32 26 L28 13 L40 19 Z" fill="#f0e3c8"/><path d="M47 24 L52 12 L41 17 Z" fill="#f0e3c8"/><path d="M33 24 L31 16 L38 20 Z" fill="#f4d3da" stroke="none"/><path d="M45 22 L48 15 L42 18 Z" fill="#f4d3da" stroke="none"/><path d="M31 36 q3 2.6 6 0 M45 36 q3 2.6 6 0" fill="none" stroke-width="2.4"/><path d="M39 42 q3 2.4 6 0" fill="none" stroke-width="2"/><circle cx="27" cy="42" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="55" cy="42" r="3.5" fill="#f4b8b8" stroke="none"/><text x="76" y="26" font-size="14" fill="#a5c9e8" stroke="none" font-weight="bold">z</text><text x="84" y="16" font-size="10" fill="#a5c9e8" stroke="none" font-weight="bold">z</text></svg>';
+function nekoName_(){
+  try{ var n = JSON.parse(localStorage.getItem("neko_v1")||"{}").name; return n || "ねこ"; }catch(e){ return "ねこ"; }
+}
+q("bnFace").onclick = function(){ location.href = "neko_house.html"; };
+function renderBoardNeko(list){
+  var el = q("boardNeko"); if (!el) return;
+  var h = new Date().getHours();
+  var name = nekoName_();
+  var sleeping = (h >= 21 || h < 5);
+  var next = list.filter(function(t){ return !store.done[mode][t.id]; })[0];
+  if (sleeping){
+    q("bnFace").innerHTML = NEKO_SLEEP;
+    q("bnMsg").textContent = name + "は ねちゃった… zzz(あしたは 9じまでに おわらせて あそぼう)";
+  } else if (!next){
+    q("bnFace").innerHTML = NEKO_AWAKE;
+    q("bnMsg").textContent = "ぜんぶ できたね! " + name + "も おなかいっぱい🍚";
+  } else {
+    q("bnFace").innerHTML = NEKO_AWAKE;
+    q("bnMsg").textContent = "つぎは「" + next.name + "」だよ! できたら " + name + "の ごはんに なるんだ";
+  }
+}
+
+/* ===== おでかけタイマー(モード連動: あさ=保育園 / よる=おふろ) ===== */
+var timer=null, totalSec=0, elapsed=0, stage=0, atSA=false;
+var bonus=0, bonusSec=0, bonusTimer=null, interiorTimers=[];
+var DECAY = 180; // コイン1枚がへるまでの秒数
+q("tsun").innerHTML=SUN;
+q("tcar2").innerHTML=CAR;
+
+function goalInfo(){
+  return mode==="asa"
+    ? { svg: YOEN, name:"ほいくえん", emoji:"🎒" }
+    : { svg: SENTO, name:"おふろ", emoji:"♨" };
+}
+/* 目的地・SAアイコン・ボタン文言を即時反映 */
+function curVeh(){ return VEH[mode==="asa" ? store.vehAsa : store.vehYoru] || CAR; }
+function updateTrip(){
+  var g = goalInfo();
+  // 夜モードの見た目(部屋も空も)
+  document.body.classList.toggle("night", mode==="yoru");
+  q("tscene").classList.toggle("night", mode==="yoru");
+  q("tsun").innerHTML = mode==="yoru" ? MOON : SUN;
+  q("goalIco").innerHTML = g.svg;
+  q("saIco").innerHTML = store.saOn ? SA : "";
+  q("saIco").style.display = store.saOn ? "block" : "none";
+  if(!timer) q("tcar2").innerHTML = curVeh();
+  if(!timer){
+    q("dest").innerHTML = store.saOn ? SA : g.svg;
+    setDest(0);
+    q("startBtn").innerHTML = g.emoji+" "+g.name+"へ しゅっぱつ!("+store.timerMin+"ぷん)";
+    q("tbig").textContent = store.saOn
+      ? "しゅっぱつすると SAによって "+g.name+"へ むかうよ"
+      : "しゅっぱつすると "+g.name+"へ むかうよ";
+  }
+}
+function setDest(p){ var s=.22+.78*p;
+  q("dest").style.transform="scale("+s+")";
+  q("dest").style.opacity=.75+.25*p; }
+function sceneRun(on){ var sc=q("tscene");
+  if(on){ sc.classList.add("running"); q("tcar2").classList.add("driving"); }
+  else { sc.classList.remove("running"); q("tcar2").classList.remove("driving"); } }
+function carReset(){ var c=q("tcar2");
+  c.style.transition="none"; c.style.left="14%"; c.style.transform="scaleX(-1)";
+  void c.offsetWidth; c.style.transition=""; }
+
+q("startBtn").onclick=function(){
+  if(timer) return;
+  totalSec=store.timerMin*60; elapsed=0; stage=0; atSA=false;
+  carReset();
+  q("startBtn").style.display="none"; q("doneBtn").style.display="none"; q("gachaLink").style.display="none";
+  q("bonusRow").style.display="none"; hideBanner(); hideStory();
+  q("tcar2").innerHTML = curVeh();
+  var g=goalInfo();
+  q("dest").innerHTML = store.saOn? SA : g.svg; setDest(0);
+  q("tscene").classList.remove("evening");
+  q("tbig").textContent = (store.saOn? "まずはSAへ! そのあと ":"")+g.name+"へ むかうよ!";
+  sceneRun(true);
+  blip(660,.1); blip(880,.1,.12);
+  timer=setInterval(tick,1000);
+};
+function tick(){
+  elapsed++;
+  var g=goalInfo();
+  var half = store.saOn? Math.floor(totalSec/2) : totalSec;
+  q("tfill").style.width=(elapsed/totalSec*100)+"%";
+  if (store.saOn && stage===0){
+    setDest(Math.min(1, elapsed/half));
+    if (elapsed>=half && !atSA){
+      atSA=true; sceneRun(false);
+      showBanner("⛽🍙 SAとうちゃく! ごはんときゅうけい!");
+      q("tbig").textContent="SAで ガソリン(ごはん)を まんたんに!";
+      blip(659,.15,0,"triangle"); blip(784,.2,.15,"triangle");
+      try{navigator.vibrate&&navigator.vibrate(60);}catch(e){}
+      setTimeout(function(){
+        if(!timer) return;
+        hideBanner(); stage=1;
+        q("dest").innerHTML=g.svg; setDest(0);
+        q("tbig").textContent="つぎは "+g.name+"へ むかうよ!";
+        sceneRun(true);
+      }, 6000);
+    }
+  } else {
+    var s0 = store.saOn? half:0;
+    setDest(Math.min(1,(elapsed-s0)/Math.max(1,totalSec-s0)));
+  }
+  if (elapsed>=totalSec-60 && elapsed<totalSec) q("tscene").classList.add("evening");
+  if (elapsed>=totalSec){
+    clearInterval(timer); timer=null;
+    sceneRun(false); setDest(1);
+    arrive();
+  }
+}
+function showBanner(t){ var b=q("tbanner"); b.textContent=t; b.style.display="block"; }
+function hideBanner(){ q("tbanner").style.display="none"; }
+function showStory(svg, cap){
+  var s=q("story");
+  s.querySelector(".ssvg").innerHTML=svg;
+  s.querySelector(".scap").textContent=cap;
+  s.style.display="block";
+  s.classList.remove("pop"); void s.offsetWidth; s.classList.add("pop");
+}
+function hideStory(){ q("story").style.display="none"; }
+
+function arrive(){
+  var g=goalInfo();
+  // 建物のよこの駐車場に停める(車がスッと寄って小さくなる)
+  var c=q("tcar2");
+  c.style.left="56%"; c.style.transform="scaleX(-1) scale(.78)";
+  showBanner("🅿 "+g.name+"の ちゅうしゃじょうに とめたよ!");
+  blip(392,.15); blip(523,.15,.15); blip(659,.2,.3);
+  // 建物の中へすすむ物語(イラストカードが順番に出る)
+  interiorTimers.forEach(clearTimeout); interiorTimers=[]; hideStory();
+  var steps = mode==="asa"
+    ? [[8,ICONS.gohan,"ごはんを たべよう"],[30,ICONS.kigae,"おきがえ しよう"],
+       [52,ICONS.youchien,"リュックと くつを そろえよう"],[74,GENKAN,"げんかんへ! ラムネを もらおう"]]
+    : [[20,NOREN,"せんとうの なかへ"],[40,UKETSUKE,"うけつけ「こんにちは!」"],[60,DATSUI,"だついじょ! ふくを ぬごう"]];
+  steps.forEach(function(st){
+    interiorTimers.push(setTimeout(function(){
+      hideBanner(); showStory(st[1], st[2]);
+      blip(700,.08,0,"triangle"); blip(880,.1,.1,"triangle");
+      try{navigator.vibrate&&navigator.vibrate(40);}catch(e){}
+    }, st[0]*1000));
+  });
+  // ボーナス: あさ=ラムネ / よる=お湯コイン。減りかけの1個にメーターが付く
+  bonus=3; bonusSec=0;
+  var bIco = mode==="asa" ? RAMUNE : COIN;
+  var row=q("bonusRow"); row.innerHTML=""; row.style.display="flex";
+  for(var i=0;i<3;i++){
+    row.insertAdjacentHTML("beforeend",'<div class="bc">'+bIco+'<div class="meter"><i></i></div></div>');
+  }
+  q("doneBtn").style.display="inline-block";
+  vidLocked=false;
+  q("lastVidBtn").style.display="inline-block";
+  updateBonusMsg();
+  clearInterval(bonusTimer);
+  bonusTimer=setInterval(function(){
+    bonusSec++;
+    var frac = 1 - (bonusSec % DECAY)/DECAY;
+    var bcs = row.querySelectorAll(".bc");
+    var active = bonus-1;
+    if (active>=0 && bcs[active]) bcs[active].querySelector(".meter i").style.width=(frac*100)+"%";
+    if (bonusSec % DECAY === 0 && bonus>0){
+      bonus--;
+      if (bcs[bonus]) bcs[bonus].classList.add("lost");
+      blip(330,.15,0,"triangle");
+      try{navigator.vibrate&&navigator.vibrate(80);}catch(e){}
+    }
+    updateBonusMsg();
+  },1000);
+}
+/* 「さいごのどうが」を えらんだ瞬間にコインを守る
+   (決断へのごほうび。動画の長さでペナルティを受けさせない) */
+var vidLocked=false;
+q("lastVidBtn").onclick=function(){
+  if (bonus<=0){ q("lastVidBtn").style.display="none"; return; }
+  vidLocked=true;
+  clearInterval(bonusTimer);
+  document.querySelectorAll("#bonusRow .bc:not(.lost) .meter i").forEach(function(m){ m.style.width="100%"; });
+  var unit = mode==="asa" ? "ラムネ "+bonus+"こ" : "お湯コイン "+bonus+"まい";
+  q("tbig").textContent = "えらべて えらい! "+unit+"は まもられたよ✨ みおわったら「おしまい」してね";
+  showBanner("🎬 さいごのどうが! "+unit+" キープ!");
+  blip(523,.1); blip(659,.1,.12); blip(784,.15,.24);
+  try{navigator.vibrate&&navigator.vibrate([40,40,40]);}catch(e){}
+  q("lastVidBtn").style.display="none";
+  setTimeout(hideBanner, 4000);
+};
+
+function updateBonusMsg(){
+  if (vidLocked) return;
+  var unit = mode==="asa" ? "ラムネ +"+bonus+"こ" : "お湯コイン +"+bonus+"まい";
+  if (bonus<=0){
+    q("tbig").textContent = mode==="asa"
+      ? "ラムネはなくなったけど、おしまいできたら えらい!"
+      : "コインはなくなったけど、おしまいできたら えらい!";
+    return;
+  }
+  var left = DECAY - (bonusSec % DECAY);
+  var mm = Math.floor(left/60), ss = ("0"+left%60).slice(-2);
+  q("tbig").textContent="いま おしまいすると "+unit+"! (つぎにへるまで "+mm+":"+ss+")";
+}
+q("doneBtn").onclick=function(){
+  clearInterval(bonusTimer);
+  interiorTimers.forEach(clearTimeout); interiorTimers=[];
+  hideStory();
+  if (mode!=="asa") walletAdd(bonus); // 朝のラムネは現物支給(げんかんで)
+  q("doneBtn").style.display="none";
+  q("lastVidBtn").style.display="none";
+  vidLocked=false;
+  q("startBtn").style.display="inline-block";
+  q("gachaLink").style.display = mode==="asa" ? "none" : "inline-block";
+  hideBanner();
+  q("tbig").textContent = mode==="asa"
+    ? (bonus>0 ? "おわれた! げんかんで ラムネ "+bonus+"こ もらおう🍬"
+               : "おわれてえらい! あしたは はやおわりで ラムネゲット!")
+    : (bonus>0 ? "じぶんでおわれた! お湯コイン+"+bonus+"まい! ガチャであそぼう♨"
+               : "じぶんでおわれてえらい! つぎは はやおわりで コインゲット!");
+  q("bonusRow").style.display="none";
+  q("tfill").style.width="0%";
+  carReset();
+  q("tscene").classList.remove("evening");
+  updateTrip();
+  fanfare(); confetti(22);
+};
+
+/* ===== タブ ===== */
+q("tabTask").onclick=function(){ q("taskPage").style.display="block"; q("ticketPage").style.display="none";
+  q("tabTask").classList.add("on"); q("tabTicket").classList.remove("on"); };
+q("tabTicket").onclick=function(){ q("taskPage").style.display="none"; q("ticketPage").style.display="block";
+  q("tabTicket").classList.add("on"); q("tabTask").classList.remove("on"); };
+
+/* ===== せってい ===== */
+(function(){
+  var t=null, btn=q("parentBtn"), g=q("pbGauge");
+  function down(){ g.style.transition="width 1.5s linear"; g.style.width="100%";
+    t=setTimeout(function(){ g.style.transition="none"; g.style.width="0"; openParent(); },1500); }
+  function up(){ clearTimeout(t); g.style.transition="width .2s"; g.style.width="0"; }
+  btn.addEventListener("mousedown",down); btn.addEventListener("mouseup",up); btn.addEventListener("mouseleave",up);
+  btn.addEventListener("touchstart",down,{passive:true}); btn.addEventListener("touchend",up);
+})();
+function renderEditor(m){
+  var wrap = q(m==="asa"?"editAsa":"editYoru"); wrap.innerHTML="";
+  store.tasks[m].forEach(function(t,i){
+    var d=document.createElement("div"); d.className="tedit";
+    d.innerHTML='<div class="ico">'+(ICONS[t.icon]||ICONS.kigae)+'</div>';
+    var inp=document.createElement("input"); inp.value=t.name; inp.maxLength=12;
+    inp.onchange=function(){ t.name=this.value||"タスク"; save(); renderBoard(); };
+    var up=document.createElement("button"); up.textContent="↑";
+    up.onclick=function(){ if(i>0){ var a=store.tasks[m]; a.splice(i-1,0,a.splice(i,1)[0]); save(); renderEditor(m); renderBoard(); } };
+    var dn=document.createElement("button"); dn.textContent="↓";
+    dn.onclick=function(){ var a=store.tasks[m]; if(i<a.length-1){ a.splice(i+1,0,a.splice(i,1)[0]); save(); renderEditor(m); renderBoard(); } };
+    var del=document.createElement("button"); del.textContent="🗑";
+    del.onclick=function(){ store.tasks[m]=store.tasks[m].filter(function(x){return x.id!==t.id;}); save(); renderEditor(m); renderBoard(); };
+    d.querySelector(".ico").onclick=function(){
+      var idx=(ICONKEYS.indexOf(t.icon)+1)%ICONKEYS.length;
+      t.icon=ICONKEYS[idx]; save();
+      this.innerHTML=ICONS[t.icon]; renderBoard();
+    };
+    d.appendChild(inp); d.appendChild(up); d.appendChild(dn); d.appendChild(del);
+    wrap.appendChild(d);
+  });
+}
+function addTask(m){
+  store.tasks[m].push({ id: "t"+Date.now(), name:"あたらしいタスク", icon: ICONKEYS[store.tasks[m].length % ICONKEYS.length] });
+  save(); renderEditor(m); renderBoard();
+}
+function openParent(){
+  refreshCoin();
+  renderEditor("asa"); renderEditor("yoru");
+  document.querySelectorAll("#parent [data-min]").forEach(function(b){
+    b.className=(parseInt(b.dataset.min,10)===store.timerMin)?"on":"";
+    b.onclick=function(){ store.timerMin=parseInt(b.dataset.min,10); save();
+      document.querySelectorAll("#parent [data-min]").forEach(function(x){x.className="";});
+      b.className="on"; updateTrip(); };
+  });
+  var st=q("saToggle");
+  st.textContent = store.saOn? "SAあり":"SAなし";
+  st.className = store.saOn? "on":"";
+  st.onclick=function(){ store.saOn=!store.saOn; save();
+    st.textContent=store.saOn?"SAあり":"SAなし"; st.className=store.saOn?"on":"";
+    updateTrip(); };
+  renderVeh("asa"); renderVeh("yoru");
+  q("parent").style.display="flex";
+}
+function renderVeh(m){
+  var wrap=q(m==="asa"?"vehAsaRow":"vehYoruRow");
+  wrap.innerHTML = m==="asa" ? "☀あさ:&nbsp;" : "🌙よる:&nbsp;";
+  Object.keys(VEH).forEach(function(k){
+    var b=document.createElement("button"); b.type="button";
+    b.textContent=VEHNAMES[k];
+    var cur = m==="asa" ? store.vehAsa : store.vehYoru;
+    b.className = cur===k ? "on" : "";
+    b.onclick=function(){
+      if(m==="asa") store.vehAsa=k; else store.vehYoru=k;
+      save(); renderVeh(m); updateTrip();
+    };
+    wrap.appendChild(b);
+  });
+}
+function grantCoin(k){ walletAdd(k); toast("お湯コイン "+(k>0?"+":"")+k+" (いま"+walletGet()+"まい)"); blip(1047,.1,0,"triangle"); }
+function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard(); toast("きょうの「できた」をリセットしました"); }
+function closeParent(){ q("parent").style.display="none"; }
+
+/* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
+
+q("coinIco").innerHTML=COIN;
+refreshCoin();
+renderBoard();
+updateTrip();
+</script>
+</body>
+</html>

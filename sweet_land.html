@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>スウィートランド(プロトタイプ)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
+  background:linear-gradient(#fbe3ec,#fdf0e8 45%,#f5ecd7);display:flex;flex-direction:column;align-items:center;padding:12px}
+#hud{display:flex;gap:8px;align-items:center;margin-bottom:8px;width:min(430px,96vw)}
+.badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:6px 14px;
+  font-size:14px;font-weight:bold;color:#7a6146;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 rgba(141,123,102,.2)}
+.badge svg{width:20px;height:20px}
+#title{flex:1;text-align:center;font-size:13px;font-weight:bold;color:#c96a86;letter-spacing:.1em}
+
+/* 筐体 */
+#cab{position:relative;width:min(430px,96vw)}
+#body{background:#f27a96;border:5px solid #b8506a;border-radius:26px;padding:14px 14px 10px;
+  box-shadow:0 10px 22px rgba(184,80,106,.35)}
+#glassWrap{position:relative;width:100%;aspect-ratio:1/0.92;overflow:visible}
+#glass{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.75),rgba(230,242,250,.25) 46%,rgba(210,228,240,.35));
+  border:4px solid #8d7b66;overflow:hidden}
+#table{position:absolute;left:6%;top:8%;width:88%;height:84%;border-radius:50%;
+  background:radial-gradient(circle,#fdf0e8 58%,#f4d3da 59%,#f4d3da);border:4px solid #d9a3b2}
+#poleSign{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);z-index:6;
+  background:#f2d98a;border:3px solid #b8506a;border-radius:12px;padding:5px 12px;
+  font-size:12px;font-weight:bold;color:#b8506a;letter-spacing:.12em;text-align:center;line-height:1.3;
+  box-shadow:0 4px 8px rgba(141,123,102,.3)}
+.candy{position:absolute;width:34px;pointer-events:none}
+.candy svg{width:100%;height:auto;display:block;filter:drop-shadow(0 2px 2px rgba(141,123,102,.3))}
+.candy.fall{transition:all .9s cubic-bezier(.4,0,.7,1);opacity:0}
+/* アーム(上から押し出す) */
+#arm{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:46px;z-index:7;transition:top .45s ease-in}
+#arm.push{top:24%}
+#arm svg{width:100%;height:auto;display:block}
+/* 落とし口(手前) */
+#chute{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);width:120px;height:34px;
+  background:#b8506a;border:4px solid #8d3a50;border-radius:0 0 18px 18px;z-index:8;
+  color:#fff;font-size:11px;font-weight:bold;text-align:center;line-height:28px;letter-spacing:.2em}
+#tray{display:flex;align-items:center;justify-content:space-between;background:#fffaf0;
+  border:3px solid #c9ae87;border-radius:14px;padding:8px 14px;margin-top:14px}
+#tray .cnt{font-size:15px;font-weight:bold;color:#b06a86}
+#tray svg{width:26px;height:26px}
+#msg{width:min(430px,96vw);text-align:center;font-size:13.5px;font-weight:bold;color:#7a6146;
+  background:#fffaf0;border:2.5px solid #c9ae87;border-radius:999px;padding:8px 10px;margin:10px 0 8px}
+#pushBtn{width:min(430px,96vw);font-family:inherit;font-size:17px;font-weight:bold;border:none;border-radius:16px;
+  padding:16px 0;cursor:pointer;background:#f2a2bc;color:#fff;box-shadow:0 5px 0 #d584a0}
+#pushBtn:active{transform:translateY(4px);box-shadow:0 1px 0 #d584a0}
+.confetti{position:fixed;width:10px;height:14px;border-radius:3px;z-index:60;pointer-events:none;animation:cfall linear forwards}
+@keyframes cfall{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="badge" id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
+  <div id="title">🍭 スウィートランド</div>
+  <a class="badge" href="ofuro_gacha.html" style="text-decoration:none">♨</a>
+</div>
+
+<div id="cab"><div id="body">
+  <div id="glassWrap">
+    <div id="glass">
+      <div id="table"></div>
+    </div>
+    <div id="poleSign">SWEET<br>LAND</div>
+    <div id="arm"><svg viewBox="0 0 46 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="18" y="0" width="10" height="34" rx="4" fill="#f2d98a"/><path d="M8 34 H38 L34 52 H12 Z" fill="#cfe0ee"/><path d="M12 52 Q23 58 34 52" fill="none"/></svg></div>
+    <div id="chute">GET!</div>
+  </div>
+  <div id="tray"><span>とれた おかし</span><span id="trayIco"></span><span class="cnt"><span id="got">0</span> こ</span></div>
+</div></div>
+
+<div id="msg">コイン1まいで アームがおかしを おしだすよ</div>
+<button id="pushBtn">🪙 おしだす!(コイン1まい)</button>
+
+<script>
+/* ===== 財布(共有) ===== */
+function wGet(){ try{ return Math.max(0, JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0); }catch(e){ return 0; } }
+function wSet(n){ try{ localStorage.setItem("yucoin_wallet_v1", JSON.stringify({n:Math.max(0,n)})); }catch(e){} refreshCoin(); }
+function refreshCoin(){ q("coinN").textContent = wGet(); }
+var COIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>';
+
+/* ===== おかし(小さいやつ3種) ===== */
+var CANDIES=[
+ '<svg viewBox="0 0 40 40" fill="none" stroke="#8d7b66" stroke-width="2.5" stroke-linejoin="round"><circle cx="20" cy="20" r="9" fill="#f4b8c9"/><path d="M11 20 L3 14 L5 20 L3 26 Z" fill="#f4b8c9"/><path d="M29 20 L37 14 L35 20 L37 26 Z" fill="#f4b8c9"/><path d="M16 16 q4 -2 8 0" stroke="#fff"/></svg>',
+ '<svg viewBox="0 0 40 40" fill="none" stroke="#8d7b66" stroke-width="2.5" stroke-linejoin="round"><circle cx="20" cy="20" r="12" fill="#e8c99e"/><circle cx="20" cy="20" r="4" fill="#fdf0e8"/><path d="M12 14 l3 2 M26 12 l-2 3 M28 24 l-3 1" stroke="#f4b8c9"/></svg>',
+ '<svg viewBox="0 0 40 40" fill="none" stroke="#8d7b66" stroke-width="2.5" stroke-linejoin="round"><rect x="8" y="12" width="24" height="16" rx="5" fill="#cfe0ee"/><path d="M8 20 H32" stroke="#fff" stroke-width="4"/><path d="M14 12 V28 M26 12 V28" stroke="#fff" stroke-width="2"/></svg>'
+];
+
+var audioCtx=null;
+function q(id){ return document.getElementById(id); }
+function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  var o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t||"triangle"; o.frequency.value=f;
+  g.gain.setValueAtTime(.05,audioCtx.currentTime+(w||0)); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
+  o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
+function fanfare(){ [523,659,784,1047].forEach(function(f,i){ blip(f,.16,i*.11); }); try{navigator.vibrate&&navigator.vibrate([60,40,120]);}catch(e){} }
+function confetti(n){ var cols=["#f4b8c9","#cfe0ee","#d3e7cb","#f9e3a8"];
+  for(var i=0;i<n;i++){ var c=document.createElement("div"); c.className="confetti";
+    c.style.cssText+="left:"+(Math.random()*100)+"vw;top:-20px;background:"+cols[i%cols.length]+
+    ";animation-duration:"+(1.4+Math.random()*1.2)+"s"; document.body.appendChild(c);
+    setTimeout(function(el){return function(){el.remove();};}(c),3000); } }
+
+/* ===== テーブル上のおかし(極座標。回転が落とし口まで運ぶ) ===== */
+var got=0;
+try{ got=JSON.parse(localStorage.getItem("sweetland_v1")||"0"); }catch(e){}
+q("got").textContent=got;
+
+var candies=[]; // {r, th, el, falling}
+var TOP=-Math.PI/2, BOTTOM=Math.PI/2;
+function tableGeom(){
+  var t=q("table");
+  return { w:t.clientWidth, h:t.clientHeight, cx:t.clientWidth/2, cy:t.clientHeight/2,
+           edge:t.clientWidth*0.40 };
+}
+function spawnCandy(rMin,rMax){
+  var g=tableGeom();
+  var c={ r: rMin + Math.random()*(rMax-rMin),
+          th: Math.random()*Math.PI*2,
+          el: document.createElement("div"), falling:false };
+  c.el.className="candy";
+  c.el.innerHTML=CANDIES[Math.floor(Math.random()*CANDIES.length)];
+  q("table").appendChild(c.el);
+  candies.push(c);
+}
+for(var i=0;i<14;i++) spawnCandy(20, tableGeom().edge*0.95);
+
+function angDiff(a,b){ var d=a-b; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI; return Math.abs(d); }
+
+/* 回転+落下判定 */
+function frame(){
+  var g=tableGeom();
+  candies.forEach(function(c){
+    if(c.falling) return;
+    c.th += 0.0035; // テーブルがゆっくり回る
+    var x=g.cx + Math.cos(c.th)*c.r;
+    var y=g.cy + Math.sin(c.th)*c.r;
+    c.el.style.left=(x-17)+"px";
+    c.el.style.top=(y-17)+"px";
+    // ふち近く+落とし口(手前±35°)なら落ちる!
+    if (c.r > g.edge*0.92 && angDiff(c.th, BOTTOM) < 0.61){
+      c.falling=true;
+      c.el.classList.add("fall");
+      c.el.style.top=(y+120)+"px";
+      blip(659,.1); blip(523,.12,.1);
+      setTimeout(function(){ collect(c); },900);
+    }
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function collect(c){
+  c.el.remove();
+  candies=candies.filter(function(x){ return x!==c; });
+  got++; q("got").textContent=got;
+  try{ localStorage.setItem("sweetland_v1", JSON.stringify(got)); }catch(e){}
+  q("msg").textContent="🎉 おかしが おちてきた! ("+got+"こめ)";
+  fanfare(); confetti(14);
+  spawnCandy(20, tableGeom().edge*0.5); // 補充は中央寄りに
+}
+
+/* アームで押し出す(奥のおかしがふちへ→回転が運んでくれる) */
+var pushing=false;
+q("pushBtn").onclick=function(){
+  if(pushing) return;
+  if(wGet()<1){ q("msg").textContent="お湯コインがないよ。おしたくで ためてね"; blip(300,.2); return; }
+  wSet(wGet()-1);
+  pushing=true;
+  q("arm").classList.add("push");
+  blip(392,.15); blip(440,.15,.15);
+  try{navigator.vibrate&&navigator.vibrate(50);}catch(e){}
+  setTimeout(function(){
+    var g=tableGeom(), pushed=0;
+    candies.forEach(function(c){
+      if(c.falling) return;
+      // アームの下(奥側±40°)にいるおかしを外へ押す
+      if (angDiff(c.th, TOP) < 0.7){
+        c.r = Math.min(g.edge*0.97, c.r + 26 + Math.random()*14);
+        pushed++;
+      }
+    });
+    blip(587,.1); blip(659,.1,.1);
+    q("msg").textContent = pushed>0
+      ? "おしたよ! ぐるっとまわって GET!のあなに くるかな…"
+      : "アームのしたに おかしがなかった! タイミングをみて もういっかい";
+    setTimeout(function(){ q("arm").classList.remove("push"); pushing=false; },300);
+  },500);
+};
+
+q("coinIco").innerHTML=COIN;
+q("trayIco").innerHTML=CANDIES[0];
+refreshCoin();
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
+/* おうちのひと用: コインバッジ1.5秒ながおしで+3 */
+(function(){
+  var t=null, b=q("coinBadge");
+  function down(){ t=setTimeout(function(){ wSet(wGet()+3);
+    q("msg").textContent="🪙 おうちのひとから コイン+3!"; blip(1047,.12); },1500); }
+  function up(){ clearTimeout(t); }
+  b.addEventListener("mousedown",down); b.addEventListener("mouseup",up); b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
+})();
+</script>
+</body>
+</html>

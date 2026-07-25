@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>おふろUFOキャッチャー(プロトタイプ)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
+  background:linear-gradient(#454f6e,#57628a 45%,#6a688a);display:flex;flex-direction:column;align-items:center;padding:12px}
+#hud{display:flex;gap:8px;align-items:center;margin-bottom:10px;width:min(440px,96vw)}
+.badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:6px 14px;
+  font-size:14px;font-weight:bold;color:#7a6146;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.badge svg{width:20px;height:20px}
+#title{flex:1;text-align:center;font-size:15px;font-weight:bold;color:#fffaf0;letter-spacing:.15em}
+/* 筐体 */
+#cab{width:min(440px,96vw);background:#f4d3da;border:5px solid #8d7b66;border-radius:22px;padding:10px;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+#glass{position:relative;height:300px;background:linear-gradient(rgba(214,232,244,.55),rgba(240,248,252,.35));
+  border:4px solid #8d7b66;border-radius:14px;overflow:hidden}
+#rail{position:absolute;top:10px;left:8px;right:8px;height:8px;background:#c9ae87;border:2.5px solid #8d7b66;border-radius:6px}
+#unit{position:absolute;top:14px;left:20px;width:56px;z-index:5}
+#box{width:34px;height:20px;margin:0 auto;background:#f9e3a8;border:3px solid #8d7b66;border-radius:6px}
+#rope{width:3.5px;background:#8d7b66;margin:0 auto;height:8px}
+#claw{width:44px;margin:0 auto;display:block}
+.arm{transform-origin:22px 6px;transition:transform .3s}
+#claw.closed .armL{transform:rotate(18deg)}
+#claw.closed .armR{transform:rotate(-18deg)}
+.prize{position:absolute;bottom:6px;width:62px;z-index:2}
+.prize svg{width:100%;height:auto;display:block}
+#chute{position:absolute;left:8px;bottom:0;width:74px;height:56px;background:rgba(141,123,102,.25);
+  border:3px dashed #8d7b66;border-radius:10px 10px 0 0;display:flex;align-items:flex-end;justify-content:center;
+  font-size:10px;font-weight:bold;color:#6b5a44;padding-bottom:3px}
+#msg{text-align:center;font-size:13.5px;font-weight:bold;color:#7a6146;background:#fffaf0;
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 10px;margin:10px 0}
+#btnRow{display:flex;gap:10px}
+#btnRow button{flex:1;font-family:inherit;font-size:16px;font-weight:bold;border:none;border-radius:16px;
+  padding:16px 0;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+#playBtn{background:#a8cf9e;color:#fff;box-shadow:0 5px 0 #83a878!important}
+#moveBtn{background:#f2b28c;color:#fff;box-shadow:0 5px 0 #d5946e!important;display:none}
+#moveBtn:active{transform:translateY(4px);box-shadow:0 1px 0 #d5946e!important}
+/* コレクション */
+#coll{width:min(440px,96vw);background:#fffaf0;border:3px solid #c9ae87;border-radius:16px;padding:10px 12px;margin-top:12px}
+#coll h4{font-size:12px;color:#a58868;margin-bottom:6px}
+#crow{display:flex;gap:8px;flex-wrap:wrap}
+.citem{width:44px;position:relative}
+.citem svg{width:100%;height:auto}
+.citem.no{opacity:.2;filter:grayscale(1)}
+.citem .cnt{position:absolute;right:-4px;bottom:-2px;background:#f2b28c;color:#fff;font-size:9px;
+  font-weight:bold;border-radius:999px;padding:0 5px}
+.confetti{position:fixed;width:10px;height:14px;border-radius:3px;z-index:60;pointer-events:none;animation:cfall linear forwards}
+@keyframes cfall{to{transform:translateY(110vh) rotate(720deg)}}
+#flyP{position:fixed;width:60px;z-index:70;pointer-events:none;transition:all .8s cubic-bezier(.4,-0.1,.6,1);display:none}
+#flyP svg{width:100%;height:auto}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="badge" id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
+  <div id="title">UFOキャッチャー</div>
+  <a class="badge" href="ofuro_gacha.html" style="text-decoration:none">♨ ガチャへ</a>
+</div>
+
+<div id="cab">
+  <div id="glass">
+    <div id="rail"></div>
+    <div id="unit">
+      <div id="box"></div><div id="rope"></div>
+      <svg id="claw" viewBox="0 0 44 34" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linecap="round">
+        <path class="arm armL" d="M22 6 Q10 10 8 24 Q8 28 12 28" />
+        <path class="arm armR" d="M22 6 Q34 10 36 24 Q36 28 32 28" />
+        <circle cx="22" cy="6" r="4.5" fill="#f9e3a8"/>
+      </svg>
+    </div>
+    <div id="chute">GET!</div>
+  </div>
+  <div id="msg">お湯コイン1まいで あそべるよ</div>
+  <div id="btnRow">
+    <button id="playBtn">🪙 コインをいれる</button>
+    <button id="moveBtn">▶ おしてるあいだ うごく / はなすと おちる!</button>
+  </div>
+</div>
+
+<div id="coll"><h4>とったもの コレクション</h4><div id="crow"></div></div>
+<div id="flyP"></div>
+
+<script>
+/* ===== 財布(共有) ===== */
+function wGet(){ try{ return Math.max(0, JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0); }catch(e){ return 0; } }
+function wSet(n){ try{ localStorage.setItem("yucoin_wallet_v1", JSON.stringify({n:Math.max(0,n)})); }catch(e){} refreshCoin(); }
+function refreshCoin(){ q("coinN").textContent = wGet(); }
+
+/* ===== 景品(ぬいぐるみ画風) ===== */
+var COIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>';
+var PRIZES=[
+ {id:"bear", name:"くまさん", svg:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="26" cy="20" r="8" fill="#e8c99e"/><circle cx="54" cy="20" r="8" fill="#e8c99e"/><circle cx="40" cy="36" r="20" fill="#e8c99e"/><ellipse cx="40" cy="64" rx="17" ry="13" fill="#e8c99e"/><circle cx="34" cy="34" r="2" fill="#8d7b66"/><circle cx="46" cy="34" r="2" fill="#8d7b66"/><ellipse cx="40" cy="41" rx="6" ry="4.5" fill="#fff7ec"/><circle cx="40" cy="40" r="1.8" fill="#8d7b66"/></svg>'},
+ {id:"usagi", name:"うさぎさん", svg:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="30" cy="14" rx="7" ry="13" fill="#f4d3da"/><ellipse cx="50" cy="14" rx="7" ry="13" fill="#f4d3da"/><circle cx="40" cy="38" r="19" fill="#fdf0e8"/><ellipse cx="40" cy="64" rx="15" ry="12" fill="#fdf0e8"/><circle cx="34" cy="36" r="2" fill="#8d7b66"/><circle cx="46" cy="36" r="2" fill="#8d7b66"/><ellipse cx="29" cy="42" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="51" cy="42" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 43 q3 3 6 0"/></svg>'},
+ {id:"duck", name:"あひるちゃん", svg:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M12 50 Q10 38 24 38 L58 38 Q70 38 68 48 Q64 62 40 62 Q16 62 12 50 Z" fill="#f9e3a8"/><circle cx="30" cy="30" r="14" fill="#f9e3a8"/><path d="M24 34 Q30 39 36 34 Q30 30 24 34 Z" fill="#f5c9a8"/><circle cx="24" cy="27" r="2" fill="#8d7b66"/><circle cx="36" cy="27" r="2" fill="#8d7b66"/></svg>'},
+ {id:"gpotato", name:"きんのじゃがいも", svg:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 46 Q12 30 28 26 Q40 18 54 26 Q68 30 66 48 Q64 62 44 64 Q20 64 14 46 Z" fill="#f9e3a8"/><path d="M64 12 l3 6 6 3 -6 3 -3 6 -3 -6 -6 -3 6 -3 Z" fill="#fff7ec"/><circle cx="32" cy="42" r="2" fill="#8d7b66"/><circle cx="48" cy="42" r="2" fill="#8d7b66"/><path d="M37 48 q3 3 6 0"/></svg>'},
+ {id:"crown", name:"おうかん", svg:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M16 60 L12 28 L27 41 L40 20 L53 41 L68 28 L64 60 Z" fill="#f9e3a8"/><circle cx="12" cy="24" r="3.5" fill="#f4d3da"/><circle cx="40" cy="17" r="3.5" fill="#ddd7f0"/><circle cx="68" cy="24" r="3.5" fill="#cfe0ee"/></svg>'},
+ {id:"star", name:"おほしさま", svg:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><path d="M40 8 L48 30 L72 30 L53 44 L60 68 L40 54 L20 68 L27 44 L8 30 L32 30 Z" fill="#f9e3a8"/><circle cx="34" cy="36" r="2" fill="#8d7b66"/><circle cx="46" cy="36" r="2" fill="#8d7b66"/><path d="M37 43 q3 3 6 0" stroke-linecap="round"/></svg>'}
+];
+
+var coll={};
+try{ coll=JSON.parse(localStorage.getItem("ufo_v1")||"{}"); }catch(e){}
+function saveColl(){ try{ localStorage.setItem("ufo_v1", JSON.stringify(coll)); }catch(e){} }
+
+var audioCtx=null;
+function q(id){ return document.getElementById(id); }
+function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  var o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t||"square"; o.frequency.value=f;
+  g.gain.setValueAtTime(.06,audioCtx.currentTime+(w||0)); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
+  o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
+function fanfare(){ [523,659,784,1047].forEach(function(f,i){ blip(f,.16,i*.11,"triangle"); }); try{navigator.vibrate&&navigator.vibrate([60,40,120]);}catch(e){} }
+function confetti(n){ var cols=["#f4d3da","#cfe0ee","#d3e7cb","#f9e3a8","#ddd7f0"];
+  for(var i=0;i<n;i++){ var c=document.createElement("div"); c.className="confetti";
+    c.style.cssText+="left:"+(Math.random()*100)+"vw;top:-20px;background:"+cols[i%cols.length]+
+    ";animation-duration:"+(1.4+Math.random()*1.2)+"s"; document.body.appendChild(c);
+    setTimeout(function(el){return function(){el.remove();};}(c),3000); } }
+
+/* ===== 台の上の景品(3つ並ぶ・とられたら補充) ===== */
+var floor=[]; // {id, x, el}
+function spawnPrizes(){
+  document.querySelectorAll(".prize").forEach(function(e){ e.remove(); });
+  floor=[];
+  var W=q("glass").clientWidth;
+  var xs=[Math.round(W*.34), Math.round(W*.58), Math.round(W*.80)];
+  xs.forEach(function(x){
+    var p=PRIZES[Math.floor(Math.random()*PRIZES.length)];
+    var el=document.createElement("div");
+    el.className="prize"; el.innerHTML=p.svg;
+    el.style.left=(x-31)+"px";
+    q("glass").appendChild(el);
+    floor.push({id:p.id, x:x, el:el});
+  });
+}
+function renderColl(){
+  var row=q("crow"); row.innerHTML="";
+  PRIZES.forEach(function(p){
+    var n=coll[p.id]||0;
+    var d=document.createElement("div");
+    d.className="citem"+(n>0?"":" no");
+    d.innerHTML=p.svg+(n>1?'<span class="cnt">×'+n+'</span>':'');
+    row.appendChild(d);
+  });
+}
+
+/* ===== ゲーム進行 ===== */
+var state="idle", unitX=20, dir=1, moveTimer=null;
+q("coinIco").innerHTML=COIN;
+refreshCoin(); spawnPrizes(); renderColl();
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
+/* おうちのひと用: コインバッジ1.5秒ながおしで+3(テスト・特別支給) */
+(function(){
+  var t=null, b=q("coinBadge");
+  function down(){ t=setTimeout(function(){ wSet(wGet()+3);
+    q("msg").textContent="🪙 おうちのひとから コイン+3!"; blip(1047,.12,0,"triangle"); },1500); }
+  function up(){ clearTimeout(t); }
+  b.addEventListener("mousedown",down); b.addEventListener("mouseup",up); b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
+})();
+
+q("playBtn").onclick=function(){
+  if(state!=="idle") return;
+  if(wGet()<1){ q("msg").textContent="お湯コインがないよ。おしたくやガチャの画面でためてね"; blip(300,.2); return; }
+  wSet(wGet()-1);
+  state="ready";
+  q("playBtn").style.display="none";
+  q("moveBtn").style.display="block";
+  q("msg").textContent="ボタンをおしてるあいだ UFOがうごくよ!";
+  blip(880,.1); blip(1175,.1,.12);
+};
+
+(function(){
+  var btn=q("moveBtn");
+  function down(e){
+    if(state!=="ready") return;
+    state="moving";
+    moveTimer=setInterval(function(){
+      var W=q("glass").clientWidth;
+      unitX+=dir*3.2;
+      if(unitX>W-70){ unitX=W-70; dir=-1; }
+      if(unitX<12){ unitX=12; dir=1; }
+      q("unit").style.left=unitX+"px";
+      if(Math.round(unitX)%5===0) blip(560,.03);
+    },16);
+    e.preventDefault();
+  }
+  function up(){
+    if(state!=="moving") return;
+    clearInterval(moveTimer);
+    drop();
+  }
+  btn.addEventListener("mousedown",down); document.addEventListener("mouseup",up);
+  btn.addEventListener("touchstart",down,{passive:false}); document.addEventListener("touchend",up);
+})();
+
+function drop(){
+  state="dropping";
+  q("moveBtn").style.display="none";
+  q("msg").textContent="おりていくよ…!";
+  var rope=q("rope");
+  rope.style.transition="height 1.1s ease-in";
+  rope.style.height="190px";
+  blip(440,.2,0,"triangle"); blip(392,.2,.3,"triangle"); blip(349,.2,.6,"triangle");
+  setTimeout(function(){
+    q("claw").classList.add("closed");
+    blip(300,.1);
+    // 判定: つかみ位置(unitX+28)に近い景品(±34px)
+    var cx=unitX+28, hit=null;
+    floor.forEach(function(f){ if(Math.abs(f.x-cx)<34 && !hit) hit=f; });
+    setTimeout(function(){ lift(hit); },400);
+  },1200);
+}
+function lift(hit){
+  var rope=q("rope");
+  rope.style.transition="height 1s ease-out";
+  rope.style.height="8px";
+  if(hit){
+    // 景品がUFOにくっついて上がる
+    hit.el.style.transition="all 1s ease-out";
+    hit.el.style.bottom="200px";
+    hit.el.style.left=(unitX-3)+"px";
+    blip(523,.1,0); blip(659,.12,.15); blip(784,.15,.3);
+    setTimeout(function(){ carry(hit); },1050);
+  } else {
+    blip(262,.25,0,"triangle");
+    q("msg").textContent="おしい! むりょうで もういっかい!";
+    setTimeout(function(){
+      q("claw").classList.remove("closed");
+      state="ready";
+      q("moveBtn").style.display="block";
+    },600);
+  }
+}
+function carry(hit){
+  state="carrying";
+  // 取り出し口へ移動
+  var move=setInterval(function(){
+    unitX-=4;
+    q("unit").style.left=unitX+"px";
+    hit.el.style.transition="none";
+    hit.el.style.left=(unitX-3)+"px";
+    if(unitX<=30){
+      clearInterval(move);
+      q("claw").classList.remove("closed");
+      hit.el.style.transition="all .5s ease-in";
+      hit.el.style.bottom="4px";
+      blip(392,.1,0);
+      setTimeout(function(){ win(hit); },550);
+    }
+  },16);
+}
+function win(hit){
+  var p=PRIZES.filter(function(x){return x.id===hit.id;})[0];
+  coll[p.id]=(coll[p.id]||0)+1; saveColl();
+  // コレクションに飛んでいく
+  var fp=q("flyP"), r=hit.el.getBoundingClientRect(), c=q("coll").getBoundingClientRect();
+  fp.innerHTML=p.svg;
+  fp.style.transition="none"; fp.style.left=r.left+"px"; fp.style.top=r.top+"px";
+  fp.style.opacity="1"; fp.style.transform="scale(1)"; fp.style.display="block";
+  hit.el.remove();
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    fp.style.transition="all .8s cubic-bezier(.4,-0.1,.6,1)";
+    fp.style.left=(c.left+20)+"px"; fp.style.top=(c.top+10)+"px";
+    fp.style.transform="scale(.4) rotate(360deg)"; fp.style.opacity=".6";
+  });});
+  setTimeout(function(){ fp.style.display="none"; renderColl(); },820);
+  q("msg").textContent="🎉 "+p.name+" ゲット!";
+  fanfare(); confetti(24);
+  setTimeout(function(){
+    spawnPrizes();
+    state="idle";
+    q("playBtn").style.display="block";
+    q("msg").textContent="お湯コイン1まいで もういっかい あそべるよ";
+  },1600);
+}
+</script>
+</body>
+</html>
