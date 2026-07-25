@@ -76,7 +76,14 @@ body.night #clkDigits{color:#f5ead3}
 
 /* ===== おでかけタイマー(パララックス走行) ===== */
 #ticketPage{display:none;max-width:480px;margin:10px auto 40px;padding:0 14px}
-#ringWrap{position:relative;width:190px;margin:6px auto 10px}
+#ringWrap{position:relative;width:200px;margin:6px auto 10px;background:rgba(255,250,240,.94);
+  border:3px solid #c9ae87;border-radius:26px;padding:8px}
+#saIco{display:none!important}
+#minWheel{display:inline-block;height:108px;width:64px;overflow-y:auto;scroll-snap-type:y mandatory;
+  background:#fff;border:2.5px solid #c9ae87;border-radius:12px}
+#minWheel .mw{height:36px;line-height:36px;text-align:center;scroll-snap-align:center;
+  font-weight:bold;font-size:16px;color:#5a4a38}
+#minWheel .sp{height:36px}
 #ringSvg{width:100%;height:auto;display:block}
 #ringDigits{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:42px;font-weight:bold;color:#5a4a38;font-variant-numeric:tabular-nums}
@@ -130,8 +137,8 @@ body.night #clkDigits{color:#f5ead3}
 #goalIco{position:absolute;right:-4px;top:-20px;width:30px}
 #saIco svg,#goalIco svg{width:100%;height:auto;display:block}
 #tcar2{transition:left 2.5s ease,transform 2.5s ease}
-#maruBadge{background:rgba(255,250,240,.95);border:2.5px solid #d9a3b2;border-radius:999px;padding:6px 12px;
-  font-size:13.5px;font-weight:bold;color:#b86a7c;display:flex;align-items:center;gap:4px}
+#maruBadge{display:none;background:rgba(255,250,240,.95);border:2.5px solid #d9a3b2;border-radius:999px;padding:6px 12px;
+  font-size:13.5px;font-weight:bold;color:#b86a7c;align-items:center;gap:4px}
 #maruBadge.pulse{animation:mpulse .5s ease}
 @keyframes mpulse{50%{transform:scale(1.18)}}
 #stretchBtn{font-size:13px;padding:5px 10px;border-radius:999px;border:2px solid #dcc06e;background:#fdf6dd;cursor:pointer;opacity:.85}
@@ -156,9 +163,15 @@ body.night #clkDigits{color:#f5ead3}
   color:#7a6146;border-radius:999px;padding:8px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer}
 /* ボードのねこ+とけい(吹き出し廃止。ねこタップでねこのおうちへ。21時以降は丸まって寝る) */
 #boardNeko{display:flex;align-items:center;justify-content:space-between;width:100%;margin:4px 0 12px;padding:0 4px}
-#bnFace{flex:0 0 84px;cursor:pointer}
+#bnFace{flex:0 0 84px;cursor:pointer;animation:bnstroll 16s ease-in-out infinite}
 #bnFace svg{width:84px;height:auto;display:block}
 #bnFace:active svg{transform:scale(.93)}
+@keyframes bnstroll{0%{transform:translateX(0) scaleX(-1)}
+  45%{transform:translateX(92px) scaleX(-1)}
+  50%{transform:translateX(92px) scaleX(1)}
+  95%,100%{transform:translateX(0) scaleX(1)}}
+#nekoNow{width:100%;text-align:center;font-size:12.5px;font-weight:bold;color:#a58868;margin:-6px 0 8px}
+body.night #nekoNow{color:#d8cdb4}
 #bnFace.joy svg{animation:bnjump .45s ease 2}
 @keyframes bnjump{50%{transform:translateY(-10px)}}
 #bnClock{display:flex;align-items:center;gap:10px}
@@ -232,6 +245,7 @@ body.night #clkDigits{color:#f5ead3}
         <circle cx="50" cy="50" r="4" fill="#e8937c" stroke="#8d7b66" stroke-width="2"/>
       </svg><span id="clkDigits"></span></div>
     </div>
+    <div id="nekoNow"></div>
     <div id="board">
       <div id="boardTitle">きょうの おしたく</div>
       <div id="boardHead"><span>◀ まだ</span><span>できた! ▶</span></div>
@@ -287,10 +301,12 @@ body.night #clkDigits{color:#f5ead3}
     <button onclick="grantCoin(1)">+1(がんばったね)</button>
     <button onclick="grantCoin(-1)">-1</button></div>
   <h3>タイマー</h3>
-  <div class="row">
-    <button data-min="5">5分</button><button data-min="10">10分</button>
-    <button data-min="15">15分</button><button data-min="20">20分</button>
-    <button id="saToggle">SAあり</button>
+  <div class="row" style="align-items:center;gap:10px">じかん:
+    <div id="minWheel"></div><b><span id="minVal">10</span> ぷん</b></div>
+  <div class="row" style="flex-wrap:wrap">⏰ おしまいのおしらせ:
+    <button data-nt="0">なし</button><button data-nt="30">30びょう前</button>
+    <button data-nt="60">1ぷん前</button><button data-nt="180">3ぷん前</button>
+    <button data-nt="300">5ぷん前</button>
   </div>
   <h3>⭐ おかわりの きほんセット(星ボタンで出るタスク)</h3>
   <div id="editStretch"></div>
@@ -366,10 +382,10 @@ var DEFAULT_TASKS = {
          {id:"y3",name:"はみがき",icon:"hamigaki"}, {id:"y4",name:"おかたづけ",icon:"katazuke"},
          {id:"y5",name:"えほん",icon:"ehon"} ]
 };
-var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:true,
+var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:false, notifySec:60,
   vehAsa:"bike", vehYoru:"car" };
 function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
-  ["date","tasks","done","timerMin","saOn","vehAsa","vehYoru"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
 load();
 if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
@@ -581,7 +597,7 @@ function renderBoard(newId){
     ar.onclick=addStretchTask;
     wrap.appendChild(ar);
   }
-  renderBoardNeko(list);
+  renderBoardNeko();
   renderPapa();
   var all=list.length>0 && list.every(function(t){ return store.done[mode][t.id]; });
   q("perfect").querySelector(".inner").textContent = mode==="asa"
@@ -656,11 +672,37 @@ function nekoName_(){
   try{ var n = JSON.parse(localStorage.getItem("neko_v1")||"{}").name; return n || "ねこ"; }catch(e){ return "ねこ"; }
 }
 q("bnFace").onclick = function(){ location.href = "neko_house.html"; };
-function renderBoardNeko(list){
+/* ごはん中(おわん付き) */
+var NEKO_EAT = NEKO_AWAKE.replace('</svg>',
+  '<ellipse cx="16" cy="72" rx="13" ry="5" fill="#a5c9e8"/><ellipse cx="16" cy="69" rx="9" ry="3" fill="#e8c99e" stroke-width="2"/></svg>');
+/* 保育園スタイル(むらさきの帽子+みどりのリュック) */
+var NEKO_SCHOOL = NEKO_AWAKE.replace('</svg>',
+  '<path d="M13 20 q19 -16 38 0 l-3 7 q-16 -9 -32 0 Z" fill="#c9b8e8"/><path d="M12 21 h40" stroke-width="2.5"/><rect x="58" y="30" width="20" height="22" rx="7" fill="#b7d9a8"/><path d="M60 36 q-12 10 -22 12" stroke-width="4" stroke="#7fae6f"/></svg>');
+/* ねこの1日(理想的な生活時間のベンチマーク。「ねこが◯◯してるから一緒に◯◯しよう」用) */
+function nekoNow_(){
+  var d = new Date(), t = d.getHours()*60 + d.getMinutes(), wd = d.getDay();
+  var wk = (wd >= 1 && wd <= 5);
+  if (t >= 1245 || t < 420) return { img: NEKO_SLEEP,  cap: "すやすや ねてるよ(よるは 20:45に ねるよ)" };
+  if (t < 450)  return { img: NEKO_AWAKE,  cap: "おきたよ! のびのび〜" };
+  if (t < 470)  return { img: NEKO_EAT,    cap: "あさごはん もぐもぐちゅう" };
+  if (t < 480)  return { img: NEKO_AWAKE,  cap: "トイレに いってるよ🚽" };
+  if (t < 510)  return wk ? { img: NEKO_SCHOOL, cap: "みじたく! ぼうしと リュックで しゅっぱつ" }
+                          : { img: NEKO_AWAKE,  cap: "おうちで のんびりしてるよ" };
+  if (t < 1095) return wk ? { img: NEKO_SCHOOL, cap: "ほいくえんで がんばってるよ" }
+                          : { img: NEKO_AWAKE,  cap: "おうちで あそんでるよ" };
+  if (t < 1125) return { img: NEKO_EAT,    cap: "ゆうごはん もぐもぐちゅう" };
+  if (t < 1170) return { img: NEKO_AWAKE,  cap: "おふろちゅう♨ ぴかぴかに なるよ" };
+  if (t < 1200) return { img: NEKO_AWAKE,  cap: "ドライヤーで かみを かわかしてるよ" };
+  if (t < 1215) return { img: NEKO_AWAKE,  cap: "ボールで あそんでるよ⚽" };
+  if (t < 1230) return { img: NEKO_AWAKE,  cap: "えほんと くもんの じかん📖" };
+  return { img: NEKO_AWAKE, cap: "トイレに いって ねんねの じゅんびだよ🚽" };
+}
+function renderBoardNeko(){
   var el = q("boardNeko"); if (!el) return;
-  var h = new Date().getHours();
-  var sleeping = (h >= 21 || h < 5);
-  q("bnFace").innerHTML = sleeping ? NEKO_SLEEP : NEKO_AWAKE;
+  var now = nekoNow_();
+  q("bnFace").innerHTML = now.img;
+  var cap = q("nekoNow");
+  if (cap) cap.textContent = nekoName_() + "は いま: " + now.cap;
   updateClock_();
 }
 /* 時計(園の「時計を意識する」方針に合わせて常時表示) */
@@ -673,7 +715,7 @@ function updateClock_(){
   var d = document.getElementById("clkDigits");
   if (d) d.textContent = hh + ":" + ("0" + mm).slice(-2);
 }
-setInterval(updateClock_, 20000);
+setInterval(function(){ renderBoardNeko(); }, 30000);
 /* できたらねこが一緒に喜ぶ(ごはん制は廃止→ごはんはお湯コインで買う) */
 function nekoCelebrate(){
   var f = q("bnFace");
@@ -716,16 +758,14 @@ function updateTrip(){
   q("tscene").classList.toggle("night", mode==="yoru");
   q("tsun").innerHTML = mode==="yoru" ? MOON : SUN;
   q("goalIco").innerHTML = g.svg;
-  q("saIco").innerHTML = store.saOn ? SA : "";
-  q("saIco").style.display = store.saOn ? "block" : "none";
   if(!timer) q("tcar2").innerHTML = curVeh();
   if(!timer){
-    q("dest").innerHTML = store.saOn ? SA : g.svg;
+    q("dest").innerHTML = g.svg;
     setDest(0);
-    q("startBtn").innerHTML = g.emoji+" "+g.name+"へ しゅっぱつ!("+store.timerMin+"ぷん)";
-    q("tbig").textContent = store.saOn
-      ? "しゅっぱつすると SAによって "+g.name+"へ むかうよ"
-      : "しゅっぱつすると "+g.name+"へ むかうよ";
+    q("startBtn").innerHTML = "▶ しゅっぱつ!";
+    q("tbig").textContent = "タイマーを はじめると " + g.name + "へ むかうよ";
+    q("ringDigits").textContent = store.timerMin + ":00";
+    q("ringFg").style.strokeDashoffset = "0";
   }
 }
 function setDest(p){ var s=.22+.78*p;
@@ -758,31 +798,20 @@ q("startBtn").onclick=function(){
 function tick(){
   elapsed++;
   var g=goalInfo();
-  var half = store.saOn? Math.floor(totalSec/2) : totalSec;
   q("tfill").style.width=(elapsed/totalSec*100)+"%";
   // 標準タイマー風の残り時間表示(メイン表示。車はサブ演出)
   var remain = Math.max(0, totalSec - elapsed);
   q("ringDigits").textContent = Math.floor(remain/60) + ":" + ("0" + remain % 60).slice(-2);
   q("ringFg").style.strokeDashoffset = String(553 * (elapsed / totalSec));
-  if (store.saOn && stage===0){
-    setDest(Math.min(1, elapsed/half));
-    if (elapsed>=half && !atSA){
-      atSA=true; sceneRun(false);
-      showBanner("⛽🍙 SAとうちゃく! ごはんときゅうけい!");
-      q("tbig").textContent="SAで ガソリン(ごはん)を まんたんに!";
-      blip(659,.15,0,"triangle"); blip(784,.2,.15,"triangle");
-      try{navigator.vibrate&&navigator.vibrate(60);}catch(e){}
-      setTimeout(function(){
-        if(!timer) return;
-        hideBanner(); stage=1;
-        q("dest").innerHTML=g.svg; setDest(0);
-        q("tbig").textContent="つぎは "+g.name+"へ むかうよ!";
-        sceneRun(true);
-      }, 6000);
-    }
-  } else {
-    var s0 = store.saOn? half:0;
-    setDest(Math.min(1,(elapsed-s0)/Math.max(1,totalSec-s0)));
+  setDest(Math.min(1, elapsed/totalSec));
+  // おしまいへのお知らせ(SA廃止→マインドセット告知。何分前かは設定で選択)
+  if (store.notifySec > 0 && remain === store.notifySec){
+    var lbl = remain >= 60 ? Math.floor(remain/60) + "ぷん" : remain + "びょう";
+    showBanner("⏰ あと" + lbl + "で おしまい!");
+    q("tbig").textContent = "あと" + lbl + "! さいごのどうがは えらんだ?";
+    blip(659,.15,0,"triangle"); blip(784,.2,.15,"triangle");
+    try{navigator.vibrate&&navigator.vibrate([60,40,60]);}catch(e){}
+    setTimeout(hideBanner, 5000);
   }
   if (elapsed>=totalSec-60 && elapsed<totalSec) q("tscene").classList.add("evening");
   if (elapsed>=totalSec){
@@ -809,19 +838,9 @@ function arrive(){
   c.style.left="56%"; c.style.transform="scaleX(-1) scale(.78)";
   showBanner("🅿 "+g.name+"の ちゅうしゃじょうに とめたよ!");
   blip(392,.15); blip(523,.15,.15); blip(659,.2,.3);
-  // 建物の中へすすむ物語(イラストカードが順番に出る)
+  // 到着後の物語カードは廃止(2026-07-25: シンプル化。到着→ボーナスのみ)
   interiorTimers.forEach(clearTimeout); interiorTimers=[]; hideStory();
-  var steps = mode==="asa"
-    ? [[8,ICONS.gohan,"ごはんを たべよう"],[30,ICONS.kigae,"おきがえ しよう"],
-       [52,ICONS.youchien,"リュックと くつを そろえよう"],[74,GENKAN,"げんかんへ! ラムネを もらおう"]]
-    : [[20,NOREN,"せんとうの なかへ"],[40,UKETSUKE,"うけつけ「こんにちは!」"],[60,DATSUI,"だついじょ! ふくを ぬごう"]];
-  steps.forEach(function(st){
-    interiorTimers.push(setTimeout(function(){
-      hideBanner(); showStory(st[1], st[2]);
-      blip(700,.08,0,"triangle"); blip(880,.1,.1,"triangle");
-      try{navigator.vibrate&&navigator.vibrate(40);}catch(e){}
-    }, st[0]*1000));
-  });
+  setTimeout(hideBanner, 4000);
   // ボーナス: あさ=ラムネ / よる=お湯コイン。減りかけの1個にメーターが付く
   bonus=3; bonusSec=0;
   var bIco = mode==="asa" ? RAMUNE : COIN;
@@ -946,21 +965,43 @@ function addTask(m){
   store.tasks[m].push({ id: "t"+Date.now(), name:"あたらしいタスク", icon: ICONKEYS[store.tasks[m].length % ICONKEYS.length] });
   save(); renderEditor(m); renderBoard();
 }
+function initMinWheel(){
+  var w = q("minWheel");
+  if (!w.dataset.built){
+    w.dataset.built = "1";
+    var html = '<div class="sp"></div>';
+    for (var i = 1; i <= 30; i++) html += '<div class="mw">' + i + '</div>';
+    html += '<div class="sp"></div>';
+    w.innerHTML = html;
+    var t = null;
+    w.addEventListener("scroll", function(){
+      clearTimeout(t);
+      t = setTimeout(function(){
+        var v = Math.min(30, Math.max(1, Math.round(w.scrollTop / 36) + 1));
+        if (v !== store.timerMin){
+          store.timerMin = v; save();
+          q("minVal").textContent = v;
+          blip(880,.05);
+          updateTrip();
+        }
+      }, 140);
+    });
+  }
+  w.scrollTop = (store.timerMin - 1) * 36;
+  q("minVal").textContent = store.timerMin;
+}
 function openParent(){
   refreshCoin();
   renderEditor("asa"); renderEditor("yoru");
-  document.querySelectorAll("#parent [data-min]").forEach(function(b){
-    b.className=(parseInt(b.dataset.min,10)===store.timerMin)?"on":"";
-    b.onclick=function(){ store.timerMin=parseInt(b.dataset.min,10); save();
-      document.querySelectorAll("#parent [data-min]").forEach(function(x){x.className="";});
-      b.className="on"; updateTrip(); };
+  initMinWheel();
+  document.querySelectorAll("#parent [data-nt]").forEach(function(b){
+    b.className = (parseInt(b.dataset.nt,10) === store.notifySec) ? "on" : "";
+    b.onclick = function(){
+      store.notifySec = parseInt(b.dataset.nt,10); save();
+      document.querySelectorAll("#parent [data-nt]").forEach(function(x){ x.className=""; });
+      b.className = "on";
+    };
   });
-  var st=q("saToggle");
-  st.textContent = store.saOn? "SAあり":"SAなし";
-  st.className = store.saOn? "on":"";
-  st.onclick=function(){ store.saOn=!store.saOn; save();
-    st.textContent=store.saOn?"SAあり":"SAなし"; st.className=store.saOn?"on":"";
-    updateTrip(); };
   renderStretchDef();
   q("parent").style.display="flex";
 }

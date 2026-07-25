@@ -30,6 +30,8 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
   transition:left 1.4s ease,bottom 1.4s ease}
 #cat svg{width:100%;height:auto;display:block}
 #cat.bounce{animation:cbounce .5s ease 2}
+#cat.munch{animation:munchA .35s ease 8}
+@keyframes munchA{50%{transform:translateX(-50%) translateY(4px)}}
 @keyframes cbounce{50%{transform:translateX(-50%) translateY(-14px)}}
 .tail{transform-origin:8px 6px;animation:tailwag 2.4s ease-in-out infinite}
 @keyframes tailwag{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
@@ -255,21 +257,41 @@ q("cat").onclick = function(){
   render(); sayLine();
 };
 /* ごはん購入制(2026-07-25変更: できた!自動支給→お湯コインで買ってあげる) */
+var feeding = false;
 q("feedBtn").onclick = function(){
+  if (feeding) return;
   if (wGet() < 1){
     catSay("お湯コインが ないみたい… おしたくで ためてきてにゃ");
     blip(300,.15);
     return;
   }
+  feeding = true;
   wSet(wGet() - 1);
   neko.fedTotal += 1; neko.lastFed = Date.now();
   neko.love = Math.min(100, neko.love + 3); save();
-  catSay("🍚 もぐもぐ… おいしいにゃ! かってくれて ありがとにゃ!");
-  blip(523,.1); blip(659,.1,.12); blip(784,.15,.24); purr();
-  var c = q("cat"); c.classList.add("happy","bounce");
-  setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
-  setTimeout(function(){ c.classList.remove("happy"); render(); }, 2500);
-  render();
+  // ごはんの器が出る→ねこが歩いていく→もぐもぐ→もどる
+  var b = q("bowl");
+  b.innerHTML = BOWL; b.style.display = "block"; b.classList.remove("wiggle");
+  var c = q("cat");
+  c.classList.add("happy");
+  catSay("わーい! ごはんだにゃ!");
+  blip(523,.1); blip(659,.1,.12);
+  c.style.left = "22%";
+  setTimeout(function(){
+    c.classList.add("munch");
+    catSay("もぐもぐ… もぐもぐ…");
+    blip(392,.08); blip(392,.08,.3); blip(392,.08,.6);
+  }, 1500);
+  setTimeout(function(){
+    c.classList.remove("munch");
+    purr();
+    catSay("ぺろり! おいしかったにゃ〜 かってくれて ありがとにゃ!");
+    blip(784,.15); blip(1047,.2,.15);
+    if (feedsPending() <= 0) b.style.display = "none";
+    c.style.left = "50%";
+  }, 4600);
+  setTimeout(function(){ c.classList.remove("happy"); feeding = false; render(); }, 6200);
+  refreshCoin();
 };
 
 q("bowl").onclick = function(){
