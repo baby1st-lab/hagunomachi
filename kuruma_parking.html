@@ -13,6 +13,7 @@ body.night{background:linear-gradient(#454f6e,#57628a 40%,#6a688a)}
 body.night #hud{background:rgba(69,79,110,.94)}
 body.night .tab{background:#e8e2d2;border-color:#9a8f78}
 body.night #boardTitle{color:#8a6a3f}
+body.night #clkDigits{color:#f5ead3}
 #tscene.night{background:linear-gradient(#8a93b8,#aab6d4 58%,#b9cfae 59%,#adc4a0 66%)}
 #tscene.night .cl{opacity:.45}
 
@@ -75,6 +76,10 @@ body.night #boardTitle{color:#8a6a3f}
 
 /* ===== おでかけタイマー(パララックス走行) ===== */
 #ticketPage{display:none;max-width:480px;margin:10px auto 40px;padding:0 14px}
+#ringWrap{position:relative;width:190px;margin:6px auto 10px}
+#ringSvg{width:100%;height:auto;display:block}
+#ringDigits{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:42px;font-weight:bold;color:#5a4a38;font-variant-numeric:tabular-nums}
 #tscene{position:relative;height:250px;border:3.5px solid #c9ae87;border-radius:20px 20px 0 0;overflow:hidden;
   background:linear-gradient(#cfe4f2,#e8f3fa 58%,#d3e7cb 59%,#cfe3c4 66%)}
 #tscene.evening{background:linear-gradient(#f6d3b0,#fbeedd 58%,#d3e7cb 59%,#cfe3c4 66%)}
@@ -129,7 +134,7 @@ body.night #boardTitle{color:#8a6a3f}
   font-size:13.5px;font-weight:bold;color:#b86a7c;display:flex;align-items:center;gap:4px}
 #maruBadge.pulse{animation:mpulse .5s ease}
 @keyframes mpulse{50%{transform:scale(1.18)}}
-#stretchBtn{font-size:16px;padding:6px 14px;border-radius:999px;border:2.5px solid #dcc06e;background:#fdf6dd;cursor:pointer}
+#stretchBtn{font-size:13px;padding:5px 10px;border-radius:999px;border:2px solid #dcc06e;background:#fdf6dd;cursor:pointer;opacity:.85}
 #stretchBtn.on{background:#f2d98a}
 .rrow.stretchrow{border-color:#e8cf7a;background:#fffbe8}
 #stretchAddPanel{background:#fffbe8;border:3px dashed #e8cf7a;border-radius:16px;padding:10px 12px;margin-top:8px}
@@ -138,19 +143,28 @@ body.night #boardTitle{color:#8a6a3f}
 .sgchip{font-family:inherit;font-size:14px;font-weight:bold;color:#7a6146;background:#fff;
   border:2.5px solid #c9ae87;border-radius:999px;padding:7px 14px;cursor:pointer}
 .sgchip:active{transform:scale(.95)}
+.sgicos{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:6px}
+.sgico{background:#fff;border:2.5px solid #e8dcc4;border-radius:12px;padding:4px;cursor:pointer;width:52px;height:52px}
+.sgico svg{width:100%;height:100%}
+.sgico.sel{border-color:#e8937c;background:#fdeee8}
+.sgmine{background:#fff;border:2px solid #e8dcc4;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:bold;color:#7a6146}
+.sgmine .sgdel{cursor:pointer;margin-left:4px}
 .sgfree{display:flex;gap:6px;margin-top:8px}
 .sgfree input{flex:1;font-family:inherit;font-size:15px;font-weight:bold;padding:8px 12px;
   border:2.5px solid #c9ae87;border-radius:12px;min-width:0}
 .sgok{font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;
   color:#7a6146;border-radius:999px;padding:8px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer}
-/* ボードのねこ(吹き出しの外に体つきで。タップでねこのおうちへ。21時をすぎると丸まって寝る) */
-#boardNeko{display:flex;align-items:flex-end;gap:8px;width:100%;margin:4px 0 12px;padding:0}
-#bnFace{flex:0 0 62px;cursor:pointer}
-#bnFace svg{width:62px;height:auto;display:block}
+/* ボードのねこ+とけい(吹き出し廃止。ねこタップでねこのおうちへ。21時以降は丸まって寝る) */
+#boardNeko{display:flex;align-items:center;justify-content:space-between;width:100%;margin:4px 0 12px;padding:0 4px}
+#bnFace{flex:0 0 84px;cursor:pointer}
+#bnFace svg{width:84px;height:auto;display:block}
 #bnFace:active svg{transform:scale(.93)}
-#bnBubble{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:16px 16px 16px 4px;
-  padding:9px 13px;flex:1;margin-bottom:8px}
-#boardNeko .nmsg{font-size:13px;font-weight:bold;color:#7a6146;line-height:1.5}
+#bnFace.joy svg{animation:bnjump .45s ease 2}
+@keyframes bnjump{50%{transform:translateY(-10px)}}
+#bnClock{display:flex;align-items:center;gap:10px}
+#clkSvg{width:64px;height:64px}
+#clkH,#clkM{transform-origin:50px 50px}
+#clkDigits{font-size:26px;font-weight:bold;color:#7a6146;font-variant-numeric:tabular-nums}
 #papaCard{width:100%;margin:10px 0 0;background:rgba(255,250,240,.9);border:2.5px solid #d8c9ab;border-radius:16px;overflow:hidden}
 #papaHead{font-size:13px;font-weight:bold;color:#8d7b66;padding:9px 14px;cursor:pointer;display:flex;gap:6px;align-items:center}
 #papaHead #papaArrow{margin-left:auto;transition:transform .2s}
@@ -196,8 +210,9 @@ body.night #boardTitle{color:#8a6a3f}
   <div id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
   <div id="maruBadge">🌸× <span id="maruN">0</span></div>
   <div class="tab on" id="tabTask">🚗 おしたく</div>
-  <div class="tab" id="tabTicket">🛣 おでかけ</div>
+  <div class="tab" id="tabTicket">⏱ タイマー</div>
   <a class="tab" id="tabCal" href="mitooshi_calendar.html" style="text-decoration:none;color:inherit">📅 カレンダー</a>
+  <a class="tab" href="ofuro_gacha.html" style="text-decoration:none;color:inherit">♨ ガチャ</a>
   <div class="tab" id="parentBtn"><span id="pbGauge"></span><span>せってい<br>(ながおし)</span></div>
 </div>
 
@@ -208,7 +223,15 @@ body.night #boardTitle{color:#8a6a3f}
       <button id="modeYoru">🌙 よる</button>
       <button id="stretchBtn" title="おかわりチャレンジ">⭐</button>
     </div>
-    <div id="boardNeko"><span id="bnFace" title="ねこのおうちへ"></span><div id="bnBubble"><span class="nmsg" id="bnMsg"></span></div></div>
+    <div id="boardNeko"><span id="bnFace" title="ねこのおうちへ"></span>
+      <div id="bnClock"><svg id="clkSvg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="#fffaf0" stroke="#c9ae87" stroke-width="4"/>
+        <g stroke="#c9ae87" stroke-width="3" stroke-linecap="round"><line x1="50" y1="8" x2="50" y2="15"/><line x1="50" y1="85" x2="50" y2="92"/><line x1="8" y1="50" x2="15" y2="50"/><line x1="85" y1="50" x2="92" y2="50"/></g>
+        <line id="clkH" x1="50" y1="50" x2="50" y2="28" stroke="#8d7b66" stroke-width="5" stroke-linecap="round"/>
+        <line id="clkM" x1="50" y1="50" x2="50" y2="16" stroke="#b8916a" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="50" cy="50" r="4" fill="#e8937c" stroke="#8d7b66" stroke-width="2"/>
+      </svg><span id="clkDigits"></span></div>
+    </div>
     <div id="board">
       <div id="boardTitle">きょうの おしたく</div>
       <div id="boardHead"><span>◀ まだ</span><span>できた! ▶</span></div>
@@ -223,6 +246,15 @@ body.night #boardTitle{color:#8a6a3f}
 </div>
 
 <div id="ticketPage">
+  <div id="ringWrap">
+    <svg id="ringSvg" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#efe3cc" stroke-width="11"/>
+      <circle id="ringFg" cx="100" cy="100" r="88" fill="none" stroke="#f2a05e" stroke-width="11"
+        stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="0"
+        transform="rotate(-90 100 100)"/>
+    </svg>
+    <div id="ringDigits">10:00</div>
+  </div>
   <div id="tscene">
     <div id="tsun"></div>
     <div class="cl c1 mv"></div><div class="cl c2 mv"></div>
@@ -260,9 +292,10 @@ body.night #boardTitle{color:#8a6a3f}
     <button data-min="15">15分</button><button data-min="20">20分</button>
     <button id="saToggle">SAあり</button>
   </div>
-  <h3>のりもの</h3>
-  <div class="row" id="vehAsaRow"></div>
-  <div class="row" id="vehYoruRow"></div>
+  <h3>⭐ おかわりの きほんセット(星ボタンで出るタスク)</h3>
+  <div id="editStretch"></div>
+  <div class="row"><button onclick="addStretchDef()">+ ついか</button></div>
+  <p style="font-size:11px;color:#a58868;margin:4px 0">💡 のりものは、タイマー画面で はしっている車をタップすると変えられます</p>
   <h3>☀ あさのタスク(タップで絵を変更/↑↓で並べ替え)</h3>
   <div id="editAsa"></div>
   <div class="row"><button onclick="addTask('asa')">+ タスク追加</button></div>
@@ -295,7 +328,7 @@ var YOEN='<svg viewBox="0 0 130 100" xmlns="http://www.w3.org/2000/svg" fill="no
 /* タスクの絵(8種) */
 var ICONS={
  kigae:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M28 14 L14 24 L20 36 L26 32 V66 H54 V32 L60 36 L66 24 L52 14 Q46 22 40 22 Q34 22 28 14 Z" fill="#cfe0ee"/><circle cx="40" cy="40" r="6" fill="#fff7ec"/><path d="M34 52 h12"/></svg>',
- hamigaki:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 30 Q22 16 34 16 Q46 16 46 30 Q46 40 42 46 Q40 62 34 62 Q28 62 30 46 Q22 40 22 30 Z" fill="#fff7ec"/><rect x="50" y="8" width="10" height="40" rx="5" fill="#f4d3da"/><rect x="48" y="8" width="14" height="14" rx="4" fill="#cfe0ee"/><path d="M50 12 h10 M50 17 h10"/><circle cx="30" cy="30" r="2" fill="#8d7b66"/><circle cx="38" cy="30" r="2" fill="#8d7b66"/><path d="M31 37 q3 3 6 0"/></svg>',
+ hamigaki:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M16 30 Q16 14 31 14 Q46 14 46 30 Q46 38 42 43 L44 57 Q44 62 39 62 Q35 62 33 50 Q31 62 27 62 Q22 62 22 57 L20 43 Q16 38 16 30 Z" fill="#fff7ec"/><rect x="52" y="8" width="10" height="42" rx="5" fill="#f4d3da"/><rect x="50" y="8" width="14" height="14" rx="4" fill="#cfe0ee"/><path d="M52 12 h10 M52 17 h10"/><circle cx="26" cy="28" r="2" fill="#8d7b66"/><circle cx="36" cy="28" r="2" fill="#8d7b66"/><ellipse cx="21" cy="34" rx="2.5" ry="1.8" fill="#f4b8b8" stroke="none"/><ellipse cx="41" cy="34" rx="2.5" ry="1.8" fill="#f4b8b8" stroke="none"/><path d="M28 35 q3 3 6 0"/></svg>',
  gohan:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 38 H66 Q66 56 52 62 H28 Q14 56 14 38 Z" fill="#f4d3da"/><path d="M20 38 Q20 26 30 24 Q28 30 34 32 Q34 24 42 22 Q42 28 46 30 Q48 24 56 26 Q60 30 60 38" fill="#fff7ec"/><path d="M30 10 q4 4 0 8 M42 8 q4 4 0 8"/></svg>',
  ofuro:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 40 H70 V46 Q70 60 56 62 H24 Q10 60 10 46 Z" fill="#cfe0ee"/><path d="M10 40 Q24 34 40 40 Q56 46 70 40" stroke="#8d7b66" fill="none"/><circle cx="26" cy="22" r="5" fill="#fff7ec"/><circle cx="38" cy="14" r="4" fill="#fff7ec"/><circle cx="48" cy="24" r="3.5" fill="#fff7ec"/><path d="M20 66 v4 M60 66 v4"/></svg>',
  toilet:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 14 H50 V38 H22 Z" fill="#fff7ec"/><path d="M22 38 Q22 52 36 52 H44 Q58 52 58 40 V34 H50" fill="#cfe0ee"/><rect x="30" y="52" width="14" height="10" fill="#fff7ec"/><rect x="22" y="62" width="30" height="6" rx="3" fill="#f0e3c8"/><rect x="12" y="16" width="10" height="14" rx="3" fill="#f4d3da"/><path d="M14 20 q4 3 0 6"/></svg>',
@@ -346,32 +379,43 @@ if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
 (store.tasks.asa||[]).forEach(function(t){ if(t.name==="ようちえんじゅんび"){ t.name="ほいくえんじゅんび"; } });
 // パパのおしたく(初期リスト。妻の指摘=バッグ準備は子どもとチェック)
 if (!store.papa) store.papa = { d:"", done:[] };
-var PAPA_TASKS = [
-  ["🥤","すいとう・コップを セット"],
-  ["📒","れんらくちょうを よむ(LINEの1画面)"],
-  ["🎒","ほいくえんバッグを こどもと チェック"],
-  ["👕","おきがえ ほじゅう(上下・肌着・靴下×3+ビニール袋)"],
-  ["🗑","ゴミだし(あさ)"]
-];
+var PAPA_TASKS = {
+  asa: [
+    ["🤖","おそうじロボット スイッチON"],
+    ["🗑","ゴミだし"],
+    ["🥤","すいとう・コップを セット"],
+    ["🎒","ほいくえんバッグを こどもと チェック"]
+  ],
+  yoru: [
+    ["📒","れんらくちょうを よむ(LINEの1画面)"],
+    ["👕","おきがえ ほじゅう(上下・肌着・靴下×3+ビニール袋)"],
+    ["🍽","すいとう・しょっきを あらう"]
+  ]
+};
 function papaToday_(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
 function renderPapa(){
-  if (store.papa.d !== papaToday_()){ store.papa.d = papaToday_(); store.papa.done = []; save(); }
+  // 朝夜分割への移行(旧: done=[] → 新: done={asa:[],yoru:[]})
+  if (Array.isArray(store.papa.done)) store.papa.done = { asa: [], yoru: [] };
+  if (store.papa.d !== papaToday_()){ store.papa.d = papaToday_(); store.papa.done = { asa: [], yoru: [] }; save(); }
+  var tasks = PAPA_TASKS[mode] || PAPA_TASKS.asa;
+  var doneArr = store.papa.done[mode] || [];
   var pr = document.getElementById("papaRows"); pr.innerHTML = "";
   var doneN = 0;
-  PAPA_TASKS.forEach(function(t, i){
-    var done = store.papa.done.indexOf(i) !== -1;
+  tasks.forEach(function(t, i){
+    var done = doneArr.indexOf(i) !== -1;
     if (done) doneN++;
     var row = document.createElement("div");
     row.className = "prow" + (done ? " done" : "");
     row.innerHTML = "<span>"+t[0]+"</span><span>"+t[1]+"</span><span class='chk'>"+(done?"✅":"⬜")+"</span>";
     row.onclick = function(){
-      var ix = store.papa.done.indexOf(i);
-      if (ix === -1) store.papa.done.push(i); else store.papa.done.splice(ix,1);
+      var ix = doneArr.indexOf(i);
+      if (ix === -1) doneArr.push(i); else doneArr.splice(ix,1);
+      store.papa.done[mode] = doneArr;
       save(); renderPapa();
     };
     pr.appendChild(row);
   });
-  document.getElementById("papaCount").textContent = doneN + "/" + PAPA_TASKS.length;
+  document.getElementById("papaCount").textContent = (mode==="asa"?"あさ ":"よる ") + doneN + "/" + tasks.length;
 }
 function togglePapa(){
   var c = document.getElementById("papaCard"), r = document.getElementById("papaRows");
@@ -385,42 +429,91 @@ renderPapa();
    レール(車が走る)としてボードに追加される。翌日は自動で消える */
 if (!store.stretch) store.stretch = { d:"", on:false, extra:[] };
 if (!store.stretch.extra) store.stretch.extra = [];
-var STRETCH_TASKS = [ {id:"s0",name:"くもん",icon:"kumon",stretch:true},
-                      {id:"s1",name:"おえかき",icon:"oekaki",stretch:true},
-                      {id:"s2",name:"ごほんを よむ",icon:"ehon",stretch:true} ];
+if (!store.stretchDef) store.stretchDef = [ {n:"くもん",ic:"kumon"},
+  {n:"おえかき",ic:"oekaki"}, {n:"ごほんを よむ",ic:"ehon"} ];
+/* 設定画面から編集できる「きほんセット」 */
+function renderStretchDef(){
+  var w = document.getElementById("editStretch"); if (!w) return;
+  w.innerHTML = "";
+  store.stretchDef.forEach(function(e, i){
+    var d = document.createElement("div"); d.className = "tedit";
+    var ic = document.createElement("div"); ic.className = "ico"; ic.innerHTML = ICONS[e.ic] || "";
+    ic.onclick = function(){
+      e.ic = STRETCH_ICONS[(STRETCH_ICONS.indexOf(e.ic) + 1) % STRETCH_ICONS.length];
+      save(); renderStretchDef();
+    };
+    var inp = document.createElement("input"); inp.value = e.n; inp.maxLength = 12;
+    inp.oninput = function(){ e.n = inp.value; save(); };
+    var del = document.createElement("button"); del.textContent = "🗑";
+    del.onclick = function(){ store.stretchDef.splice(i, 1); save(); renderStretchDef(); renderBoard(); };
+    d.appendChild(ic); d.appendChild(inp); d.appendChild(del);
+    w.appendChild(d);
+  });
+}
+function addStretchDef(){
+  store.stretchDef.push({ n: "あたらしい", ic: "oekaki" });
+  save(); renderStretchDef();
+}
 function stretchList(){
   if (store.stretch.d !== papaToday_()){ store.stretch = { d:papaToday_(), on:false, extra:[] }; save(); }
   if (!store.stretch.on) return [];
-  var extras = (store.stretch.extra||[]).map(function(nm, i){
-    return { id:"sx"+i, name:nm, icon:"oekaki", stretch:true };
+  var base = (store.stretchDef||[]).map(function(e, i){
+    return { id:"s"+i, name:e.n, icon:e.ic||"oekaki", stretch:true };
   });
-  return STRETCH_TASKS.concat(extras);
+  var extras = (store.stretch.extra||[]).map(function(e, i){
+    var nm = (typeof e === "string") ? e : e.n;
+    var ic = (typeof e === "string") ? "oekaki" : (e.ic || "oekaki");
+    return { id:"sx"+i, name:nm, icon:ic, stretch:true };
+  });
+  return base.concat(extras);
 }
 /* 彼の「もっとふやしたい!」を受ける(その日限り・翌日自動で消える)
    promptダイアログは環境によりブロックされるため、インラインのパネル方式(v2) */
-var STRETCH_SUGGEST = ["トイレ","リュックのじゅんび","ドライヤー","おてつだい","ぬりえ","ダンス","おふとんならべ"];
+var STRETCH_SUGGEST = ["トイレ","リュックのじゅんび","ドライヤー","おてつだい","ぬりえ","ダンス"];
+var STRETCH_ICONS = ["oekaki","kumon","ehon","katazuke","hamigaki","ofuro","kigae","gohan","youchien"];
+var sgSelIcon = "oekaki";
 function addStretchExtra_(nm){
   if (!nm || !nm.trim()) return;
-  store.stretch.extra.push(nm.trim().slice(0, 12)); save();
+  store.stretch.extra.push({ n: nm.trim().slice(0, 12), ic: sgSelIcon }); save();
   blip(784,.1); blip(1047,.12,.12);
   try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}
   renderBoard();
+  addStretchTask(); addStretchTask(); // パネルを開き直して一覧を更新
 }
 function addStretchTask(){
   var old = document.getElementById("stretchAddPanel");
   if (old){ old.remove(); return; }
   var p = document.createElement("div");
   p.id = "stretchAddPanel";
+  var icons = STRETCH_ICONS.map(function(k){
+    return '<button class="sgico'+(k===sgSelIcon?" sel":"")+'" data-k="'+k+'">'+(ICONS[k]||"")+'</button>';
+  }).join("");
   var chips = STRETCH_SUGGEST.map(function(s){
     return '<button class="sgchip" data-n="'+s+'">'+s+'</button>';
   }).join("");
-  p.innerHTML = '<div class="sgttl">なにを ふやす?(きょうだけ)</div>'+
+  var mine = (store.stretch.extra||[]).map(function(e, i){
+    var nm = (typeof e === "string") ? e : e.n;
+    return '<span class="sgmine">'+nm+' <b class="sgdel" data-i="'+i+'">🗑</b></span>';
+  }).join("");
+  p.innerHTML = '<div class="sgttl">① えをえらぶ</div>'+
+    '<div class="sgicos">'+icons+'</div>'+
+    '<div class="sgttl">② なまえをえらぶ か かく(きょうだけ)</div>'+
     '<div class="sgchips">'+chips+'</div>'+
     '<div class="sgfree"><input type="text" id="sgInput" maxlength="12" placeholder="じぶんで かく">'+
-    '<button class="sgok" id="sgOk">ついか!</button></div>';
+    '<button class="sgok" id="sgOk">ついか!</button></div>'+
+    (mine ? '<div class="sgttl" style="margin-top:8px">きょう ふやしたもの</div><div class="sgchips">'+mine+'</div>' : '');
   document.getElementById("rows").appendChild(p);
+  p.querySelectorAll(".sgico").forEach(function(b){
+    b.onclick = function(){ sgSelIcon = b.dataset.k;
+      p.querySelectorAll(".sgico").forEach(function(x){ x.classList.toggle("sel", x===b); }); };
+  });
   p.querySelectorAll(".sgchip").forEach(function(b){
     b.onclick = function(){ addStretchExtra_(b.dataset.n); };
+  });
+  p.querySelectorAll(".sgdel").forEach(function(d){
+    d.onclick = function(ev){ ev.stopPropagation();
+      store.stretch.extra.splice(parseInt(d.dataset.i,10),1); save();
+      renderBoard(); addStretchTask(); addStretchTask(); };
   });
   document.getElementById("sgOk").onclick = function(){
     addStretchExtra_(document.getElementById("sgInput").value);
@@ -428,9 +521,13 @@ function addStretchTask(){
   p.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
 document.getElementById("stretchBtn").onclick = function(){
-  if (store.stretch.d !== papaToday_()) store.stretch = { d:papaToday_(), on:false };
+  if (store.stretch.d !== papaToday_()) store.stretch = { d:papaToday_(), on:false, extra:[] };
   store.stretch.on = !store.stretch.on; save();
   document.getElementById("stretchBtn").classList.toggle("on", store.stretch.on);
+  if (!store.stretchSeen && store.stretch.on){
+    store.stretchSeen = 1; save();
+    toast("⭐は「おかわりチャレンジ」! よゆうがある日だけ、すきなタスクをふやせるよ(あしたには きえるよ)");
+  }
   blip(659,.08);
   renderBoard();
 };
@@ -485,6 +582,7 @@ function renderBoard(newId){
     wrap.appendChild(ar);
   }
   renderBoardNeko(list);
+  renderPapa();
   var all=list.length>0 && list.every(function(t){ return store.done[mode][t.id]; });
   q("perfect").querySelector(".inner").textContent = mode==="asa"
     ? "🎉 ぜんぶできた! いってらっしゃい!"
@@ -516,9 +614,8 @@ function completeTask(t,row){
       setTimeout(function(){ q("coinBadge").classList.remove("pulse"); },500);
       blip(1175,.1,0,"triangle");
     },820);
-    // ねこのごはんキューに+1(できた!=ごはん。neko_house.htmlが受け取る)
-    try{ localStorage.setItem("neko_feed_v1",
-      String(parseInt(localStorage.getItem("neko_feed_v1")||"0",10)+1)); }catch(e){}
+    // ねこも一緒に喜ぶ(ごはん自動支給は廃止: ごはんはねこのおうちでコイン購入制)
+    nekoCelebrate();
     // はなまる累計(シール帳のデジタル版。長期目標への2段目)
     store.maru = (store.maru||0) + 1; save();
     q("maruN").textContent = store.maru;
@@ -536,12 +633,25 @@ function completeTask(t,row){
     rolling=false;
   }, 2100);
 }
+/* はしっている車をタップ→のりもの切替(設定ののりもの選択は廃止) */
+q("tcar2").style.cursor="pointer";
+q("tcar2").onclick=function(){
+  var keys = Object.keys(VEH);
+  var cur = mode==="asa" ? store.vehAsa : store.vehYoru;
+  var nx = keys[(keys.indexOf(cur) + 1) % keys.length];
+  if (mode==="asa") store.vehAsa = nx; else store.vehYoru = nx;
+  save(); updateTrip(); blip(659,.08);
+  try{navigator.vibrate&&navigator.vibrate(25);}catch(e){}
+  showBanner("のりものを「" + VEHNAMES[nx] + "」にかえたよ!");
+  setTimeout(hideBanner, 1600);
+};
+
 q("modeAsa").onclick=function(){ mode="asa"; renderBoard(); updateTrip(); };
 q("modeYoru").onclick=function(){ mode="yoru"; renderBoard(); updateTrip(); };
 
 /* ===== ボードのねこ: 次のタスクを教える。21時以降は寝る(はやく終える動機) ===== */
 var NEKO_AWAKE='<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M82 62 q16 -6 12 -24" fill="none" stroke-width="6"/><ellipse cx="52" cy="60" rx="30" ry="18" fill="#f0e3c8"/><ellipse cx="52" cy="66" rx="14" ry="9" fill="#fff7ec" stroke="none"/><circle cx="32" cy="34" r="20" fill="#f0e3c8"/><path d="M18 22 L13 6 L28 13 Z" fill="#f0e3c8"/><path d="M46 22 L51 6 L36 13 Z" fill="#f0e3c8"/><path d="M19 19 L16 10 L25 14 Z" fill="#f4d3da" stroke="none"/><path d="M45 19 L48 10 L39 14 Z" fill="#f4d3da" stroke="none"/><circle cx="26" cy="32" r="3.2" fill="#5a4a38" stroke="none"/><circle cx="38" cy="32" r="3.2" fill="#5a4a38" stroke="none"/><circle cx="27.2" cy="30.8" r="1.1" fill="#fff" stroke="none"/><circle cx="39.2" cy="30.8" r="1.1" fill="#fff" stroke="none"/><ellipse cx="32" cy="37" rx="2.2" ry="1.6" fill="#e8937c" stroke="none"/><path d="M29 40 q3 3 6 0" fill="none" stroke-width="2.2"/><circle cx="17" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="47" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><path d="M12 32 h-8 M13 37 h-8 M52 32 h8 M51 37 h8" stroke-width="1.8"/></svg>';
-var NEKO_SLEEP='<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="50" cy="48" r="26" fill="#f0e3c8"/><path d="M26 60 q26 16 50 2" fill="none" stroke-width="6"/><path d="M32 26 L28 13 L40 19 Z" fill="#f0e3c8"/><path d="M47 24 L52 12 L41 17 Z" fill="#f0e3c8"/><path d="M33 24 L31 16 L38 20 Z" fill="#f4d3da" stroke="none"/><path d="M45 22 L48 15 L42 18 Z" fill="#f4d3da" stroke="none"/><path d="M31 36 q3 2.6 6 0 M45 36 q3 2.6 6 0" fill="none" stroke-width="2.4"/><path d="M39 42 q3 2.4 6 0" fill="none" stroke-width="2"/><circle cx="27" cy="42" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="55" cy="42" r="3.5" fill="#f4b8b8" stroke="none"/><text x="76" y="26" font-size="14" fill="#a5c9e8" stroke="none" font-weight="bold">z</text><text x="84" y="16" font-size="10" fill="#a5c9e8" stroke="none" font-weight="bold">z</text></svg>';
+var NEKO_SLEEP='<svg viewBox="0 0 110 75" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="48" rx="34" ry="21" fill="#f0e3c8"/><circle cx="30" cy="45" r="17" fill="#f0e3c8"/><path d="M20 34 L15 20 L28 27 Z" fill="#f0e3c8"/><path d="M37 32 L42 19 L31 25 Z" fill="#f0e3c8"/><path d="M21 32 L18 23 L26 27 Z" fill="#f4d3da" stroke="none"/><path d="M35 30 L38 24 L31 26 Z" fill="#f4d3da" stroke="none"/><path d="M23 45 q3 2.8 6 0 M32 45 q3 2.8 6 0" fill="none" stroke-width="2.4"/><path d="M28 51 q2.5 2 5 0" fill="none" stroke-width="2"/><circle cx="19" cy="50" r="3.2" fill="#f4b8b8" stroke="none"/><circle cx="41" cy="50" r="3.2" fill="#f4b8b8" stroke="none"/><ellipse cx="34" cy="61" rx="9" ry="4" fill="#fff7ec"/><path d="M88 58 q14 -4 10 -18 q-3 -10 -14 -8" fill="none" stroke-width="6"/><text x="88" y="22" font-size="15" fill="#a5c9e8" stroke="none" font-weight="bold">z</text><text x="97" y="12" font-size="10" fill="#a5c9e8" stroke="none" font-weight="bold">z</text><text x="80" y="30" font-size="8" fill="#a5c9e8" stroke="none" font-weight="bold">z</text></svg>';
 function nekoName_(){
   try{ var n = JSON.parse(localStorage.getItem("neko_v1")||"{}").name; return n || "ねこ"; }catch(e){ return "ねこ"; }
 }
@@ -549,18 +659,39 @@ q("bnFace").onclick = function(){ location.href = "neko_house.html"; };
 function renderBoardNeko(list){
   var el = q("boardNeko"); if (!el) return;
   var h = new Date().getHours();
-  var name = nekoName_();
   var sleeping = (h >= 21 || h < 5);
-  var next = list.filter(function(t){ return !store.done[mode][t.id]; })[0];
-  if (sleeping){
-    q("bnFace").innerHTML = NEKO_SLEEP;
-    q("bnMsg").textContent = name + "は ねちゃった… zzz(あしたは 9じまでに おわらせて あそぼう)";
-  } else if (!next){
-    q("bnFace").innerHTML = NEKO_AWAKE;
-    q("bnMsg").textContent = "ぜんぶ できたね! " + name + "も おなかいっぱい🍚";
-  } else {
-    q("bnFace").innerHTML = NEKO_AWAKE;
-    q("bnMsg").textContent = "つぎは「" + next.name + "」だよ! できたら " + name + "の ごはんに なるんだ";
+  q("bnFace").innerHTML = sleeping ? NEKO_SLEEP : NEKO_AWAKE;
+  updateClock_();
+}
+/* 時計(園の「時計を意識する」方針に合わせて常時表示) */
+function updateClock_(){
+  var now = new Date();
+  var hh = now.getHours(), mm = now.getMinutes();
+  var hEl = document.getElementById("clkH"), mEl = document.getElementById("clkM");
+  if (hEl){ hEl.style.transform = "rotate(" + ((hh % 12) * 30 + mm * 0.5) + "deg)";
+            mEl.style.transform = "rotate(" + (mm * 6) + "deg)"; }
+  var d = document.getElementById("clkDigits");
+  if (d) d.textContent = hh + ":" + ("0" + mm).slice(-2);
+}
+setInterval(updateClock_, 20000);
+/* できたらねこが一緒に喜ぶ(ごはん制は廃止→ごはんはお湯コインで買う) */
+function nekoCelebrate(){
+  var f = q("bnFace");
+  f.classList.add("joy");
+  setTimeout(function(){ f.classList.remove("joy"); }, 1000);
+  var r = f.getBoundingClientRect();
+  for (var i = 0; i < 3; i++){
+    var hh2 = document.createElement("div");
+    hh2.style.cssText = "position:fixed;font-size:16px;z-index:30;pointer-events:none;left:" +
+      (r.left + 20 + Math.random() * 40) + "px;top:" + (r.top) + "px;animation:hrise2 1s ease-out forwards";
+    hh2.textContent = "💗";
+    document.body.appendChild(hh2);
+    setTimeout(function(el){ return function(){ el.remove(); }; }(hh2), 1100);
+  }
+  if (!document.getElementById("hrise2style")){
+    var st = document.createElement("style"); st.id = "hrise2style";
+    st.textContent = "@keyframes hrise2{to{transform:translateY(-50px) scale(1.3);opacity:0}}";
+    document.head.appendChild(st);
   }
 }
 
@@ -610,6 +741,8 @@ function carReset(){ var c=q("tcar2");
 q("startBtn").onclick=function(){
   if(timer) return;
   totalSec=store.timerMin*60; elapsed=0; stage=0; atSA=false;
+  q("ringDigits").textContent = store.timerMin + ":00";
+  q("ringFg").style.strokeDashoffset = "0";
   carReset();
   q("startBtn").style.display="none"; q("doneBtn").style.display="none"; q("gachaLink").style.display="none";
   q("bonusRow").style.display="none"; hideBanner(); hideStory();
@@ -627,6 +760,10 @@ function tick(){
   var g=goalInfo();
   var half = store.saOn? Math.floor(totalSec/2) : totalSec;
   q("tfill").style.width=(elapsed/totalSec*100)+"%";
+  // 標準タイマー風の残り時間表示(メイン表示。車はサブ演出)
+  var remain = Math.max(0, totalSec - elapsed);
+  q("ringDigits").textContent = Math.floor(remain/60) + ":" + ("0" + remain % 60).slice(-2);
+  q("ringFg").style.strokeDashoffset = String(553 * (elapsed / totalSec));
   if (store.saOn && stage===0){
     setDest(Math.min(1, elapsed/half));
     if (elapsed>=half && !atSA){
@@ -760,6 +897,8 @@ q("doneBtn").onclick=function(){
                : "じぶんでおわれてえらい! つぎは はやおわりで コインゲット!");
   q("bonusRow").style.display="none";
   q("tfill").style.width="0%";
+  q("ringDigits").textContent = store.timerMin + ":00";
+  q("ringFg").style.strokeDashoffset = "0";
   carReset();
   q("tscene").classList.remove("evening");
   updateTrip();
@@ -822,24 +961,10 @@ function openParent(){
   st.onclick=function(){ store.saOn=!store.saOn; save();
     st.textContent=store.saOn?"SAあり":"SAなし"; st.className=store.saOn?"on":"";
     updateTrip(); };
-  renderVeh("asa"); renderVeh("yoru");
+  renderStretchDef();
   q("parent").style.display="flex";
 }
-function renderVeh(m){
-  var wrap=q(m==="asa"?"vehAsaRow":"vehYoruRow");
-  wrap.innerHTML = m==="asa" ? "☀あさ:&nbsp;" : "🌙よる:&nbsp;";
-  Object.keys(VEH).forEach(function(k){
-    var b=document.createElement("button"); b.type="button";
-    b.textContent=VEHNAMES[k];
-    var cur = m==="asa" ? store.vehAsa : store.vehYoru;
-    b.className = cur===k ? "on" : "";
-    b.onclick=function(){
-      if(m==="asa") store.vehAsa=k; else store.vehYoru=k;
-      save(); renderVeh(m); updateTrip();
-    };
-    wrap.appendChild(b);
-  });
-}
+/* renderVehは廃止(2026-07-25): のりもの切替は走っている車のタップ式へ */
 function grantCoin(k){ walletAdd(k); toast("お湯コイン "+(k>0?"+":"")+k+" (いま"+walletGet()+"まい)"); blip(1047,.1,0,"triangle"); }
 function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard(); toast("きょうの「できた」をリセットしました"); }
 function closeParent(){ q("parent").style.display="none"; }

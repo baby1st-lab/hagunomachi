@@ -7,17 +7,19 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
 body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
-  background:linear-gradient(#fdf3e3,#f7e9d0);display:flex;flex-direction:column;align-items:center;padding:12px 0 24px}
-#head{width:min(500px,96vw);text-align:center;margin-bottom:10px;position:relative}
+  background:radial-gradient(#f6e7c8 9%,transparent 10%) 0 0/30px 30px, linear-gradient(#fdf3e3,#f7e9d0);
+  display:flex;flex-direction:column;align-items:center;padding:12px 0 24px}
+#head{width:min(500px,96vw);text-align:center;margin-bottom:10px}
+#headTop{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 #today{font-size:15px;font-weight:bold;color:#a58868}
 #todayBig{display:flex;gap:8px;justify-content:center;margin-top:4px}
 .dchip{background:#fffaf0;border:3px solid #c9ae87;border-radius:14px;padding:5px 14px;
   font-size:22px;font-weight:bold;color:#7a6146;min-width:74px}
 .dchip.sun{color:#e8788a;border-color:#e8b4bd}
 .dchip.sat{color:#7d9fc9;border-color:#b4c8de}
-#zukanBadge{position:absolute;right:0;top:0;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
+#zukanBadge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
   border-radius:999px;padding:5px 12px;font-size:12px;font-weight:bold;color:#7a6146}
-#setBtn{position:absolute;left:0;top:0;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
+#setBtn{position:relative;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
   border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;overflow:hidden}
 #pbGauge{position:absolute;left:0;bottom:0;height:4px;width:0%;background:#e8937c;border-radius:99px}
 
@@ -27,9 +29,12 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 #backRow{width:min(500px,96vw);margin-top:12px;text-align:center}
 #backRow a{display:inline-block;text-decoration:none;background:#fffaf0;border:2.5px solid #c9ae87;
   border-radius:999px;padding:8px 22px;font-size:13px;font-weight:bold;color:#7a6146}
-.day{flex:0 0 96px;background:#fffaf0;border:3px solid #c9ae87;border-radius:18px;padding:8px 6px 10px;
-  text-align:center;cursor:pointer;scroll-snap-align:center;position:relative;transition:transform .2s}
+.day{flex:0 0 96px;background:#fffaf0;border:3px solid #c9ae87;border-radius:22px;padding:8px 6px 10px;
+  text-align:center;cursor:pointer;scroll-snap-align:center;position:relative;transition:transform .2s;
+  box-shadow:0 3px 0 rgba(201,174,135,.35)}
 .day:active{transform:scale(.95)}
+.day.w0{background:#fdf0f3}
+.day.w6{background:#eef4fb}
 .day.past{opacity:.72;background:#f6efe2}
 .day.today{border-color:#e8937c;border-width:4px;background:#fff;box-shadow:0 0 0 5px rgba(232,147,124,.22);}
 .rel{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;
@@ -82,10 +87,12 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 <body>
 
 <div id="head">
-  <div id="setBtn">⚙<div id="pbGauge"></div></div>
-  <div id="today">きょうは</div>
+  <div id="headTop">
+    <div id="setBtn">⚙<div id="pbGauge"></div></div>
+    <div id="today">☀ きょうは</div>
+    <div id="zukanBadge">🎁 <span id="zkN">0</span>こ</div>
+  </div>
   <div id="todayBig"></div>
-  <div id="zukanBadge">🎁 ずかん <span id="zkN">0</span>こ</div>
 </div>
 
 <div id="strip"></div>
@@ -157,7 +164,7 @@ function renderStrip(){
   var st=q("strip"); st.innerHTML="";
   DAYS.forEach(function(d){
     var k=key(d), w=d.getDay();
-    var cls="day"+(k===key(today)?" today":(d<today?" past":""));
+    var cls="day w"+w+(k===key(today)?" today":(d<today?" past":""));
     var mo = (d.getDate()===1 || (d.getMonth()!==today.getMonth() && k===key(DAYS.find(function(x){return x.getMonth()!==today.getMonth();})||d)))
       ? '<div class="mo">'+(d.getMonth()+1)+'がつ</div>' : '<div class="mo">&nbsp;</div>';
     var evs = eventsOf(d);

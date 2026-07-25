@@ -88,6 +88,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 <body>
 
 <div id="hud">
+  <a class="badge" href="kuruma_parking.html" style="text-decoration:none">🚗</a>
   <div class="badge" id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
   <div class="badge" id="nameBadge">🐱 <span id="catName">ねこ</span></div>
   <div class="badge" id="setBtn">⚙</div>
@@ -105,7 +106,12 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
   <div class="stat"><div class="lb">🍚 おなか</div><div class="bar"><i id="barFood"></i></div></div>
   <div class="stat"><div class="lb">💗 なかよし</div><div class="bar"><i id="barLove"></i></div></div>
 </div>
-<div id="msg">おしたくの「できた!」が ねこのごはんになるよ</div>
+<div id="msg">お湯コインで ごはんを かってあげよう</div>
+<div style="text-align:center;margin:6px 0 2px">
+  <button id="feedBtn" style="font-family:inherit;font-size:15px;font-weight:bold;border:none;
+    background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 26px;
+    box-shadow:0 3px 0 #dcc06e;cursor:pointer">🍚 ごはんを あげる(🪙1まい)</button>
+</div>
 
 <div id="shopRow">
   <div class="shopItem" data-id="ball"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50" /></svg><div class="nm">ボール</div><div class="pr">🪙2まい</div></div>
@@ -248,6 +254,24 @@ q("cat").onclick = function(){
   }
   render(); sayLine();
 };
+/* ごはん購入制(2026-07-25変更: できた!自動支給→お湯コインで買ってあげる) */
+q("feedBtn").onclick = function(){
+  if (wGet() < 1){
+    catSay("お湯コインが ないみたい… おしたくで ためてきてにゃ");
+    blip(300,.15);
+    return;
+  }
+  wSet(wGet() - 1);
+  neko.fedTotal += 1; neko.lastFed = Date.now();
+  neko.love = Math.min(100, neko.love + 3); save();
+  catSay("🍚 もぐもぐ… おいしいにゃ! かってくれて ありがとにゃ!");
+  blip(523,.1); blip(659,.1,.12); blip(784,.15,.24); purr();
+  var c = q("cat"); c.classList.add("happy","bounce");
+  setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
+  setTimeout(function(){ c.classList.remove("happy"); render(); }, 2500);
+  render();
+};
+
 q("bowl").onclick = function(){
   var p = feedsPending();
   if (p <= 0) return;
