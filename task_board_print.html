@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>おしたくボード 印刷キット</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;color:#5a4a38;background:#f5efe2;padding:20px}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-size:20px;margin-bottom:6px}
+.note{background:#fffaf0;border:2.5px solid #c9ae87;border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.9;margin:12px 0}
+.note h2{font-size:14px;color:#a5713f;margin:8px 0 4px}
+.note li{margin-left:1.4em}
+button{font-family:inherit;font-size:15px;font-weight:bold;border:none;background:#a8cf9e;color:#fff;
+  border-radius:999px;padding:12px 26px;box-shadow:0 4px 0 #8bb381;cursor:pointer;margin:8px 0}
+/* ===== 印刷シート ===== */
+#sheet{background:#fff;border:1px solid #ddd;padding:10mm;margin-top:16px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8mm}
+.card{border:2.5px dashed #c9ae87;border-radius:14px;text-align:center;padding:5mm 3mm 3.5mm}
+.card svg{width:30mm;height:30mm}
+.card .nm{font-size:14px;font-weight:bold;letter-spacing:.1em;margin-top:1mm}
+.banner{grid-column:1/-1;display:flex;gap:8mm}
+.banner div{flex:1;border:2.5px solid #8d7b66;border-radius:999px;text-align:center;
+  font-size:17px;font-weight:bold;padding:3mm 0;letter-spacing:.2em}
+.banner .mada{background:#f4d3da;color:#a05a6a}
+.banner .dekita{background:#d3e7cb;color:#4a7a42}
+.title{grid-column:1/-1;text-align:center;border:3px solid #8d7b66;border-radius:16px;
+  background:#f9e3a8;font-size:22px;font-weight:bold;letter-spacing:.25em;padding:4mm 0}
+@media print{
+  body{background:#fff;padding:0}
+  .note,button,h1,.sub{display:none}
+  #sheet{border:none;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🪛 おしたくボード 印刷キット(耐破壊設計v2)</h1>
+<div class="sub" style="font-size:12px;color:#a58868">村・ガチャと同じ画風のアイコンカード8種+バナー。ラミネートしてお使いください</div>
+
+<div class="note">
+  <h2>🔍 なぜバラバラにされたか(分析)</h2>
+  4歳前後にとって「外せる構造」は全部「外すおもちゃ」です。ヒートンにゴムを
+  引っ掛けただけ+チャームが取り外せる構造は、初見で分解対象になります。
+  そして一度分解が「遊び」になると、直しても同じ遊びが再開します。
+  <h2>🔧 耐破壊設計 4か条</h2>
+  <li><b>紐は裏で結び切る</b>: ヒートン引っ掛けをやめ、板の穴に通して裏側で
+  固結び+布テープ。表からは外せない</li>
+  <li><b>チャームは紐に「通す」</b>(そろばん方式): キーホルダー金具の輪に紐を
+  通してから両端を固定。左右にスライドはできるが、外せない</li>
+  <li><b>外せるものは公式に外させる</b>: アイコンカードは面ファスナー(マジックテープ)
+  留めにして「はがす→もどす」を機能にする。破壊は禁止すると増え、公認すると減ります</li>
+  <li><b>一緒に作る</b>: 組み立ての最後の工程(カード貼り)は本人にやらせる。
+  「自分が作ったボード」は壊されにくい — ガチャで自発性が出た今の彼なら効きます</li>
+  <h2>🖨 つかいかた</h2>
+  下のボタンで印刷(A4)→ ラミネート(なければ透明テープ全面貼り)→ カードを切り取り
+  → 面ファスナーで板の左列に。チャーム(はたらく車)が紐の右端に着いたら「できた!」
+</div>
+<button onclick="window.print()">🖨 A4で印刷する</button>
+
+<div id="sheet">
+  <div class="cards">
+    <div class="title">きょうの おしたく</div>
+    <div class="banner"><div class="mada">まだ</div><div class="dekita">できた!</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M28 14 L14 24 L20 36 L26 32 V66 H54 V32 L60 36 L66 24 L52 14 Q46 22 40 22 Q34 22 28 14 Z" fill="#cfe0ee"/><circle cx="40" cy="40" r="6" fill="#fff7ec"/><path d="M34 52 h12"/></svg><div class="nm">おきがえ</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 30 Q22 16 34 16 Q46 16 46 30 Q46 40 42 46 Q40 62 34 62 Q28 62 30 46 Q22 40 22 30 Z" fill="#fff7ec"/><rect x="50" y="8" width="10" height="40" rx="5" fill="#f4d3da"/><rect x="48" y="8" width="14" height="14" rx="4" fill="#cfe0ee"/><path d="M50 12 h10 M50 17 h10"/><circle cx="30" cy="30" r="2" fill="#8d7b66"/><circle cx="38" cy="30" r="2" fill="#8d7b66"/><path d="M31 37 q3 3 6 0"/></svg><div class="nm">はみがき</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 38 H66 Q66 56 52 62 H28 Q14 56 14 38 Z" fill="#f4d3da"/><path d="M20 38 Q20 26 30 24 Q28 30 34 32 Q34 24 42 22 Q42 28 46 30 Q48 24 56 26 Q60 30 60 38" fill="#fff7ec"/><path d="M30 10 q4 4 0 8 M42 8 q4 4 0 8"/></svg><div class="nm">ごはん</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 40 H70 V46 Q70 60 56 62 H24 Q10 60 10 46 Z" fill="#cfe0ee"/><path d="M10 40 Q24 34 40 40 Q56 46 70 40" stroke="#8d7b66" fill="none"/><circle cx="26" cy="22" r="5" fill="#fff7ec"/><circle cx="38" cy="14" r="4" fill="#fff7ec"/><circle cx="48" cy="24" r="3.5" fill="#fff7ec"/><path d="M20 66 v4 M60 66 v4"/></svg><div class="nm">おふろ</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 14 H50 V38 H22 Z" fill="#fff7ec"/><path d="M22 38 Q22 52 36 52 H44 Q58 52 58 40 V34 H50" fill="#cfe0ee"/><rect x="30" y="52" width="14" height="10" fill="#fff7ec"/><rect x="22" y="62" width="30" height="6" rx="3" fill="#f0e3c8"/><rect x="12" y="16" width="10" height="14" rx="3" fill="#f4d3da"/><path d="M14 20 q4 3 0 6"/></svg><div class="nm">トイレ</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="18" y="24" width="44" height="44" rx="12" fill="#f2b28c"/><path d="M28 24 Q28 12 40 12 Q52 12 52 24" fill="none"/><rect x="28" y="36" width="24" height="18" rx="6" fill="#fff7ec"/><path d="M18 40 Q12 42 14 50 M62 40 Q68 42 66 50"/></svg><div class="nm">ようちえん<br>じゅんび</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="34" width="56" height="30" rx="6" fill="#f0e3c8"/><path d="M12 42 H68"/><circle cx="30" cy="26" r="9" fill="#f4d3da"/><rect x="44" y="18" width="16" height="16" rx="4" fill="#cfe0ee"/><path d="M40 8 q6 6 0 10" stroke="#a8cf9e"/></svg><div class="nm">おかたづけ</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M46 8 a20 20 0 1 0 14 34 a16 16 0 0 1 -14 -34 Z" fill="#f9e3a8"/><rect x="10" y="48" width="60" height="18" rx="9" fill="#cfe0ee"/><rect x="10" y="44" width="24" height="12" rx="6" fill="#fff7ec"/><path d="M52 20 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/></svg><div class="nm">ねんね</div></div>
+
+    <div class="card"><svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="40" cy="40" r="26" fill="#fff7ec" stroke-dasharray="6 5"/><path d="M40 28 V52 M28 40 H52"/></svg><div class="nm">(よびカード)<br>じゆうにかく</div></div>
+  </div>
+</div>
+</div>
+</body>
+</html>

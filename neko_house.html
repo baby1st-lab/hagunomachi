@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-title" content="ねこ">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>ねこのおうち</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
@@ -150,7 +153,17 @@ function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||wi
   var o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t||"triangle"; o.frequency.value=f;
   g.gain.setValueAtTime(.05,audioCtx.currentTime+(w||0)); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
   o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
-function purr(){ blip(160,.3,0,"sawtooth"); blip(150,.3,.25,"sawtooth"); blip(160,.3,.5,"sawtooth"); }
+/* うれしい声(低音のゴロゴロは不評だったので、明るいチャープに変更) */
+function purr(){ blip(784,.1,0,"triangle"); blip(988,.1,.13,"triangle"); blip(1175,.16,.26,"triangle"); }
+/* ねむり時間(ボードのねこと同期: 20:45〜翌7:00) */
+function isSleepTime_(){
+  var d = new Date(), t = d.getHours()*60 + d.getMinutes();
+  return (t >= 1245 || t < 420);
+}
+function sleepSay_(){
+  catSay("すやすや… ねてるよ zzz また あした あそぼうにゃ");
+  blip(392,.1,0,"triangle");
+}
 
 /* ===== ねこの絵(成長3段階・ぬい画風) ===== */
 function catSVG(){
@@ -158,6 +171,23 @@ function catSVG(){
   var scale = [0.78, 0.92, 1.05][stage];
   var ribbon = stage >= 1 ? '<path d="M52 34 l-7 -5 v10 Z M52 34 l7 -5 v10 Z" fill="#e8788a" stroke="#8d7b66" stroke-width="2.5"/><circle cx="52" cy="34" r="3" fill="#f4d3da" stroke="#8d7b66" stroke-width="2"/>' : '';
   var fluff = stage === 2 ? '<path d="M20 78 q-8 4 -10 12 M100 78 q8 4 10 12" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linecap="round"/>' : '';
+  if (isSleepTime_()){
+    // ねむり顔(とじた目+zzz)。うずくまり感はおしり側を下げた姿勢で
+    return '<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg" style="transform:scale(0.95);transform-origin:bottom center">' +
+      '<g stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">' +
+      '<ellipse cx="62" cy="80" rx="40" ry="18" fill="#f0e3c8"/>' +
+      '<path d="M98 76 q16 -4 12 -20" fill="none" stroke-width="6"/>' +
+      '<circle cx="42" cy="58" r="24" fill="#f0e3c8"/>' +
+      '<path d="M24 44 L20 28 L34 36 Z" fill="#f0e3c8"/><path d="M60 42 L64 26 L50 34 Z" fill="#f0e3c8"/>' +
+      '<path d="M26 42 L23 31 L32 37 Z" fill="#f4d3da" stroke="none"/><path d="M58 40 L61 30 L52 35 Z" fill="#f4d3da" stroke="none"/>' +
+      '<path d="M32 58 q3 2.8 6 0 M48 58 q3 2.8 6 0" fill="none" stroke-width="2.6"/>' +
+      '<path d="M39 66 q3 2.4 6 0" fill="none" stroke-width="2"/>' +
+      '<circle cx="26" cy="64" r="4" fill="#f4b8b8" stroke="none"/><circle cx="58" cy="64" r="4" fill="#f4b8b8" stroke="none"/>' +
+      '<ellipse cx="46" cy="86" rx="12" ry="5" fill="#fff7ec"/>' +
+      '<text x="88" y="34" font-size="18" fill="#a5c9e8" stroke="none" font-weight="bold">z</text>' +
+      '<text x="100" y="20" font-size="12" fill="#a5c9e8" stroke="none" font-weight="bold">z</text>' +
+      '</g></svg>';
+  }
   var hungry = hoursSinceFed() > 6;
   var eyesOpen = hungry
     ? '<g class="eyesOpen"><path d="M42 46 q4 3 8 0 M70 46 q4 3 8 0" fill="none" stroke="#5a4a38" stroke-width="3.5" stroke-linecap="round"/></g>'
@@ -239,6 +269,7 @@ function sayLine(){
 
 /* ===== ふれあい ===== */
 q("cat").onclick = function(){
+  if (isSleepTime_()){ sleepSay_(); return; }
   var c = q("cat");
   c.classList.add("happy","bounce");
   setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
@@ -259,6 +290,7 @@ q("cat").onclick = function(){
 /* ごはん購入制(2026-07-25変更: できた!自動支給→お湯コインで買ってあげる) */
 var feeding = false;
 q("feedBtn").onclick = function(){
+  if (isSleepTime_()){ sleepSay_(); return; }
   if (feeding) return;
   if (wGet() < 1){
     catSay("お湯コインが ないみたい… おしたくで ためてきてにゃ");
@@ -322,6 +354,7 @@ function loveUp(n){
 }
 
 function playWith(id, el){
+  if (isSleepTime_()){ sleepSay_(); return; }
   var c=q("cat");
   c.classList.add("happy");
   c.style.left = el.style.left; // ねこがおもちゃへかけていく
@@ -347,6 +380,7 @@ function playWith(id, el){
 var PRICES = { ball:2, mouse:3, tower:5 };
 document.querySelectorAll(".shopItem").forEach(function(el){
   el.onclick = function(){
+    if (isSleepTime_()){ sleepSay_(); return; }
     var id = el.dataset.id;
     if (neko.toys[id]) return;
     var price = PRICES[id];
