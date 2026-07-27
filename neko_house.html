@@ -58,7 +58,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .stat.pulse .bar i{animation:barflash .5s ease 2}
 @keyframes barflash{50%{filter:brightness(1.5)}}
 /* しゃべる */
-#say{position:absolute;left:50%;top:18px;transform:translateX(-50%);max-width:86%;
+#say{position:absolute;right:8px;top:16px;max-width:63%;
   background:rgba(255,252,244,.97);border:2.5px solid #c9ae87;border-radius:16px 16px 16px 3px;
   font-size:13px;font-weight:bold;color:#7a6146;padding:8px 14px;display:none;z-index:5}
 .heart{position:absolute;font-size:20px;color:#e8788a;pointer-events:none;animation:hrise 1.2s ease-out forwards;z-index:6}
@@ -183,6 +183,7 @@ body{padding-bottom:78px!important}
   <input type="text" id="nameInput" maxlength="8" placeholder="例: ゆず">
   <button onclick="saveName()">きめた!</button>
   <div style="margin-top:10px;border-top:1px dashed #e5d9c2;padding-top:8px">
+    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0;text-align:left"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
     <button onclick="fbOpen()" style="background:#cfe0ee;color:#5b7ba0;box-shadow:0 3px 0 #a8c4dc">💬 かんそう・ようぼうを おくる</button><br>
     <button onclick="location.href='index.html'" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">🏠 はぐのまちトップ</button><br>
     <button onclick="q('parent').style.display='none'" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">とじる</button>

@@ -26,8 +26,8 @@ button.badge{cursor:pointer;font-family:inherit}
 
 /* ===== ガチャ本体 ===== */
 #stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding-top:56px;padding-bottom:250px}
-@media (max-height:760px){ #stage{padding-bottom:232px} #stage svg{max-height:36vh} }
+  padding-top:92px;padding-bottom:250px}
+@media (max-height:760px){ #stage{padding-top:84px;padding-bottom:222px} #stage svg{max-height:34vh} }
 #machine{position:relative;width:min(72vw,300px)}
 #machine.shake{animation:mshake .12s linear 9}
 @keyframes mshake{0%{transform:translateX(0) rotate(0)}25%{transform:translateX(-4px) rotate(-1deg)}75%{transform:translateX(4px) rotate(1deg)}}
@@ -248,6 +248,7 @@ body{padding-bottom:78px!important}
   <p>ブラウザのデータはまれに消えます(特にiPhoneのSafariは長期間開かないと削除されることがある)。ときどき「書き出す」→コードをLINEのKeep等に貼って保管を。機種変更もこれでOK。</p>
   <div class="row"><button onclick="bakOut()">書き出す</button><button onclick="bakIn()">読み込む</button></div>
   <textarea id="bakArea" style="width:100%;height:64px;font-size:11px;border:2px solid #c9ae87;border-radius:10px;font-family:monospace" placeholder="ここにコードが出ます / 貼り付けて読み込み"></textarea>
+  <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0;text-align:left"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
   <button onclick="fbOpen()" style="font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:9px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin:6px 4px 0 0">💬 かんそう・ようぼう</button>
   <a href="index.html" style="display:inline-block;text-decoration:none;font-size:13px;font-weight:bold;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:9px 18px;margin:6px 4px 0 0">🏠 トップ</a>
   <button class="close" onclick="closeParent()">とじる</button>
@@ -351,7 +352,7 @@ for (var i=0;i<10;i++){
 /* ===== UI初期化 ===== */
 q("zukanBtn").innerHTML = '<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 12 Q20 6 30 12 V48 Q20 42 8 48 Z" fill="#cfe0ee"/><path d="M52 12 Q40 6 30 12 V48 Q40 42 52 48 Z" fill="#f4d3da"/><path d="M14 20 Q21 16 26 19 M14 27 Q21 23 26 26 M34 19 Q39 16 46 20 M34 26 Q39 23 46 27"/></svg>';
 q("coinIcon").innerHTML = G.coin;
-q("coinBtn").insertAdjacentHTML("afterbegin", G.coin);
+q("coinBtn").querySelector(".icon").innerHTML = G.coin;
 q("flyCoin").innerHTML = G.coin;
 q("capsule").innerHTML = '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#f4d3da" stroke="#8d7b66" stroke-width="3.5"/><path d="M10 50 H90" stroke="#8d7b66" stroke-width="3.5"/><path d="M10 50 A40 40 0 0 1 90 50 Z" fill="#fff7ec" fill-opacity=".6"/></svg>';
 q("capTop").innerHTML = G.cap_top; q("capBot").innerHTML = G.cap_bottom;

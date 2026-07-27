@@ -140,11 +140,28 @@ body{padding-bottom:78px!important}
   <div class="chips" id="dayChips"></div>
   <div id="icoGrid"></div>
   <input type="text" id="evLabel" maxlength="10" placeholder="よていのなまえ(ひらがな)">
-  <button class="pbtn" onclick="addEvent()">よていを ついか</button>
-  <button class="pbtn" style="background:#cfe0ee;color:#5b7ba0" onclick="fbOpen()">💬 かんそう・ようぼう</button>
-  <a class="pbtn" href="index.html" style="background:#e8dcc4;text-decoration:none;display:inline-block">🏠 トップ</a>
-  <button class="pbtn" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb ;float:right" onclick="closeEditor()">とじる</button>
+  <div style="text-align:center;margin:6px 0 2px">
+    <button class="pbtn" onclick="addEvent()">よていを ついか</button>
+  </div>
   <div id="evList"></div>
+  <div style="border-top:2px dashed #e5d9c2;margin-top:12px;padding-top:10px">
+    <div style="font-size:12px;font-weight:bold;color:#a58868;margin-bottom:6px">へいじつの デフォルト(なにも予定がない日)</div>
+    <select id="wdName" onchange="setWdName(this.value)" style="font-family:inherit;font-size:14px;padding:8px 12px;border:2.5px solid #c9ae87;border-radius:12px;background:#fffaf0;color:#7a6146;width:100%">
+      <option value="ほいくえん">🎒 ほいくえん</option>
+      <option value="ようちえん">🎒 ようちえん</option>
+      <option value="こどもえん">🎒 こどもえん</option>
+      <option value="がっこう">🎒 がっこう</option>
+      <option value="おうち">🏠 おうち(えんに行っていない)</option>
+    </select>
+  </div>
+  <div style="text-align:center;margin-top:14px">
+    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
+    <button class="pbtn" style="background:#cfe0ee;color:#5b7ba0" onclick="fbOpen()">💬 かんそう・ようぼう</button>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+    <a class="pbtn" href="index.html" style="background:#e8dcc4;text-decoration:none;display:inline-block">🏠 トップ</a>
+    <button class="pbtn" style="background:#e8dcc4" onclick="closeEditor()">とじる</button>
+  </div>
 </div>
 
 
@@ -155,6 +172,26 @@ function q(id){ return document.getElementById(id); }
 var M = { ev: {} };
 try{ var s = localStorage.getItem("mitooshi_v1"); if (s) M = JSON.parse(s); if(!M.ev) M.ev={}; }catch(e){}
 function save(){ try{ localStorage.setItem("mitooshi_v1", JSON.stringify(M)); }catch(e){} }
+function setWdName(v){ M.wdName = v; save(); renderStrip(); renderDetail(); }
+/* ===== はじめてだけ出るヒント ===== */
+function firstTip(id, title, body){
+  var seen = {};
+  try{ seen = JSON.parse(localStorage.getItem("tips_seen_v1") || "{}"); }catch(e){}
+  if (seen[id]) return;
+  var w = document.createElement("div");
+  w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
+  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38">'
+    + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
+    + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
+    + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
+  w.querySelector("button").onclick = function(){
+    seen[id] = 1;
+    try{ localStorage.setItem("tips_seen_v1", JSON.stringify(seen)); }catch(e){}
+    w.remove();
+  };
+  document.body.appendChild(w);
+}
+
 
 var gacha = { owned:{}, hist:[] };
 try{ var g = localStorage.getItem("ofuro_gacha_v1"); if (g){ var go=JSON.parse(g); gacha.owned=go.owned||{}; gacha.hist=go.hist||[]; } }catch(e){}
@@ -185,7 +222,9 @@ function eventsOf(d){
   var evs = M.ev[key(d)] || [];
   if (evs.length) return evs.slice();
   var w = d.getDay();
-  var base = (w===0||w===6) ? [{e:"🏠",l:"おうち",auto:1}] : [{e:"🎒",l:"ほいくえん",auto:1}];
+  var wn = M.wdName || "ほいくえん";
+  var base = (w===0||w===6) ? [{e:"🏠",l:"おうち",auto:1}]
+           : [{e:(wn==="おうち"?"🏠":"🎒"), l:wn, auto:1}];
   if (w===5) base.push({e:"🧺",l:"もちかえりの日",auto:1}); // 毎週金曜: ロッカーの荷物持ち帰り
   return base;
 }
@@ -270,6 +309,7 @@ function renderDetail(){
 
 var edSel = { day:key(today), ico:0 };
 function openEditor(){
+  var sel = q("wdName"); if (sel) sel.value = M.wdName || "ほいくえん";
   q("editor").style.display="block";
   var dc=q("dayChips"); dc.innerHTML="";
   for (var i=0;i<=13;i++){
@@ -310,6 +350,8 @@ function addEvent(){
   renderEvList(); renderStrip(); selKey=edSel.day; renderDetail();
 }
 function closeEditor(){ q("editor").style.display="none"; }
+setTimeout(function(){ firstTip("calendar", "みとおしカレンダー",
+  "きょうと あしたの よていが わかります。<br><br>よていを 入れるときは、右上の <b>「おうちのひと(ながおし)」を 1.5秒ながおし</b>してください。<br>へいじつの よびかた(ほいくえん/がっこう など)も そこで かえられます。"); }, 600);
 
 renderStrip();
 renderDetail();
