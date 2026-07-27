@@ -88,28 +88,38 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
-/* ===== 共通ナビ(全アプリ統一・2026-07-27 UI標準化) ===== */
-#navBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
-  width:min(560px,96vw);margin:0 auto 8px;padding:0 4px}
-#navBar .nv{display:flex;align-items:center;gap:4px;text-decoration:none;background:rgba(255,250,240,.95);
-  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:bold;
-  color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer}
-#navBar .nv.on{background:#f2d98a;border-color:#dcc06e}
-#navBar .nv.coin{border-color:#dcc06e}
-#navBar .nv.set{position:relative;overflow:hidden}
-#navBar .nv.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
-@media (max-width:430px){ #navBar .nv{font-size:12px;padding:6px 10px} }
+/* ===== 共通ヘッダー(コイン・設定) ===== */
+#topBar{display:flex;gap:8px;align-items:center;width:min(560px,96vw);margin:0 auto 8px}
+#topBar .tb{display:flex;align-items:center;gap:5px;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
+  border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:bold;color:#7a6146;
+  box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
+#topBar .tb svg{width:20px;height:20px}
+#topBar .tb .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
+/* ===== 共通フッター(全アプリ統一 v2・2026-07-27) ===== */
+body{padding-bottom:78px!important}
+#appFoot{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;
+  background:rgba(255,250,240,.97);border-top:3px solid #c9ae87;box-shadow:0 -3px 10px rgba(141,123,102,.14)}
+#appFoot .fbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;text-decoration:none;color:#a58868;font-size:10.5px;font-weight:bold;padding:7px 2px 9px;
+  cursor:pointer;position:relative;background:none;border:none;font-family:inherit}
+#appFoot .fbtn .ic{line-height:0}
+#appFoot .fbtn .ic svg{width:30px;height:26px;display:block}
+#appFoot .fbtn.on{color:#7a6146}
+#appFoot .fbtn.on::before{content:"";position:absolute;top:0;left:16%;right:16%;height:4px;
+  background:#f2d98a;border-radius:0 0 6px 6px}
+#appFoot .fbtn .cn{font-size:10.5px;font-weight:bold;color:#a5842e}
+#appFoot .fbtn.set{overflow:hidden}
+#appFoot .fbtn.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c}
 </style>
 </head>
 <body>
 
-<div id="navBar">
-  <a class="nv " href="kuruma_parking.html">🚗 おしたく</a>
-  <a class="nv on" href="mitooshi_calendar.html">📅 カレンダー</a>
-  <a class="nv " href="ofuro_gacha.html">♨ ガチャ</a>
-  <a class="nv " href="neko_house.html">🐱 ねこ</a>
-  <div class="nv coin" id="navCoin" title="1.5秒ながおしで おうちのひとが+3まい">🪙 × <span id="navCoinN">0</span></div>
-  <div class="nv set" id="navSet">⚙ おうちのひと<span class="gz" id="navGauge"></span></div>
+  
+
+<div id="topBar">
+  <div class="tb coin" id="footCoin" title="1.5秒ながおしで おうちのひとが+3まい"><span id="footCoinIco"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg></span>× <span id="footCoinN">0</span></div>
+  <div style="flex:1"></div>
+  <div class="tb set" id="footSet"><span>おうちのひと</span><span style="font-size:9px">(ながおし)</span><span class="gz" id="footGauge"></span></div>
 </div>
 
 <div id="head">
@@ -364,5 +374,24 @@ function fbCopy(){
 }
 </script>
 
+<div id="appFoot">
+  <a class="fbtn " href="kuruma_parking.html"><span class="ic"><svg viewBox="0 0 80 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 44 V38 Q6 32 14 32 L22 32 Q28 18 41 18 L49 18 Q59 18 63 32 Q70 32 70 39 V44 Z" fill="#f4d3da"/><circle cx="20" cy="46" r="7" fill="#ddd7f0"/><circle cx="58" cy="46" r="7" fill="#ddd7f0"/><circle cx="33" cy="37" r="2.5" fill="#8d7b66" stroke="none"/><circle cx="45" cy="37" r="2.5" fill="#8d7b66" stroke="none"/></svg></span>おしたく</a>
+  <a class="fbtn on" href="mitooshi_calendar.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><rect x="7" y="12" width="46" height="42" rx="8" fill="#fff7ec"/><path d="M7 24 H53" stroke-width="3.5"/><rect x="17" y="4" width="5" height="12" rx="2.5" fill="#c9ae87"/><rect x="38" y="4" width="5" height="12" rx="2.5" fill="#c9ae87"/><circle cx="30" cy="39" r="7" fill="#f4b8b8" stroke="none"/></svg></span>カレンダー</a>
+  <a class="fbtn " href="ofuro_gacha.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><path d="M8 30 a22 22 0 0 1 44 0 Z" fill="#f4d3da"/><path d="M8 30 h44" stroke-width="4"/><path d="M52 30 a22 22 0 0 1 -44 0 Z" fill="#fff7ec"/></svg></span>ガチャ</a>
+  <a class="fbtn " href="neko_house.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><path d="M16 22 L11 6 L27 14 Z" fill="#f0e3c8"/><path d="M44 22 L49 6 L33 14 Z" fill="#f0e3c8"/><circle cx="30" cy="34" r="20" fill="#f0e3c8"/><circle cx="23" cy="31" r="2.6" fill="#5a4a38" stroke="none"/><circle cx="37" cy="31" r="2.6" fill="#5a4a38" stroke="none"/><path d="M27 40 q3 3 6 0" stroke-width="3"/><circle cx="16" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="44" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/></svg></span>ねこ</a>
+</div>
+
+<script>
+(function(){
+  try{ var w=JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0;
+       document.getElementById("footCoinN").textContent=w; }catch(e){}
+  var t=null,b=document.getElementById("footSet"),gz=document.getElementById("footGauge");
+  function down(){ gz.style.transition="width 1.5s linear"; gz.style.width="100%";
+    t=setTimeout(function(){ openEditor(); gz.style.transition="none"; gz.style.width="0%"; },1500); }
+  function up(){ clearTimeout(t); gz.style.transition="none"; gz.style.width="0%"; }
+  b.addEventListener("mousedown",down);b.addEventListener("mouseup",up);b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true});b.addEventListener("touchend",up);
+})();
+</script>
 </body>
 </html>

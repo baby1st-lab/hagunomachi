@@ -16,7 +16,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 @keyframes floatup{from{transform:translateY(105vh)}to{transform:translateY(-15vh)}}
 
 /* ===== ヘッダー ===== */
-#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+#hud{position:fixed;top:10px;z-index:8;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;z-index:5}
 .badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;
   padding:6px 14px;font-size:14px;font-weight:bold;color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);
   display:flex;align-items:center;gap:6px}
@@ -26,8 +26,8 @@ button.badge{cursor:pointer;font-family:inherit}
 
 /* ===== ガチャ本体 ===== */
 #stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding-top:56px;padding-bottom:210px}
-@media (max-height:700px){ #stage{padding-bottom:190px} #stage svg{max-height:44vh} }
+  padding-top:56px;padding-bottom:290px}
+@media (max-height:760px){ #stage{padding-bottom:270px} #stage svg{max-height:38vh} }
 #machine{position:relative;width:min(72vw,300px)}
 #machine.shake{animation:mshake .12s linear 9}
 @keyframes mshake{0%{transform:translateX(0) rotate(0)}25%{transform:translateX(-4px) rotate(-1deg)}75%{transform:translateX(4px) rotate(1deg)}}
@@ -54,7 +54,7 @@ button.badge{cursor:pointer;font-family:inherit}
   border:2.5px solid #c9ae87;border-radius:999px;padding:7px 20px;text-align:center;max-width:88vw}
 
 /* ===== コイン ===== */
-#coinBtn{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);width:64px;cursor:pointer;z-index:6;
+#coinBtn{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);width:64px;cursor:pointer;z-index:6;
   filter:drop-shadow(0 5px 4px rgba(141,123,102,.3));transition:opacity .3s}
 #coinBtn.off{opacity:.25;pointer-events:none}
 #coinBtn svg{width:100%;height:auto}
@@ -112,7 +112,7 @@ button.badge{cursor:pointer;font-family:inherit}
 /* ===== おうちのひとパネル ===== */
 #parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:30;display:none;align-items:center;justify-content:center;padding:20px}
 #parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:380px;width:100%;padding:20px;max-height:86vh;overflow-y:auto}
-#promiseBtn{position:fixed;bottom:136px;left:50%;transform:translateX(-50%);z-index:6;white-space:nowrap;max-width:94vw;
+#promiseBtn{position:fixed;bottom:214px;left:50%;transform:translateX(-50%);z-index:6;white-space:nowrap;max-width:94vw;
   font-family:inherit;font-size:14px;font-weight:bold;border:none;border-radius:999px;
   padding:12px 22px;background:#8fc7e8;color:#fff;box-shadow:0 5px 0 #6da7c9;cursor:pointer;white-space:nowrap}
 #zukanBtn svg{width:26px;height:26px}
@@ -146,28 +146,37 @@ button.badge{cursor:pointer;font-family:inherit}
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
-/* ===== 共通ナビ(全アプリ統一・2026-07-27 UI標準化) ===== */
-#navBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
-  width:min(560px,96vw);margin:0 auto 8px;padding:0 4px}
-#navBar .nv{display:flex;align-items:center;gap:4px;text-decoration:none;background:rgba(255,250,240,.95);
-  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:bold;
-  color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer}
-#navBar .nv.on{background:#f2d98a;border-color:#dcc06e}
-#navBar .nv.coin{border-color:#dcc06e}
-#navBar .nv.set{position:relative;overflow:hidden}
-#navBar .nv.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
-@media (max-width:430px){ #navBar .nv{font-size:12px;padding:6px 10px} }
+/* ===== 共通ヘッダー(コイン・設定) ===== */
+#topBar{position:fixed;top:10px;left:10px;right:10px;z-index:9;display:flex;gap:8px;align-items:center}
+#topBar .tb{display:flex;align-items:center;gap:5px;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
+  border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:bold;color:#7a6146;
+  box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
+#topBar .tb svg{width:20px;height:20px}
+#topBar .tb .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
+/* ===== 共通フッター(全アプリ統一 v2・2026-07-27) ===== */
+body{padding-bottom:78px!important}
+#appFoot{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;
+  background:rgba(255,250,240,.97);border-top:3px solid #c9ae87;box-shadow:0 -3px 10px rgba(141,123,102,.14)}
+#appFoot .fbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;text-decoration:none;color:#a58868;font-size:10.5px;font-weight:bold;padding:7px 2px 9px;
+  cursor:pointer;position:relative;background:none;border:none;font-family:inherit}
+#appFoot .fbtn .ic{line-height:0}
+#appFoot .fbtn .ic svg{width:30px;height:26px;display:block}
+#appFoot .fbtn.on{color:#7a6146}
+#appFoot .fbtn.on::before{content:"";position:absolute;top:0;left:16%;right:16%;height:4px;
+  background:#f2d98a;border-radius:0 0 6px 6px}
+#appFoot .fbtn .cn{font-size:10.5px;font-weight:bold;color:#a5842e}
+#appFoot .fbtn.set{overflow:hidden}
+#appFoot .fbtn.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c}
 </style>
 </head>
 <body>
 
-<div id="navBar">
-  <a class="nv " href="kuruma_parking.html">🚗 おしたく</a>
-  <a class="nv " href="mitooshi_calendar.html">📅 カレンダー</a>
-  <a class="nv on" href="ofuro_gacha.html">♨ ガチャ</a>
-  <a class="nv " href="neko_house.html">🐱 ねこ</a>
-  <div class="nv coin" id="navCoin" title="1.5秒ながおしで おうちのひとが+3まい">🪙 × <span id="navCoinN">0</span></div>
-  <div class="nv set" id="navSet">⚙ おうちのひと<span class="gz" id="navGauge"></span></div>
+  
+<div id="topBar">
+  <div class="tb coin" id="footCoin" title="1.5秒ながおしで おうちのひとが+3まい"><span id="footCoinIco"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg></span>× <span id="footCoinN">0</span></div>
+  <div style="flex:1"></div>
+  <div class="tb set" id="footSet"><span>おうちのひと</span><span style="font-size:9px">(ながおし)</span><span class="gz" id="footGauge"></span></div>
 </div>
 <div id="hud" style="justify-content:center;gap:8px">
   <button class="badge" id="zukanBtn">ずかん</button>
@@ -356,7 +365,7 @@ function idleMsg(){
   if (store.prom.used) return "やくそく まもれて えらい!";
   return "「おやくそく まもります!」を おして コインをもらおう!";
 }
-refreshHud(); if(document.getElementById("navCoinN")) document.getElementById("navCoinN").textContent = wGet();
+refreshHud(); if(document.getElementById("footCoinN")) document.getElementById("footCoinN").textContent = wGet();
 setMsg(idleMsg());
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshHud(); });
 
@@ -742,5 +751,34 @@ function fbCopy(){
 }
 </script>
 
+<div id="appFoot">
+  <a class="fbtn " href="kuruma_parking.html"><span class="ic"><svg viewBox="0 0 80 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 44 V38 Q6 32 14 32 L22 32 Q28 18 41 18 L49 18 Q59 18 63 32 Q70 32 70 39 V44 Z" fill="#f4d3da"/><circle cx="20" cy="46" r="7" fill="#ddd7f0"/><circle cx="58" cy="46" r="7" fill="#ddd7f0"/><circle cx="33" cy="37" r="2.5" fill="#8d7b66" stroke="none"/><circle cx="45" cy="37" r="2.5" fill="#8d7b66" stroke="none"/></svg></span>おしたく</a>
+  <a class="fbtn " href="mitooshi_calendar.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><rect x="7" y="12" width="46" height="42" rx="8" fill="#fff7ec"/><path d="M7 24 H53" stroke-width="3.5"/><rect x="17" y="4" width="5" height="12" rx="2.5" fill="#c9ae87"/><rect x="38" y="4" width="5" height="12" rx="2.5" fill="#c9ae87"/><circle cx="30" cy="39" r="7" fill="#f4b8b8" stroke="none"/></svg></span>カレンダー</a>
+  <a class="fbtn on" href="ofuro_gacha.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><path d="M8 30 a22 22 0 0 1 44 0 Z" fill="#f4d3da"/><path d="M8 30 h44" stroke-width="4"/><path d="M52 30 a22 22 0 0 1 -44 0 Z" fill="#fff7ec"/></svg></span>ガチャ</a>
+  <a class="fbtn " href="neko_house.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><path d="M16 22 L11 6 L27 14 Z" fill="#f0e3c8"/><path d="M44 22 L49 6 L33 14 Z" fill="#f0e3c8"/><circle cx="30" cy="34" r="20" fill="#f0e3c8"/><circle cx="23" cy="31" r="2.6" fill="#5a4a38" stroke="none"/><circle cx="37" cy="31" r="2.6" fill="#5a4a38" stroke="none"/><path d="M27 40 q3 3 6 0" stroke-width="3"/><circle cx="16" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="44" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/></svg></span>ねこ</a>
+</div>
+
+<script>
+(function(){
+  function sync(){ try{ document.getElementById("footCoinN").textContent = wGet(); }catch(e){} }
+  sync();
+  var _rh = window.refreshHud;
+  if (typeof _rh === "function"){ window.refreshHud = function(){ _rh(); sync(); }; }
+  var t=null,b=document.getElementById("footSet"),gz=document.getElementById("footGauge");
+  function down(){ gz.style.transition="width 1.5s linear"; gz.style.width="100%";
+    t=setTimeout(function(){ document.getElementById("parent").style.display="flex";
+      if(typeof refreshParent==="function") refreshParent();
+      gz.style.transition="none"; gz.style.width="0%"; },1500); }
+  function up(){ clearTimeout(t); gz.style.transition="none"; gz.style.width="0%"; }
+  b.addEventListener("mousedown",down);b.addEventListener("mouseup",up);b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true});b.addEventListener("touchend",up);
+  var t2=null,c=document.getElementById("footCoin");
+  function d2(){ t2=setTimeout(function(){ wSet(wGet()+3); if(typeof refreshHud==="function") refreshHud(); sync(); },1500); }
+  function u2(){ clearTimeout(t2); }
+  c.addEventListener("mousedown",d2);c.addEventListener("mouseup",u2);c.addEventListener("mouseleave",u2);
+  c.addEventListener("touchstart",d2,{passive:true});c.addEventListener("touchend",u2);
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden) sync(); });
+})();
+</script>
 </body>
 </html>
