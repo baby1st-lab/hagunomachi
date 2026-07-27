@@ -229,7 +229,7 @@ body.night #nekoNow{color:#d8cdb4}
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
 /* ===== 共通ヘッダー(コイン・設定) ===== */
-#topBar{display:flex;gap:8px;align-items:center;width:min(560px,96vw);margin:0 auto 8px}
+#topBar{display:flex;gap:8px;align-items:center;width:min(480px,96vw);margin:0 auto 8px;padding:0 14px}
 #topBar .tb{display:flex;align-items:center;gap:5px;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
   border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:bold;color:#7a6146;
   box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
@@ -384,6 +384,16 @@ body{padding-bottom:78px!important}
     <button onclick="fbOpen()">💬 かんそう・ようぼうを おくる</button>
     <button onclick="location.href='index.html'">🏠 はぐのまちトップ</button>
   </div>
+  <details id="bkup" style="margin-top:14px;border-top:2px dashed #dcc06e;padding-top:10px">
+    <summary style="font-size:13px;font-weight:bold;color:#a58868;cursor:pointer">🗄 データのバックアップ(ふだんは使いません)</summary>
+    <p style="font-size:12px;color:#8d7b66;margin:8px 0">記録はこの端末の中だけに保存されています。機種変更のときや、まんいちデータが消えたときのために書き出しておけます。</p>
+    <div class="row" style="gap:6px;flex-wrap:wrap">
+      <button onclick="dataExport()">⬇ 書き出す</button>
+      <button onclick="q('impFile').click()">⬆ 読み込む</button>
+      <input type="file" id="impFile" accept="application/json,.json" style="display:none" onchange="dataImport(this)">
+    </div>
+    <p style="font-size:11.5px;color:#a99f8c;margin-top:6px">※読み込むと、いまの記録は上書きされます。</p>
+  </details>
   <button class="close" onclick="closeParent()">とじる</button>
 </div></div>
 
@@ -1155,6 +1165,42 @@ function grantCoin(k){ walletAdd(k); toast("お湯コイン "+(k>0?"+":"")+k+" (
 function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard(); toast("きょうの「できた」をリセットしました"); }
 function resetDone(m){ store.done[m]={}; save(); renderBoard(); toast((m==="asa"?"あさ":"よる")+"の「できた」をリセットしました"); }
 function closeParent(){ q("parent").style.display="none"; }
+
+/* ===== データの書き出し/読み込み(全アプリ共通) ===== */
+var BK_KEYS = ["yucoin_wallet_v1","oshitaku_v1","ofuro_gacha_v1","neko_v1","mitooshi_v1",
+               "koubou_v1","neko_feed_v1","neko_gift_v1","prize_icons_v1"];
+function dataExport(){
+  var o = { _app:"hagunomachi", _ver:1, _at:new Date().toISOString(), data:{} };
+  BK_KEYS.forEach(function(k){ var v = localStorage.getItem(k); if (v !== null) o.data[k] = v; });
+  var blob = new Blob([JSON.stringify(o)], {type:"application/json"});
+  var d = new Date(), pad = function(n){ return (n<10?"0":"")+n; };
+  var nm = "hagunomachi_" + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + ".json";
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = nm;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  toast("書き出しました(" + nm + ")");
+}
+function dataImport(input){
+  var f = input.files && input.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var o = JSON.parse(r.result);
+      if (!o || o._app !== "hagunomachi" || !o.data) throw new Error("形式ちがい");
+      if (!confirm("いまの記録を、このファイルの内容で上書きします。よろしいですか?")) { input.value=""; return; }
+      Object.keys(o.data).forEach(function(k){
+        if (BK_KEYS.indexOf(k) >= 0) localStorage.setItem(k, o.data[k]);
+      });
+      alert("読み込みました。画面を読みこみ直します。");
+      location.reload();
+    }catch(e){
+      alert("このファイルは読み込めませんでした(" + e.message + ")");
+    }
+    input.value = "";
+  };
+  r.readAsText(f);
+}
 
 /* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });

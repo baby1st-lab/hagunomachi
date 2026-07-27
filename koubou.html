@@ -41,6 +41,8 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
 .part.lock .pr{color:#a99f8c}
 #doneBtn{font-family:inherit;font-size:15px;font-weight:bold;border:none;background:#a5c9e8;color:#2f4b6b;
   border-radius:999px;padding:12px 28px;box-shadow:0 4px 0 #7fa9cd;cursor:pointer;margin:12px auto 0;display:none}
+#stage{text-align:center}
+#trainName,#hint{text-align:center}
 
 /* かんせいした でんしゃ */
 #garageTtl{width:min(500px,96vw);font-size:14px;font-weight:bold;color:#5a6b86;margin:14px 0 4px 10px}
@@ -135,14 +137,14 @@ function fanfare(){ [523,659,784,1047].forEach(function(f,i){ blip(f,.22,i*.13);
 
 /* ===== でんしゃの せっけいず ===== */
 var TRAINS = [
-  { id:"mita",   type:"train", name:"みたせん",     color:"#7fb3e8", line:"#3a6fa8", roof:"#e8eef6" },
-  { id:"oedo",   type:"train", name:"おおえどせん", color:"#e79ec4", line:"#b8437f", roof:"#f7e6ef" },
+  { id:"mita",   type:"train", name:"あおい でんしゃ",     color:"#7fb3e8", line:"#3a6fa8", roof:"#e8eef6" },
+  { id:"oedo",   type:"train", name:"ももいろ でんしゃ", color:"#e79ec4", line:"#b8437f", roof:"#f7e6ef" },
   { id:"car",    type:"car",   name:"くるま",       color:"#f4d3da", line:"#d9a3b2", roof:"#cfe0ee" },
   { id:"ribbon", type:"ribbon",name:"リボンのかんむり", color:"#f4b8b8", line:"#e8788a", roof:"#f9e3a8" },
-  { id:"marunouchi", type:"train", name:"まるのうちせん", color:"#e88b7d", line:"#c0392b", roof:"#f8e6e2" },
+  { id:"marunouchi", type:"train", name:"あかい でんしゃ", color:"#e88b7d", line:"#c0392b", roof:"#f8e6e2" },
   { id:"cake",   type:"cake",  name:"ケーキ",       color:"#fff7ec", line:"#f4b8b8", roof:"#f4d3da" },
-  { id:"ginza",  type:"train", name:"ぎんざせん",   color:"#f0c274", line:"#c8902f", roof:"#faf0da" },
-  { id:"shinkansen", type:"train", name:"しんかんせん", color:"#eef1f6", line:"#3a6fa8", roof:"#dfe6ef" }
+  { id:"ginza",  type:"train", name:"きいろい でんしゃ",   color:"#f0c274", line:"#c8902f", roof:"#faf0da" },
+  { id:"shinkansen", type:"train", name:"はやい でんしゃ", color:"#eef1f6", line:"#3a6fa8", roof:"#dfe6ef" }
 ];
 /* 4つの ぶひん(順番に買う) */
 var PARTS = [
@@ -261,7 +263,7 @@ function render(){
   var next = PARTS.filter(function(p){ return !K.bought[p.key]; })[0];
   q("hint").textContent = st >= 4 ? "ぜんぶ そろった! 「かんせい!」を おしてね"
     : (next ? "つぎは「" + next.name + "」を かおう(" + next.price + "まい)" : "");
-  q("doneBtn").style.display = st >= 4 ? "inline-block" : "none";
+  q("doneBtn").style.display = st >= 4 ? "block" : "none";
   renderGarage();
   refreshCoin();
 }
@@ -303,7 +305,7 @@ q("doneBtn").onclick = function(){
   try{navigator.vibrate&&navigator.vibrate([60,50,60,50,120]);}catch(e){}
   q("celSvg").innerHTML = trainSVG(t, 4);
   q("celTtl").textContent = "🎉 「" + t.name + "」 かんせい!";
-  q("celMsg").textContent = "じぶんで つくったね! ねこに みせに いこうか";
+  q("celMsg").textContent = "じぶんで つくったね! ねこに みせに いこう";
   q("cel").style.display = "flex";
   // ねこの部屋に「もらったでんしゃ」として渡す
   try{

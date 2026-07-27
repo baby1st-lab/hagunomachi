@@ -29,6 +29,12 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .toyObj{position:absolute;cursor:pointer}
 .toyObj svg{width:100%;height:auto;display:block}
 /* ねこ */
+#railTrack{position:absolute;left:4%;right:4%;bottom:14px;height:9px;background:#c9ae87;border:2px solid #8d7b66;
+  border-radius:99px;z-index:1;display:none}
+#railTrack::after{content:"";position:absolute;inset:2px 4px;background:repeating-linear-gradient(90deg,#8d7b66 0 4px,transparent 4px 16px);opacity:.5}
+#railCar{position:absolute;bottom:16px;left:6%;width:104px;z-index:3;cursor:pointer;display:none;
+  transition:left 1.6s linear,transform .2s}
+#railCar svg{width:100%;height:auto;display:block}
 #cat{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:150px;cursor:pointer;
   transition:left 1.4s ease,bottom 1.4s ease}
 #cat svg{width:100%;height:auto;display:block}
@@ -96,7 +102,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
 /* ===== 共通ヘッダー(コイン・設定) ===== */
-#topBar{display:flex;gap:8px;align-items:center;width:min(560px,96vw);margin:0 auto 8px}
+#topBar{display:flex;gap:8px;align-items:center;width:min(440px,96vw);margin:0 auto 8px}
 #topBar .tb{display:flex;align-items:center;gap:5px;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
   border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:bold;color:#7a6146;
   box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
@@ -139,6 +145,8 @@ body{padding-bottom:78px!important}
   <div id="cushion"></div>
   <div id="say"></div>
   <div id="bowl"><span class="n" id="bowlN">×1</span></div>
+  <div id="railTrack"></div>
+  <div id="railCar" title="タップで はしるよ"></div>
   <div id="cat"></div>
   <div id="toyBox" style="position:absolute;right:20px;bottom:96px;width:62px;cursor:pointer;display:none;z-index:3">
     <span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px"></span>
@@ -319,17 +327,72 @@ function giftTrainSVG(id){
     '<circle cx="252" cy="76" r="7" fill="#f9e3a8"/><circle cx="46" cy="76" r="7" fill="#f9e3a8"/>'+
     '<circle cx="238" cy="58" r="3" fill="#5a4a38" stroke="none"/><circle cx="256" cy="58" r="3" fill="#5a4a38" stroke="none"/></svg>';
 }
+/* ===== 線路: 電車を つくったら あらわれる ===== */
+var railBusy = false;
+function renderRail(g){
+  var trains = (g||[]).filter(function(x){ return !GIFT_TYPE[x.id]; });
+  var tr = q("railTrack"), rc = q("railCar");
+  if (!tr || !rc) return;
+  if (!trains.length){ tr.style.display = "none"; rc.style.display = "none"; return; }
+  var last = trains[trains.length - 1];
+  tr.style.display = "block"; rc.style.display = "block";
+  rc.innerHTML = giftTrainSVG(last.id);
+  rc.dataset.nm = last.name;
+  rc.onclick = function(){ runTrain(last); };
+}
+function runTrain(item){
+  if (railBusy) return;
+  if (isSleepTime_()){ sleepSay_(); return; }
+  railBusy = true;
+  var rc = q("railCar"), c = q("cat");
+  var oldTrans = c.style.transition;
+  c.style.transition = "left 1.4s ease, bottom .3s ease";
+  catSay("わっ! でんしゃが うごいたにゃ!! まてまて〜");
+  var stops = ["70%","10%","74%","6%"], i = 0;
+  function hop(){
+    if (i >= stops.length){
+      rc.style.left = "6%"; rc.style.transform = "";
+      c.style.left = "22%";
+      setTimeout(function(){
+        catSay("はぁ はぁ… つかまえたにゃ! 「" + item.name + "」 はやいにゃ〜");
+        loveUp(2);
+        c.classList.add("happy","bounce");
+        setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
+        setTimeout(function(){
+          c.classList.remove("happy"); c.style.left = "50%";
+          c.style.transition = oldTrans; railBusy = false; render();
+        }, 2600);
+      }, 1500);
+      return;
+    }
+    var to = stops[i];
+    var goRight = parseFloat(to) > parseFloat(rc.style.left || "6");
+    rc.style.left = to;
+    rc.style.transform = goRight ? "" : "scaleX(-1)";
+    // ねこは すこし おくれて おいかける
+    setTimeout(function(){
+      c.style.left = Math.max(6, Math.min(78, parseFloat(to) + (goRight ? -14 : 14))) + "%";
+    }, 260);
+    i++;
+    setTimeout(hop, 1750);
+  }
+  rc.style.left = "6%";
+  setTimeout(hop, 300);
+}
+
 function gifts_(){ try{ return JSON.parse(localStorage.getItem("neko_gift_v1")||"[]"); }catch(e){ return []; } }
 function renderGifts(){
   var room = q("room");
   room.querySelectorAll(".giftTrain").forEach(function(e){ e.remove(); });
   var g = gifts_();
+  renderRail(g);
   if (!g.length) return;
-  // 最新の3つを床に並べる
-  g.slice(-3).forEach(function(item, i){
+  // 電車いがいの さくひんを 床に並べる(最新3つ)
+  g.filter(function(x){ return !!GIFT_TYPE[x.id]; }).slice(-3).forEach(function(item, i){
     var el = document.createElement("div");
     el.className = "giftTrain";
-    el.style.cssText = "position:absolute;left:"+(8 + i*30)+"%;bottom:"+(6 + i*4)+"px;width:96px;z-index:2;cursor:pointer";
+    var SLOT = [{l:"2%",b:44,w:86},{l:"72%",b:44,w:86},{l:"3%",b:100,w:64}][i] || {l:"2%",b:44,w:86};
+    el.style.cssText = "position:absolute;left:"+SLOT.l+";bottom:"+SLOT.b+"px;width:"+SLOT.w+"px;z-index:1;cursor:pointer";
     el.innerHTML = giftTrainSVG(item.id);
     el.onclick = function(){
       catSay("これ、"+ (neko.name||"ぼく") +"に つくってくれた「"+item.name+"」だにゃ! だいじに するにゃ");
