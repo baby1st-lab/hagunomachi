@@ -81,7 +81,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .shopItem .pr{font-size:11px;color:#a58868;font-weight:bold}
 .shopItem .pr svg{width:16px;height:16px;vertical-align:-3px}
 .shopItem.owned{opacity:.55;pointer-events:none}
-.shopItem.owned .pr::after{content:" ✓おうちにあるよ"}
+.shopItem.owned .pr::after{content:"✓もってる";display:block;font-size:10px}
 #parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
 #parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:20px}
 #parent h3{color:#7a6146;font-size:15px;margin-bottom:6px}
@@ -146,7 +146,7 @@ body{padding-bottom:78px!important}
 <div id="msg">お湯コインで ごはんを かってあげよう</div>
 <div style="text-align:center;margin:6px 0 2px">
   <button id="feedBtn" style="font-family:inherit;font-size:15px;font-weight:bold;border:none;
-    background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 26px;
+    background:#fffaf0;color:#7a6146;border:3px solid #dcc06e;border-radius:999px;padding:11px 26px;
     box-shadow:0 3px 0 #dcc06e;cursor:pointer"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><path d="M8 30 Q30 10 52 30 Z" fill="#fff7ec" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"/><path d="M6 32 h48 q-2 16 -24 16 T6 32 Z" fill="#a5c9e8" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"/></svg> ごはんを あげる(<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>1まい)</button>
 </div>
 
@@ -162,9 +162,9 @@ body{padding-bottom:78px!important}
   <input type="text" id="nameInput" maxlength="8" placeholder="例: ゆず">
   <button onclick="saveName()">きめた!</button>
   <div style="margin-top:10px;border-top:1px dashed #e5d9c2;padding-top:8px">
-    <button onclick="fbOpen()" style="background:#cfe0ee;color:#5b7ba0;box-shadow:0 3px 0 #a8c4dc">💬 かんそう・ようぼう</button>
-    <a href="index.html" style="display:inline-block;text-decoration:none;font-size:13px;font-weight:bold;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:9px 22px;margin-top:8px">🏠 トップ</a>
-    <button onclick="q('parent').style.display='none'" style="background:#e8dcc4">とじる</button>
+    <button onclick="fbOpen()" style="background:#cfe0ee;color:#5b7ba0;box-shadow:0 3px 0 #a8c4dc">💬 かんそう・ようぼうを おくる</button><br>
+    <button onclick="location.href='index.html'" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">🏠 はぐのまちトップ</button><br>
+    <button onclick="q('parent').style.display='none'" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">とじる</button>
   </div>
 </div></div>
 
@@ -297,8 +297,8 @@ function sayLine(){
   else if (h >= 17 && h < 19) lines = ["そろそろ おふろの じゅんびかにゃ?", "おふろから かえったら あそぼうにゃ"];
   else if (h >= 19 && h < 21) lines = ["どうが、きりのいいところで おしまいして おふろいこ? まってるにゃ", "はやく もどってきたら いっぱい あそべるにゃ"];
   else if (h >= 21 || h < 6) lines = ["…zzz(そっと なでてもいいよ)", "きょうも いっぱい がんばったにゃ。おやすみ"];
-  else lines = ["ひなたぼっこ びよりだにゃ", "できた!が とどくの、たのしみに してるにゃ"];
-  if (hoursSinceFed() > 6) lines.push("おなか すいたにゃ〜(できた!が ごはんになるよ)");
+  else lines = ["ひなたぼっこ びよりだにゃ", "きょうも あそびに きてくれて うれしいにゃ"];
+  if (hoursSinceFed() > 6) lines.push("おなか すいたにゃ〜(お湯コインで ごはんを かってほしいにゃ)");
   var t = lines[Math.floor(Math.random()*lines.length)];
   var s = q("say"); s.textContent = t; s.style.display = "block";
   clearTimeout(s._t); s._t = setTimeout(function(){ s.style.display="none"; }, 4200);
@@ -440,7 +440,7 @@ document.querySelectorAll(".shopItem").forEach(function(el){
   var h = new Date().getHours();
   var sky = q("winsky");
   if (h >= 19 || h < 5) sky.style.background = "linear-gradient(#454f6e,#5c688c)";
-  else if (h >= 16) sky.style.background = "linear-gradient(#f6d3b0,#fbeedd)";
+  else if (h >= 16) sky.style.background = "linear-gradient(#ffd9a8,#ffeccf)";
   else sky.style.background = "linear-gradient(#cfe4f2,#e8f3fa)";
 })();
 
