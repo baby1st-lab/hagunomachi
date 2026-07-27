@@ -94,9 +94,11 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 
 <div id="hud">
   <a class="badge" href="kuruma_parking.html" style="text-decoration:none">🚗</a>
-  <div class="badge" id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
+  <a class="badge" href="mitooshi_calendar.html" style="text-decoration:none">📅</a>
+  <a class="badge" href="ofuro_gacha.html" style="text-decoration:none">♨</a>
+  <div class="badge" id="coinBadge" title="1.5秒ながおしで おうちのひとが+3まい"><span id="coinIco"></span>× <span id="coinN">0</span></div>
   <div class="badge" id="nameBadge">🐱 <span id="catName">ねこ</span></div>
-  <div class="badge" id="setBtn">⚙</div>
+  <div class="badge" id="setBtn">⚙ せってい<br><span style="font-size:9px">(ながおし)</span><span id="pbGauge"></span></div>
 </div>
 
 <div id="room">
@@ -125,10 +127,15 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 </div>
 
 <div id="parent"><div class="inner">
-  <h3>ねこのなまえ</h3>
+  <h3 id="pTitle">ねこのなまえ</h3>
   <p>お子さんと一緒に決めて入力してください(あとから変更OK)。ごはんは「おしたくボードのできた!」で届きます。このねこは、おなかがすいても弱ったり死んだりしません(甘えん坊になるだけ)。</p>
   <input type="text" id="nameInput" maxlength="8" placeholder="例: ゆず">
   <button onclick="saveName()">きめた!</button>
+  <div style="margin-top:10px;border-top:1px dashed #e5d9c2;padding-top:8px">
+    <button onclick="fbOpen()" style="background:#cfe0ee;color:#5b7ba0;box-shadow:0 3px 0 #a8c4dc">💬 かんそう・ようぼう</button>
+    <a href="index.html" style="display:inline-block;text-decoration:none;font-size:13px;font-weight:bold;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:9px 22px;margin-top:8px">🏠 トップ</a>
+    <button onclick="q('parent').style.display='none'" style="background:#e8dcc4">とじる</button>
+  </div>
 </div></div>
 
 <script>
@@ -416,7 +423,12 @@ function saveName(){
   render();
   catSay(v + "だにゃ! きょうから うちのこに なるにゃ🐱 よろしくにゃ!", 6000);
 }
-q("setBtn").onclick = function(){ q("nameInput").value = neko.name; q("parent").style.display = "flex"; };
+q("setBtn").onclick = function(){
+  q("nameInput").value = neko.name;
+  var t = q("pTitle");
+  if (t) t.textContent = neko.name ? "せってい(なまえの へんこう)" : "ねこのなまえ";
+  q("parent").style.display = "flex";
+};
 
 /* おうちのひと用: コインバッジ1.5秒ながおしで+3(テスト・特別支給) */
 (function(){
@@ -436,5 +448,61 @@ document.addEventListener("visibilitychange", function(){ if(!document.hidden){ 
 setInterval(render, 60000);
 setInterval(sayLine, 45000);
 </script>
+<!-- ふぃーどばっく(共通パーツ) -->
+<div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+    <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。送信ボタンでメールが開きます(下書きが入っています)。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
+    <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="fbSend()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📧 メールで おくる</button>
+      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピー(LINEに貼る)</button>
+      <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
+    </div>
+    <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
+  </div>
+</div>
+<script>
+var FB_TO = "hagunomachi.feedback@gmail.com";
+var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
+function fbOpen(){
+  var p=document.getElementById("fbPanel"); p.style.display="flex";
+  var c=document.getElementById("fbChips");
+  if(!c.dataset.built){ c.dataset.built="1";
+    FB_TAGS.forEach(function(t){
+      var b=document.createElement("button");
+      b.textContent=t; b.dataset.on="";
+      b.style.cssText="font-family:inherit;font-size:12px;font-weight:bold;border:2px solid #c9ae87;background:#fff;color:#7a6146;border-radius:999px;padding:6px 12px;cursor:pointer";
+      b.onclick=function(){ var on=b.dataset.on==="1"; b.dataset.on=on?"":"1";
+        b.style.background=on?"#fff":"#f2d98a"; };
+      c.appendChild(b);
+    });
+  }
+}
+function fbClose(){ document.getElementById("fbPanel").style.display="none";
+  document.getElementById("fbDone").style.display="none"; }
+function fbBody(){
+  var tags=[].slice.call(document.querySelectorAll("#fbChips button"))
+    .filter(function(b){return b.dataset.on==="1";}).map(function(b){return b.textContent;});
+  var t=document.getElementById("fbText").value.trim();
+  return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
+    "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
+}
+function fbSend(){
+  var url="mailto:"+FB_TO+"?subject="+encodeURIComponent("はぐのまち かんそう・ようぼう")+
+    "&body="+encodeURIComponent(fbBody());
+  location.href=url;
+  var d=document.getElementById("fbDone"); d.textContent="メールアプリが開かない場合は「コピー」でLINEに貼ってください"; d.style.display="block";
+}
+function fbCopy(){
+  var v=fbBody();
+  var d=document.getElementById("fbDone");
+  try{ navigator.clipboard.writeText(v).then(function(){ d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }); }
+  catch(e){ var ta=document.getElementById("fbText"); ta.select(); document.execCommand("copy");
+    d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }
+}
+</script>
+
 </body>
 </html>

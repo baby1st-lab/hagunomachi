@@ -148,7 +148,12 @@ button.badge{cursor:pointer;font-family:inherit}
 <body>
 
 <div id="hud">
-  <div class="badge"><span id="coinIcon"></span>× <span id="coins">0</span></div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <a class="badge" href="kuruma_parking.html" style="text-decoration:none">🚗</a>
+    <a class="badge" href="mitooshi_calendar.html" style="text-decoration:none">📅</a>
+    <a class="badge" href="neko_house.html" style="text-decoration:none">🐱</a>
+    <div class="badge" title="1.5秒ながおしで おうちのひとが+3まい"><span id="coinIcon" title="1.5秒ながおしで おうちのひとが+3まい"></span>× <span id="coins">0</span></div>
+  </div>
   <div style="display:flex;gap:8px">
     <button class="badge" id="zukanBtn">ずかん</button>
     <button class="badge" id="parentBtn"><span id="pbGauge"></span><span>おうちのひと(ながおし)</span></button>
@@ -169,10 +174,10 @@ button.badge{cursor:pointer;font-family:inherit}
     <div id="outlet"></div>
     <div id="capsule"></div>
   </div>
-  <div id="msg">やくそくボタンをおして コインをもらおう!</div>
+  <div id="msg">「おやくそく まもります!」を おして コインをもらおう!</div>
 </div>
 
-<button id="promiseBtn">🛁 おふろにはいります!</button>
+<button id="promiseBtn">✋ おやくそく まもります!</button>
 <div id="coinBtn" class="off"><span class="icon"></span><div class="lbl">コインをいれる</div></div>
 <div id="gtoast"></div>
 <div id="flyPrize"></div>
@@ -197,14 +202,16 @@ button.badge{cursor:pointer;font-family:inherit}
 
 <div id="parent"><div class="inner">
   <h3>おうちのひとメニュー</h3>
-  <p>基本の流れ: 子が水色の「おふろにはいります!」を押す(<b>1日1回だけ</b>)→コインが出る→ガチャ→出た子とお風呂へ。ハンドルは必ず本人に回させる。ごほうびは風呂上がりでなく<b>風呂の入口</b>に。</p>
+  <p>基本の流れ: 子が水色の「<b>おやくそく まもります!</b>」を押す(<b>1日1回だけ</b>)→コインが出る→ガチャ→出た子とお風呂へ。<br>
+  ※「これから おふろ入る?」「はみがきする?」など、<b>その日の約束を決めてから押させる</b>のがコツです。ハンドルは必ず本人に回させる。ごほうびは終わったあとでなく<b>行動の入口</b>に置きます。<br>
+  <b>コインのバッジを1.5秒ながおし</b>すると、おうちの人が+3枚あげられます。</p>
   <p>いまのコイン: <b id="pCoins">0</b>まい / やくそくボタン: きょうは<b id="pProm">まだ</b></p>
   <div class="row">
     <button onclick="addCoin(1)">コイン +1</button>
     <button onclick="addCoin(3)">コイン +3</button>
     <button class="warn" onclick="resetAll()">ずかんリセット(2回押し)</button>
   </div>
-  <h3>やくそくボタン1回でもらえるコイン</h3>
+  <h3>「おやくそく」1回でもらえるコイン</h3>
   <div class="row" id="promMax"></div>
   <div class="row"><button id="cfgToggle" onclick="toggleCfg()">▼ 在庫・確定ガチャの設定をひらく</button></div>
   <div id="cfgWrap">
@@ -215,6 +222,8 @@ button.badge{cursor:pointer;font-family:inherit}
   <p>ブラウザのデータはまれに消えます(特にiPhoneのSafariは長期間開かないと削除されることがある)。ときどき「書き出す」→コードをLINEのKeep等に貼って保管を。機種変更もこれでOK。</p>
   <div class="row"><button onclick="bakOut()">書き出す</button><button onclick="bakIn()">読み込む</button></div>
   <textarea id="bakArea" style="width:100%;height:64px;font-size:11px;border:2px solid #c9ae87;border-radius:10px;font-family:monospace" placeholder="ここにコードが出ます / 貼り付けて読み込み"></textarea>
+  <button onclick="fbOpen()" style="font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:9px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin:6px 4px 0 0">💬 かんそう・ようぼう</button>
+  <a href="index.html" style="display:inline-block;text-decoration:none;font-size:13px;font-weight:bold;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:9px 18px;margin:6px 4px 0 0">🏠 トップ</a>
   <button class="close" onclick="closeParent()">とじる</button>
 </div></div>
 
@@ -329,8 +338,8 @@ function setMsg(t){ q("msg").textContent = t; }
 /* 状況にあった案内(やくそく済みなら次を促さない) */
 function idleMsg(){
   if (wGet()>0) return "コインがあるよ! したのコインを タップ!";
-  if (store.prom.used) return "おふろ たのしんできてね♨";
-  return "やくそくボタンをおして コインをもらおう!";
+  if (store.prom.used) return "やくそく まもれて えらい!";
+  return "「おやくそく まもります!」を おして コインをもらおう!";
 }
 refreshHud();
 setMsg(idleMsg());
@@ -416,7 +425,7 @@ function refreshPromise(){
     b.textContent = "きょうのやくそくは できたね!";
   } else {
     b.classList.remove("used");
-    b.textContent = "🛁 おふろにはいります!";
+    b.textContent = "✋ おやくそく まもります!";
   }
 }
 q("promiseBtn").onclick = function(){
@@ -596,7 +605,7 @@ function renderParent(){
   });
   var rz = document.createElement("button");
   rz.type = "button";
-  rz.textContent = "やくそくボタンを復活させる";
+  rz.textContent = "きょうの「おやくそく」を もう1回おせるようにする";
   rz.onclick = function(){
     store.prom.used = false; save();
     gtoast("やくそくボタンが また押せるようになりました");
@@ -662,5 +671,61 @@ function bakIn(){
 }
 refreshPromise();
 </script>
+<!-- ふぃーどばっく(共通パーツ) -->
+<div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+    <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。送信ボタンでメールが開きます(下書きが入っています)。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
+    <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="fbSend()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📧 メールで おくる</button>
+      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピー(LINEに貼る)</button>
+      <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
+    </div>
+    <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
+  </div>
+</div>
+<script>
+var FB_TO = "hagunomachi.feedback@gmail.com";
+var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
+function fbOpen(){
+  var p=document.getElementById("fbPanel"); p.style.display="flex";
+  var c=document.getElementById("fbChips");
+  if(!c.dataset.built){ c.dataset.built="1";
+    FB_TAGS.forEach(function(t){
+      var b=document.createElement("button");
+      b.textContent=t; b.dataset.on="";
+      b.style.cssText="font-family:inherit;font-size:12px;font-weight:bold;border:2px solid #c9ae87;background:#fff;color:#7a6146;border-radius:999px;padding:6px 12px;cursor:pointer";
+      b.onclick=function(){ var on=b.dataset.on==="1"; b.dataset.on=on?"":"1";
+        b.style.background=on?"#fff":"#f2d98a"; };
+      c.appendChild(b);
+    });
+  }
+}
+function fbClose(){ document.getElementById("fbPanel").style.display="none";
+  document.getElementById("fbDone").style.display="none"; }
+function fbBody(){
+  var tags=[].slice.call(document.querySelectorAll("#fbChips button"))
+    .filter(function(b){return b.dataset.on==="1";}).map(function(b){return b.textContent;});
+  var t=document.getElementById("fbText").value.trim();
+  return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
+    "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
+}
+function fbSend(){
+  var url="mailto:"+FB_TO+"?subject="+encodeURIComponent("はぐのまち かんそう・ようぼう")+
+    "&body="+encodeURIComponent(fbBody());
+  location.href=url;
+  var d=document.getElementById("fbDone"); d.textContent="メールアプリが開かない場合は「コピー」でLINEに貼ってください"; d.style.display="block";
+}
+function fbCopy(){
+  var v=fbBody();
+  var d=document.getElementById("fbDone");
+  try{ navigator.clipboard.writeText(v).then(function(){ d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }); }
+  catch(e){ var ta=document.getElementById("fbText"); ta.select(); document.execCommand("copy");
+    d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }
+}
+</script>
+
 </body>
 </html>

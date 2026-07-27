@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-title" content="はぐのまち">
+<meta name="description" content="はぐのまち — 子どもが自分から動きたくなる、家庭の生活アプリ。画面を、現実へ動く入口に。">
+<title>はぐのまち | 画面を、現実へ動く入口に。</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;color:#5a4a38;
+  background:radial-gradient(#f6e7c8 9%,transparent 10%) 0 0/30px 30px, linear-gradient(#fdf3e3,#f5ead3);
+  line-height:1.8}
+.wrap{max-width:560px;margin:0 auto;padding:28px 18px 60px}
+header{text-align:center;margin-bottom:26px}
+.town{width:200px;margin:0 auto 8px}
+h1{font-size:30px;color:#7a6146;letter-spacing:2px}
+.lead{font-size:15px;font-weight:bold;color:#a5842e;margin-top:4px}
+.intro{background:rgba(255,250,240,.95);border:3px solid #c9ae87;border-radius:20px;
+  padding:16px 18px;font-size:13.5px;margin-bottom:26px}
+h2{font-size:17px;color:#7a6146;margin:30px 0 12px;text-align:center}
+h2 small{display:block;font-size:10px;color:#b8916a;letter-spacing:2px}
+
+/* アプリカード */
+.apps{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.app{display:block;text-decoration:none;color:inherit;background:#fffaf0;border:3px solid #c9ae87;
+  border-radius:20px;padding:14px 10px;text-align:center;box-shadow:0 4px 0 rgba(201,174,135,.35);
+  transition:transform .15s}
+.app:active{transform:scale(.96)}
+.app svg{width:64px;height:64px}
+.app .nm{font-size:15px;font-weight:bold;color:#7a6146;margin-top:4px}
+.app .ds{font-size:11px;color:#a58868}
+.subapps{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.sub{text-decoration:none;background:#fff;border:2.5px solid #d8c9ab;border-radius:999px;
+  padding:7px 14px;font-size:12.5px;font-weight:bold;color:#8d7b66}
+
+/* しくみ */
+.flow{background:#fffaf0;border:3px solid #c9ae87;border-radius:20px;padding:14px 16px}
+.step{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px dashed #e5d9c2}
+.step:last-child{border-bottom:none}
+.step .no{flex:0 0 34px;height:34px;border-radius:50%;background:#f2d98a;border:2.5px solid #dcc06e;
+  display:flex;align-items:center;justify-content:center;font-weight:bold;color:#7a6146}
+.step .tx{font-size:13.5px;font-weight:bold}
+.step .tx small{display:block;font-weight:normal;font-size:11.5px;color:#a58868}
+
+/* 保護者向け */
+.note{background:#fdf6dd;border:3px solid #e8cf7a;border-radius:20px;padding:14px 18px;font-size:12.5px}
+.note li{margin:6px 0 6px 18px}
+.policy{background:#eef4fb;border:3px solid #b4c8de;border-radius:20px;padding:14px 18px;font-size:12.5px;margin-top:12px}
+.policy b{color:#5b7ba0}
+
+footer{text-align:center;margin-top:36px;font-size:11.5px;color:#a58868}
+footer a{color:#a5842e}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="town"><svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="100" cy="104" rx="92" ry="12" fill="#d3e7cb" stroke-width="2.5"/>
+    <path d="M40 74 V52 L62 36 L84 52 V74 Z" fill="#fff7ec"/><path d="M36 54 L62 34 L88 54" fill="none"/><rect x="55" y="58" width="14" height="16" rx="3" fill="#f5c9a8"/>
+    <rect x="98" y="46" width="40" height="28" rx="6" fill="#f4d3da"/><path d="M94 48 L118 32 L142 48" fill="none"/><path d="M112 32 h12" stroke-width="4"/><path d="M118 32 v-8" stroke-width="3"/><circle cx="118" cy="18" r="6" fill="#cfe0ee"/>
+    <rect x="152" y="56" width="26" height="18" rx="5" fill="#f9e3a8"/><path d="M150 56 L165 46 L180 56" fill="none"/>
+    <circle cx="24" cy="66" r="9" fill="#d3e7cb"/><rect x="22" y="72" width="4" height="8" fill="#b98b5e" stroke="none"/>
+    <path d="M60 96 q4 -8 12 -6" fill="none" stroke-width="2.5"/><circle cx="76" cy="88" r="7" fill="#f0e3c8"/><path d="M71 84 L69 78 L75 81 Z" fill="#f0e3c8"/><path d="M81 84 L83 78 L77 81 Z" fill="#f0e3c8"/><circle cx="74" cy="87" r="1.2" fill="#5a4a38" stroke="none"/><circle cx="78" cy="87" r="1.2" fill="#5a4a38" stroke="none"/>
+  </svg></div>
+  <h1>はぐのまち</h1>
+  <div class="lead">画面を、現実へ動く入口に。</div>
+</header>
+
+<div class="intro">
+  4歳の息子の「早くして!」が減らない毎日をなんとかしたくて、父(非エンジニア)がAIと一緒に作っている、<b>実験中の家庭用アプリ</b>です。お支度・お風呂・歯みがきなどの生活行動を、子どもが<b>自分からやりたくなる</b>仕掛けにしています。わが家で使いながら毎週改良中 — 同じ悩みのご家庭にも試してもらえたら嬉しいです。
+</div>
+
+<h2>まちのなかへ <small>APPS</small></h2>
+<div class="apps">
+  <a class="app" href="kuruma_parking.html">
+    <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 52 V46 Q8 40 16 40 L24 40 Q30 26 43 26 L51 26 Q61 26 65 40 Q72 40 72 47 V52 Z" fill="#f4d3da"/><path d="M30 40 Q34 30 43 30 L49 30 Q56 30 59 40 Z" fill="#cfe0ee"/><circle cx="20" cy="54" r="7" fill="#ddd7f0"/><circle cx="60" cy="54" r="7" fill="#ddd7f0"/><circle cx="35" cy="45" r="2" fill="#8d7b66"/><circle cx="45" cy="45" r="2" fill="#8d7b66"/><ellipse cx="28" cy="48" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="52" cy="48" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 46 q3 3 6 0"/></svg>
+    <div class="nm">おしたくボード</div>
+    <div class="ds">できた!で車が走る</div>
+  </a>
+  <a class="app" href="mitooshi_calendar.html">
+    <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="16" width="56" height="52" rx="10" fill="#fff7ec"/><path d="M12 30 H68" stroke-width="2.5"/><rect x="24" y="8" width="6" height="12" rx="3" fill="#c9ae87"/><rect x="50" y="8" width="6" height="12" rx="3" fill="#c9ae87"/><text x="40" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="#7a6146" stroke="none" font-family="sans-serif">23</text></svg>
+    <div class="nm">みとおしカレンダー</div>
+    <div class="ds">きょうと あしたが わかる</div>
+  </a>
+  <a class="app" href="ofuro_gacha.html">
+    <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M16 38 a24 24 0 0 1 48 0 Z" fill="#eef4f8"/><rect x="14" y="38" width="52" height="20" rx="6" fill="#f4d3da"/><circle cx="52" cy="48" r="7" fill="#fff7ec"/><path d="M52 43 v10 M47 48 h10" stroke-width="2.5"/><circle cx="30" cy="26" r="7" fill="#f9e3a8" stroke-width="2.5"/><circle cx="44" cy="20" r="5" fill="#d3e7cb" stroke-width="2.5"/></svg>
+    <div class="nm">おふろガチャ</div>
+    <div class="ds">お湯コインで まわす</div>
+  </a>
+  <a class="app" href="neko_house.html">
+    <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 26 L16 8 L34 17 Z" fill="#f0e3c8"/><path d="M58 26 L64 8 L46 17 Z" fill="#f0e3c8"/><circle cx="40" cy="42" r="26" fill="#f0e3c8"/><circle cx="31" cy="39" r="3" fill="#5a4a38" stroke="none"/><circle cx="49" cy="39" r="3" fill="#5a4a38" stroke="none"/><ellipse cx="40" cy="46" rx="2.5" ry="2" fill="#e8937c" stroke="none"/><path d="M36 50 q4 4 8 0" stroke-width="2.5"/><circle cx="22" cy="48" r="4" fill="#f4b8b8" stroke="none"/><circle cx="58" cy="48" r="4" fill="#f4b8b8" stroke="none"/><path d="M14 40 h-8 M15 46 h-8 M66 40 h8 M65 46 h8" stroke-width="2"/></svg>
+    <div class="nm">ねこのおうち</div>
+    <div class="ds">がんばりが ごはんになる</div>
+  </a>
+</div>
+
+<h2>しくみ <small>HOW IT WORKS</small></h2>
+<div class="flow">
+  <div class="step"><div class="no">1</div><div class="tx">じぶんで おしたくをやる<small>タップすると車が走って「できた!」になる</small></div></div>
+  <div class="step"><div class="no">2</div><div class="tx">お湯コインが たまる<small>がんばりが目に見えるかたちで残る</small></div></div>
+  <div class="step"><div class="no">3</div><div class="tx">ガチャをまわす・ねこのお世話をする<small>ごほうびは「つぎの現実の行動」につながる設計</small></div></div>
+  <div class="step"><div class="no">4</div><div class="tx">画面を閉じて、現実のあそびへ<small>ガチャでじゃがいもが当たったら、本物のじゃがいもがお風呂に浮かびます</small></div></div>
+</div>
+
+
+<h2>はじめての方へ <small>TIPS</small></h2>
+<div class="note">
+  <ul>
+    <li><b>おうちの人の設定</b>は、各画面の右上「せってい(ながおし)」を<b>1.5秒ながおし</b>で開きます(子どもが勝手に触らないように)</li>
+    <li><b>⭐おかわり</b>ボタン: よゆうがある日だけ、追加のタスクを出せます。翌日には自動で消えます</li>
+    <li><b>お湯コインのバッジを1.5秒ながおし</b>: おうちの人がコインを+3枚あげられます(ごほうびの微調整に)</li>
+    <li>タスク・持ち物リスト・ねこの名前などは、すべて設定から自由に変えられます</li>
+  </ul>
+</div>
+
+<h2>おうちの方へ <small>FOR PARENTS</small></h2>
+<div class="note">
+  <ul>
+    <li><b>実験中のツールです。</b>効果を保証するものではありません。わが家では生活リズムの見直しと合わせて使い、朝の支度がスムーズになる日が増えました(個人の記録です)</li>
+    <li>対象のめやすは3〜6歳ごろ。<b>おうちの方と一緒に</b>お使いください</li>
+    <li>ごほうび設計は「画面の時間を増やさない」ことを最優先にしています。アプリを閉じて現実の行動が始まれば成功、という考え方です</li>
+    <li>無料です。広告もありません</li>
+    <li>SafariやChromeで開き、共有ボタンから<b>「ホーム画面に追加」</b>するとアプリのように使えます</li>
+  </ul>
+</div>
+<div class="policy">
+  <b>データについて:</b> 記録(タスク・コイン・ずかん等)はすべて<b>お使いの端末の中だけ</b>に保存されます。外部への送信は一切ありません。アカウント登録も不要です。<br>
+  ※端末のブラウザデータを消すと記録も消えます。きょうだいで使う場合は端末を分けるのがおすすめです。
+</div>
+
+<h2>おねがい <small>FEEDBACK</small></h2>
+<div class="intro" style="margin-bottom:0">
+  使ってみて「うちの子はこうだった」「ここが分かりにくい」など、ひとことでも感想をもらえるととても助かります。紹介してくれた人にそのまま返信してください。子どもの反応(良くも悪くも)が、次の改良の材料になります。
+</div>
+
+
+<div style="text-align:center;margin-top:14px">
+  <button onclick="fbOpen()" style="font-family:inherit;font-size:15px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:13px 30px;box-shadow:0 4px 0 #dcc06e;cursor:pointer">💬 かんそう・ようぼうを おくる</button>
+</div>
+
+<footer>
+  はぐのまち — つくっているのは、育休をひかえた ふつうの父です。<br>
+  © 2026 育休カンパニー(非公式・非営利の家族プロジェクト)
+</footer>
+
+</div>
+<!-- ふぃーどばっく(共通パーツ) -->
+<div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+    <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。送信ボタンでメールが開きます(下書きが入っています)。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
+    <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="fbSend()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📧 メールで おくる</button>
+      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピー(LINEに貼る)</button>
+      <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
+    </div>
+    <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
+  </div>
+</div>
+<script>
+var FB_TO = "hagunomachi.feedback@gmail.com";
+var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
+function fbOpen(){
+  var p=document.getElementById("fbPanel"); p.style.display="flex";
+  var c=document.getElementById("fbChips");
+  if(!c.dataset.built){ c.dataset.built="1";
+    FB_TAGS.forEach(function(t){
+      var b=document.createElement("button");
+      b.textContent=t; b.dataset.on="";
+      b.style.cssText="font-family:inherit;font-size:12px;font-weight:bold;border:2px solid #c9ae87;background:#fff;color:#7a6146;border-radius:999px;padding:6px 12px;cursor:pointer";
+      b.onclick=function(){ var on=b.dataset.on==="1"; b.dataset.on=on?"":"1";
+        b.style.background=on?"#fff":"#f2d98a"; };
+      c.appendChild(b);
+    });
+  }
+}
+function fbClose(){ document.getElementById("fbPanel").style.display="none";
+  document.getElementById("fbDone").style.display="none"; }
+function fbBody(){
+  var tags=[].slice.call(document.querySelectorAll("#fbChips button"))
+    .filter(function(b){return b.dataset.on==="1";}).map(function(b){return b.textContent;});
+  var t=document.getElementById("fbText").value.trim();
+  return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
+    "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
+}
+function fbSend(){
+  var url="mailto:"+FB_TO+"?subject="+encodeURIComponent("はぐのまち かんそう・ようぼう")+
+    "&body="+encodeURIComponent(fbBody());
+  location.href=url;
+  var d=document.getElementById("fbDone"); d.textContent="メールアプリが開かない場合は「コピー」でLINEに貼ってください"; d.style.display="block";
+}
+function fbCopy(){
+  var v=fbBody();
+  var d=document.getElementById("fbDone");
+  try{ navigator.clipboard.writeText(v).then(function(){ d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }); }
+  catch(e){ var ta=document.getElementById("fbText"); ta.select(); document.execCommand("copy");
+    d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }
+}
+</script>
+
+</body>
+</html>
