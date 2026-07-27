@@ -10,7 +10,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
 body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
-  background:linear-gradient(#f5ecd7,#f0e4cc);display:flex;flex-direction:column;align-items:center;padding:10px}
+  background:linear-gradient(#f5ecd7,#f0e4cc);display:flex;flex-direction:column;align-items:center;padding:10px 10px 104px}
 #hud{display:flex;gap:8px;align-items:center;width:min(440px,96vw);margin-bottom:8px}
 .badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:6px 13px;
   font-size:13.5px;font-weight:bold;color:#7a6146;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 rgba(141,123,102,.18)}
@@ -30,12 +30,12 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .toyObj svg{width:100%;height:auto;display:block}
 /* ねこ */
 #railTrack{position:absolute;left:4%;right:4%;bottom:14px;height:9px;background:#c9ae87;border:2px solid #8d7b66;
-  border-radius:99px;z-index:1;display:none}
+  border-radius:99px;z-index:0;display:none}
 #railTrack::after{content:"";position:absolute;inset:2px 4px;background:repeating-linear-gradient(90deg,#8d7b66 0 4px,transparent 4px 16px);opacity:.5}
 #railCar{position:absolute;bottom:16px;left:6%;width:104px;z-index:3;cursor:pointer;display:none;
   transition:left 1.6s linear,transform .2s}
 #railCar svg{width:100%;height:auto;display:block}
-#cat{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:150px;cursor:pointer;
+#cat{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:150px;cursor:pointer;z-index:2;
   transition:left 1.4s ease,bottom 1.4s ease}
 #cat svg{width:100%;height:auto;display:block}
 #cat.bounce{animation:cbounce .5s ease 2}
@@ -391,7 +391,7 @@ function renderGifts(){
   g.filter(function(x){ return !!GIFT_TYPE[x.id]; }).slice(-3).forEach(function(item, i){
     var el = document.createElement("div");
     el.className = "giftTrain";
-    var SLOT = [{l:"2%",b:44,w:86},{l:"72%",b:44,w:86},{l:"3%",b:100,w:64}][i] || {l:"2%",b:44,w:86};
+    var SLOT = [{l:"2%",b:70,w:78},{l:"72%",b:70,w:78},{l:"3%",b:112,w:58}][i] || {l:"2%",b:70,w:78};
     el.style.cssText = "position:absolute;left:"+SLOT.l+";bottom:"+SLOT.b+"px;width:"+SLOT.w+"px;z-index:1;cursor:pointer";
     el.innerHTML = giftTrainSVG(item.id);
     el.onclick = function(){
@@ -716,15 +716,14 @@ setInterval(sayLine, 45000);
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
     <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      <button onclick="fbSend()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📧 メールで おくる</button>
-      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピー(LINEに貼る)</button>
+      <button onclick="fbLine()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#c8e6c0;color:#4a6b42;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a5cf9b;cursor:pointer">💬 LINEで おくる</button>
+      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピーだけする</button>
       <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
     </div>
     <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
   </div>
 </div>
 <script>
-var FB_TO = "hagunomachi.feedback@gmail.com";
 var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
 function fbOpen(){
   var p=document.getElementById("fbPanel"); p.style.display="flex";
@@ -749,11 +748,16 @@ function fbBody(){
   return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
     "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
 }
-function fbSend(){
-  var url="mailto:"+FB_TO+"?subject="+encodeURIComponent("はぐのまち かんそう・ようぼう")+
-    "&body="+encodeURIComponent(fbBody());
-  location.href=url;
-  var d=document.getElementById("fbDone"); d.textContent="メールアプリが開かない場合は「コピー」でLINEに貼ってください"; d.style.display="block";
+function fbLine(){
+  var v = fbBody();
+  var d = document.getElementById("fbDone");
+  // さきにコピー(LINEが開かなくても貼れるように)
+  try{ navigator.clipboard && navigator.clipboard.writeText(v); }catch(e){}
+  d.textContent = "LINEを ひらきます。ひらかないときは「コピーだけする」で 貼りつけてください";
+  d.style.display = "block";
+  setTimeout(function(){
+    window.open("https://line.me/R/share?text=" + encodeURIComponent(v), "_blank");
+  }, 150);
 }
 function fbCopy(){
   var v=fbBody();

@@ -9,7 +9,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
 body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
-  background:linear-gradient(#eef1f6,#e3e8f0);display:flex;flex-direction:column;align-items:center;padding:10px 0 78px}
+  background:linear-gradient(#eef1f6,#e3e8f0);display:flex;flex-direction:column;align-items:center;padding:10px 0 104px}
 h1{font-size:18px;color:#5a6b86;text-align:center;margin:2px 0 8px}
 h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
 
@@ -244,6 +244,7 @@ function render(){
   var t = curTrain(), st = step_();
   q("trainName").textContent = "つくっているのは「" + t.name + "」";
   q("trainSvg").innerHTML = trainSVG(t, st);
+  q("railLine").style.display = (t.type === "train") ? "block" : "none";
   var pg = q("progress"); pg.innerHTML = "";
   for (var i=0;i<4;i++) pg.insertAdjacentHTML("beforeend", '<div class="pd'+(i<st?" on":"")+'"></div>');
   var ps = q("parts"); ps.innerHTML = "";
@@ -274,7 +275,7 @@ function renderGarage(){
     var t = TRAINS.filter(function(x){ return x.id === id; })[0]; if (!t) return;
     g.insertAdjacentHTML("beforeend",
       '<div class="gcar">' + trainSVG(t, 4) + '<div class="nm">' + t.name + '</div>' +
-      '<div class="gv">' + (i+1) + 'りょうめ</div></div>');
+      '<div class="gv">' + (i+1) + (t.type === "train" ? "りょうめ" : "こめ") + '</div></div>');
   });
 }
 

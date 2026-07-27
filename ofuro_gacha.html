@@ -147,7 +147,7 @@ button.badge{cursor:pointer;font-family:inherit}
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
 /* ===== 共通ヘッダー(コイン・設定) ===== */
-#topBar{position:fixed;top:10px;left:10px;right:10px;z-index:9;display:flex;gap:8px;align-items:center}
+#topBar{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:min(500px,96vw);z-index:9;display:flex;gap:8px;align-items:center}
 #topBar .tb{display:flex;align-items:center;gap:5px;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
   border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:bold;color:#7a6146;
   box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
@@ -703,15 +703,14 @@ refreshPromise();
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
     <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      <button onclick="fbSend()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📧 メールで おくる</button>
-      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピー(LINEに貼る)</button>
+      <button onclick="fbLine()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#c8e6c0;color:#4a6b42;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a5cf9b;cursor:pointer">💬 LINEで おくる</button>
+      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピーだけする</button>
       <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
     </div>
     <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
   </div>
 </div>
 <script>
-var FB_TO = "hagunomachi.feedback@gmail.com";
 var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
 function fbOpen(){
   var p=document.getElementById("fbPanel"); p.style.display="flex";
@@ -736,11 +735,16 @@ function fbBody(){
   return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
     "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
 }
-function fbSend(){
-  var url="mailto:"+FB_TO+"?subject="+encodeURIComponent("はぐのまち かんそう・ようぼう")+
-    "&body="+encodeURIComponent(fbBody());
-  location.href=url;
-  var d=document.getElementById("fbDone"); d.textContent="メールアプリが開かない場合は「コピー」でLINEに貼ってください"; d.style.display="block";
+function fbLine(){
+  var v = fbBody();
+  var d = document.getElementById("fbDone");
+  // さきにコピー(LINEが開かなくても貼れるように)
+  try{ navigator.clipboard && navigator.clipboard.writeText(v); }catch(e){}
+  d.textContent = "LINEを ひらきます。ひらかないときは「コピーだけする」で 貼りつけてください";
+  d.style.display = "block";
+  setTimeout(function(){
+    window.open("https://line.me/R/share?text=" + encodeURIComponent(v), "_blank");
+  }, 150);
 }
 function fbCopy(){
   var v=fbBody();
