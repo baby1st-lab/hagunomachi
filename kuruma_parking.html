@@ -287,6 +287,7 @@ body{padding-bottom:78px!important}
     <div id="nekoNow"></div>
     <div id="board">
       <div id="boardTitle">きょうの おしたく</div>
+      <div id="boardSub" style="text-align:center;font-size:11.5px;font-weight:bold;color:#a58868;margin-top:2px">1つ できると お湯コイン +1</div>
       <div id="boardHead"><span>◀ まだ</span><span>できた! ▶</span></div>
       <div id="rows"></div>
     </div>
@@ -1164,6 +1165,26 @@ function openParent(){
 function grantCoin(k){ walletAdd(k); toast("お湯コイン "+(k>0?"+":"")+k+" (いま"+walletGet()+"まい)"); blip(1047,.1,0,"triangle"); }
 function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard(); toast("きょうの「できた」をリセットしました"); }
 function resetDone(m){ store.done[m]={}; save(); renderBoard(); toast((m==="asa"?"あさ":"よる")+"の「できた」をリセットしました"); }
+
+/* ===== はじめてだけ出るヒント ===== */
+function firstTip(id, title, body){
+  var seen = {};
+  try{ seen = JSON.parse(localStorage.getItem("tips_seen_v1") || "{}"); }catch(e){}
+  if (seen[id]) return;
+  var w = document.createElement("div");
+  w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
+  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38">'
+    + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
+    + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
+    + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
+  w.querySelector("button").onclick = function(){
+    seen[id] = 1;
+    try{ localStorage.setItem("tips_seen_v1", JSON.stringify(seen)); }catch(e){}
+    w.remove();
+  };
+  document.body.appendChild(w);
+}
+
 function closeParent(){ q("parent").style.display="none"; }
 
 /* ===== データの書き出し/読み込み(全アプリ共通) ===== */
@@ -1203,6 +1224,7 @@ function dataImport(input){
 }
 
 /* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */
+setTimeout(function(){ firstTip("oshitaku", "おしたくボード", "できた ことを タップすると、くるまが はしって <b>お湯コイン +1</b>。<br>ためた コインは、おふろガチャや ねこのおうちで つかえます。"); }, 600);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
 
 q("coinIco").innerHTML=COIN; if(q("footCoinIco")) q("footCoinIco").innerHTML=COIN;

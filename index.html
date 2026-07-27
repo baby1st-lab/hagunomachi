@@ -36,6 +36,21 @@ h2 small{display:block;font-size:10px;color:#b8916a;letter-spacing:2px}
 
 /* しくみ */
 .flow{background:#fffaf0;border:3px solid #c9ae87;border-radius:20px;padding:14px 16px}
+.appMain{display:block;text-decoration:none;color:inherit;background:#fffaf0;border:4px solid #c9ae87;
+  border-radius:24px;padding:16px 18px;box-shadow:0 5px 0 rgba(201,174,135,.5);display:flex;align-items:center;gap:16px}
+.appMain svg{width:78px;height:78px;flex:0 0 78px}
+.appMain .nm{font-size:19px;font-weight:bold;color:#7a6146}
+.appMain .ds{font-size:12.5px;color:#a58868;margin-top:2px}
+.appMain .go{margin-left:auto;font-size:13px;font-weight:bold;color:#fff;background:#e8a95c;
+  border-radius:999px;padding:8px 14px;white-space:nowrap}
+.lead{text-align:center;font-size:12.5px;font-weight:bold;color:#a58868;margin:0 0 8px}
+details.fold{background:#fffaf0;border:2.5px solid #e0cfae;border-radius:16px;padding:10px 14px;margin-top:10px}
+details.fold summary{font-size:13.5px;font-weight:bold;color:#a58868;cursor:pointer;list-style:none}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::before{content:"▸ "}
+details.fold[open] summary::before{content:"▾ "}
+details.fold ul{margin:10px 0 2px;padding-left:18px}
+details.fold li{font-size:12.5px;line-height:1.7;margin-bottom:5px}
 .step{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px dashed #e5d9c2}
 .step:last-child{border-bottom:none}
 .step .no{flex:0 0 34px;height:34px;border-radius:50%;background:#f2d98a;border:2.5px solid #dcc06e;
@@ -70,16 +85,19 @@ footer a{color:#a5842e}
 </header>
 
 <div class="intro">
-  4歳の息子の「早くして!」が減らない毎日をなんとかしたくて、父(非エンジニア)がAIと一緒に作っている、<b>実験中の家庭用アプリ</b>です。お支度・お風呂・歯みがきなどの生活行動を、子どもが<b>自分からやりたくなる</b>仕掛けにしています。わが家で使いながら毎週改良中 — 同じ悩みのご家庭にも試してもらえたら嬉しいです。
+  4歳の息子の「早くして!」をなんとかしたくて、父(非エンジニア)がAIと一緒に作っている<b>実験中の家庭用アプリ</b>です。無料・登録なし・広告なし。
 </div>
 
-<h2>まちのなかへ <small>APPS</small></h2>
+<h2>まずは ここから <small>START HERE</small></h2>
+<a class="appMain" href="kuruma_parking.html">
+  <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 52 V46 Q8 40 16 40 L24 40 Q30 26 43 26 L51 26 Q61 26 65 40 Q72 40 72 47 V52 Z" fill="#f4d3da"/><path d="M30 40 Q34 30 43 30 L49 30 Q56 30 59 40 Z" fill="#cfe0ee"/><circle cx="20" cy="54" r="7" fill="#ddd7f0"/><circle cx="60" cy="54" r="7" fill="#ddd7f0"/><circle cx="35" cy="45" r="2" fill="#8d7b66"/><circle cx="45" cy="45" r="2" fill="#8d7b66"/><ellipse cx="28" cy="48" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="52" cy="48" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 46 q3 3 6 0"/></svg>
+  <div><div class="nm">おしたくボード</div><div class="ds">できた!をタップすると車が走って、お湯コインが1枚たまります</div></div>
+  <div class="go">ひらく →</div>
+</a>
+
+<h2 style="margin-top:22px">たまったコインで <small>THEN</small></h2>
+<p class="lead">おしたくでコインをためると、ここで つかえます</p>
 <div class="apps">
-  <a class="app" href="kuruma_parking.html">
-    <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 52 V46 Q8 40 16 40 L24 40 Q30 26 43 26 L51 26 Q61 26 65 40 Q72 40 72 47 V52 Z" fill="#f4d3da"/><path d="M30 40 Q34 30 43 30 L49 30 Q56 30 59 40 Z" fill="#cfe0ee"/><circle cx="20" cy="54" r="7" fill="#ddd7f0"/><circle cx="60" cy="54" r="7" fill="#ddd7f0"/><circle cx="35" cy="45" r="2" fill="#8d7b66"/><circle cx="45" cy="45" r="2" fill="#8d7b66"/><ellipse cx="28" cy="48" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="52" cy="48" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 46 q3 3 6 0"/></svg>
-    <div class="nm">おしたくボード</div>
-    <div class="ds">できた!で車が走る</div>
-  </a>
   <a class="app" href="mitooshi_calendar.html">
     <svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="16" width="56" height="52" rx="10" fill="#fff7ec"/><path d="M12 30 H68" stroke-width="2.5"/><rect x="24" y="8" width="6" height="12" rx="3" fill="#c9ae87"/><rect x="50" y="8" width="6" height="12" rx="3" fill="#c9ae87"/><text x="40" y="58" text-anchor="middle" font-size="24" font-weight="bold" fill="#7a6146" stroke="none" font-family="sans-serif">23</text></svg>
     <div class="nm">みとおしカレンダー</div>
@@ -103,25 +121,23 @@ footer a{color:#a5842e}
 
 <h2>しくみ <small>HOW IT WORKS</small></h2>
 <div class="flow">
-  <div class="step"><div class="no">1</div><div class="tx">じぶんで おしたくをやる<small>タップすると車が走って「できた!」になる</small></div></div>
-  <div class="step"><div class="no">2</div><div class="tx">お湯コインが たまる<small>がんばりが目に見えるかたちで残る</small></div></div>
-  <div class="step"><div class="no">3</div><div class="tx">ガチャをまわす・ねこのお世話をする<small>ごほうびは「つぎの現実の行動」につながる設計</small></div></div>
-  <div class="step"><div class="no">4</div><div class="tx">画面を閉じて、現実のあそびへ<small>ガチャでじゃがいもが当たったら、本物のじゃがいもがお風呂に浮かびます</small></div></div>
+  <div class="step"><div class="no">1</div><div class="tx">じぶんで おしたくをやる<small>できた!をタップすると、お湯コインが1枚もらえる</small></div></div>
+  <div class="step"><div class="no">2</div><div class="tx">コインを つかう<small>おふろガチャを回す・ねこにごはんをあげる</small></div></div>
+  <div class="step"><div class="no">3</div><div class="tx">画面を閉じて、現実へ<small>ガチャの結果が「きょうのおふろのおたのしみ」になります</small></div></div>
 </div>
 
 
-<h2>はじめての方へ <small>TIPS</small></h2>
-<div class="note">
+<h2>くわしく <small>DETAILS</small></h2>
+<details class="fold"><summary>はじめての方へ(使い方のコツ)</summary>
   <ul>
     <li><b>おうちの人の設定</b>は、各画面の右上「せってい(ながおし)」を<b>1.5秒ながおし</b>で開きます(子どもが勝手に触らないように)</li>
     <li><b>⭐おかわり</b>ボタン: よゆうがある日だけ、追加のタスクを出せます。翌日には自動で消えます</li>
     <li><b>お湯コインのバッジを1.5秒ながおし</b>: おうちの人がコインを+3枚あげられます(ごほうびの微調整に)</li>
     <li>タスク・持ち物リスト・ねこの名前などは、すべて設定から自由に変えられます</li>
   </ul>
-</div>
+</details>
 
-<h2>おうちの方へ <small>FOR PARENTS</small></h2>
-<div class="note">
+<details class="fold"><summary>おうちの方へ</summary>
   <ul>
     <li><b>実験中のツールです。</b>効果を保証するものではありません。わが家では生活リズムの見直しと合わせて使い、朝の支度がスムーズになる日が増えました(個人の記録です)</li>
     <li>対象のめやすは3〜6歳ごろ。<b>おうちの方と一緒に</b>お使いください</li>
@@ -129,8 +145,9 @@ footer a{color:#a5842e}
     <li>無料です。広告もありません</li>
     <li>SafariやChromeで開き、共有ボタンから<b>「ホーム画面に追加」</b>するとアプリのように使えます</li>
   </ul>
-</div>
-<div class="policy">
+</details>
+
+<div class="policy" style="margin-top:10px">
   <b>データについて:</b> 記録(タスク・コイン・ずかん等)はすべて<b>お使いの端末の中だけ</b>に保存されます。外部への送信は一切ありません。アカウント登録も不要です。<br>
   ※端末のブラウザデータを消すと記録も消えます。きょうだいで使う場合は端末を分けるのがおすすめです。<br>
   <b style="color:#c0392b">※プライベートモード(シークレットタブ)で開くと、閉じたときに記録が消えます。</b>ふつうのタブで開いて、ホーム画面に追加してお使いください。<br>
