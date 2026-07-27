@@ -225,6 +225,9 @@ body.night #nekoNow{color:#d8cdb4}
 .tedit button{padding:6px 9px!important;font-size:12px!important}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(122,97,70,.92);color:#fff;
   font-size:13px;font-weight:bold;border-radius:999px;padding:9px 20px;z-index:70;display:none;max-width:90vw;text-align:center}
+
+*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
 </style>
 </head>
 <body>
@@ -236,7 +239,7 @@ body.night #nekoNow{color:#d8cdb4}
   <div class="tab" id="tabTicket" style="display:none">⏱ タイマー</div>
   <a class="tab" id="tabCal" href="mitooshi_calendar.html" style="text-decoration:none;color:inherit">📅 カレンダー</a>
   <a class="tab" href="ofuro_gacha.html" style="text-decoration:none;color:inherit">♨ ガチャ</a>
-  <div class="tab" id="parentBtn"><span id="pbGauge"></span><span>せってい<br>(ながおし)</span></div>
+  <div class="tab" id="parentBtn"><span id="pbGauge"></span><span>おうちのひと<br>(ながおし)</span></div>
 </div>
 
 <div id="taskPage">
@@ -307,9 +310,9 @@ body.night #nekoNow{color:#d8cdb4}
   </div>
 </div>
 
-<div id="parent"><div class="inner">
+<div id="parent"><div class="inner" style="position:relative"><button onclick="closeParent()" style="position:absolute;top:10px;right:12px;background:#e8dcc4;border:none;border-radius:50%;width:34px;height:34px;font-size:16px;font-weight:bold;color:#7a6146;cursor:pointer;box-shadow:none;margin:0;padding:0">✕</button>
   <h3>せってい(おうちのひと)</h3>
-  <p><b>おしたくボード</b>: タスクを1個おわるたびに、お湯コイン+1(ガチャ・ねこと共通の財布)。<br>
+  <p><b>おしたくボード</b>: タスクを1個おわるたびに、お湯コイン+1。<br>
   <b>⭐おかわり</b>: よゆうがある日だけ、追加のタスクを出せます(翌日にはきえます。子は1日3個まで追加OK)。<br>
   <b>お湯コインのバッジを1.5秒ながおし</b>すると、おうちの人が+3枚あげられます(ごほうびの微調整に)。<br>
   この設定画面も、右上の「せってい(ながおし)」を<b>1.5秒ながおし</b>で開きます。</p>
@@ -326,8 +329,10 @@ body.night #nekoNow{color:#d8cdb4}
     <button data-nt="300">5ぷん前</button>
   </div>
   </div>
-  <p style="font-size:11px;color:#a58868;margin:4px 0">💡 のりものは、タイマー画面で はしっている車をタップすると変えられます</p>
-  <div class="row" style="margin-top:10px"><button onclick="resetToday()">きょうの「できた」をリセット</button></div>
+  <div class="row" style="margin-top:10px">
+    <button onclick="resetDone('asa')">☀あさの「できた」をリセット</button>
+    <button onclick="resetDone('yoru')">🌙よるの「できた」をリセット</button>
+  </div>
   <h3>☀ あさのタスク(タップで絵を変更/↑↓で並べ替え)</h3>
   <div id="editAsa"></div>
   <div class="row"><button onclick="addTask('asa')">+ タスク追加</button></div>
@@ -420,11 +425,18 @@ var DEFAULT_TASKS = {
 var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:false, notifySec:60,
   vehAsa:"bike", vehYoru:"car" };
 function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
-  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
 load();
 if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
 // 旧デフォルトの「ねんね」は「えほん」に移行(寝る直前は画面を見せない設計)
+// 過去の「+タスク追加」残骸を一回だけ掃除(2026-07-27)
+if (!store.cleaned1){
+  ["asa","yoru"].forEach(function(m){
+    store.tasks[m] = (store.tasks[m]||[]).filter(function(t){ return t.name !== "あたらしいタスク"; });
+  });
+  store.cleaned1 = 1;
+}
 // 夜の「えほん/ねんね」はデフォルトから外し、⭐おかわり側へ移した(2026-07-27)
 store.tasks.yoru = (store.tasks.yoru||[]).filter(function(t){ return t.id!=="y5"; });
 // うちは幼稚園ではなく保育園(2026-07-22修正)
@@ -437,8 +449,9 @@ if (!store.papaDef) store.papaDef = {
   yoru: ["📒 れんらくちょうを よむ(LINEの1画面)","👕 おきがえ ほじゅう(×3+ビニール袋)","🍽 すいとう・しょっきを あらう"]
 };
 /* ほいくえんバッグの中身(チェックだけ・コインなし。設定から編集可能) */
-if (!store.bagDef) store.bagDef = ["うわばき(週はじめ)","きがえ 上下×3","肌着×3","靴下×3","おむつ ほじゅう","水筒","コップ","タオル","ビニールぶくろ","エプロン・三角巾(クッキングの日)"];
+if (!store.bagDef) store.bagDef = ["うわばき(週はじめ)","きがえ 上下","肌着","靴下","おむつ ほじゅう","水筒","コップ","タオル","ビニールぶくろ","エプロン・三角巾(クッキングの日)"];
 if (!store.bag) store.bag = { d:"", done:[] };
+store.bagDef = store.bagDef.map(function(t){ return String(t).replace(/×3/g,"").replace(/ +$/,""); });
 function papaToday_(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
 function renderPapa(){
   // 朝夜分割への移行(旧: done=[] → 新: done={asa:[],yoru:[]})
@@ -631,8 +644,16 @@ document.getElementById("stretchBtn").onclick = function(){
   store.stretch.on = !store.stretch.on; save();
   document.getElementById("stretchBtn").classList.toggle("on", store.stretch.on);
   if (!store.stretchSeen && store.stretch.on){
-    store.stretchSeen = 1; save();
-    toast("⭐は「おかわりチャレンジ」! よゆうがある日だけ、すきなタスクをふやせるよ(あしたには きえるよ)");
+    var ip = document.createElement("div");
+    ip.id = "stretchInfo";
+    ip.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:20px";
+    ip.innerHTML = '<div style="background:#fffcf4;border:4px solid #dcc06e;border-radius:22px;max-width:340px;padding:20px;text-align:center">'+
+      '<div style="font-size:30px">⭐</div>'+
+      '<div style="font-size:15px;font-weight:bold;color:#7a6146;margin:8px 0">おかわりチャレンジ</div>'+
+      '<div style="font-size:13px;color:#8d7b66;line-height:1.8">よゆうがある日だけ、すきなタスクをふやせるよ。<br>ふやしたぶんは、あしたには きえるよ。<br>(1日3こまで)</div>'+
+      '<button onclick="store.stretchSeen=1;save();document.getElementById(\'stretchInfo\').remove()" '+
+      'style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 30px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:12px">わかった!</button></div>';
+    document.body.appendChild(ip);
   }
   blip(659,.08);
   renderBoard();
@@ -1100,6 +1121,7 @@ function openParent(){
 /* renderVehは廃止(2026-07-25): のりもの切替は走っている車のタップ式へ */
 function grantCoin(k){ walletAdd(k); toast("お湯コイン "+(k>0?"+":"")+k+" (いま"+walletGet()+"まい)"); blip(1047,.1,0,"triangle"); }
 function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard(); toast("きょうの「できた」をリセットしました"); }
+function resetDone(m){ store.done[m]={}; save(); renderBoard(); toast((m==="asa"?"あさ":"よる")+"の「できた」をリセットしました"); }
 function closeParent(){ q("parent").style.display="none"; }
 
 /* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */

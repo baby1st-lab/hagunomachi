@@ -88,6 +88,9 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 #parent input{font-family:inherit;font-size:15px;font-weight:bold;padding:8px 12px;border:2.5px solid #c9ae87;border-radius:12px;width:100%;margin:6px 0}
 #parent button{font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;
   border-radius:999px;padding:9px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:8px}
+
+*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
 </style>
 </head>
 <body>
@@ -98,7 +101,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
   <a class="badge" href="ofuro_gacha.html" style="text-decoration:none">♨</a>
   <div class="badge" id="coinBadge" title="1.5秒ながおしで おうちのひとが+3まい"><span id="coinIco"></span>× <span id="coinN">0</span></div>
   <div class="badge" id="nameBadge">🐱 <span id="catName">ねこ</span></div>
-  <div class="badge" id="setBtn">⚙ せってい<br><span style="font-size:9px">(ながおし)</span><span id="pbGauge"></span></div>
+  <div class="badge" id="setBtn" style="position:relative;overflow:hidden;white-space:nowrap">⚙ おうちのひと<span style="font-size:9px">(ながおし)</span><span id="pbGauge" style="position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px"></span></div>
 </div>
 
 <div id="room">
@@ -423,12 +426,20 @@ function saveName(){
   render();
   catSay(v + "だにゃ! きょうから うちのこに なるにゃ🐱 よろしくにゃ!", 6000);
 }
-q("setBtn").onclick = function(){
+function openNekoParent_(){
   q("nameInput").value = neko.name;
   var t = q("pTitle");
   if (t) t.textContent = neko.name ? "せってい(なまえの へんこう)" : "ねこのなまえ";
   q("parent").style.display = "flex";
-};
+}
+(function(){
+  var t=null, b=q("setBtn"), gz=q("pbGauge");
+  function down(){ gz.style.transition="width 1.5s linear"; gz.style.width="100%";
+    t=setTimeout(function(){ openNekoParent_(); gz.style.transition="none"; gz.style.width="0%"; },1500); }
+  function up(){ clearTimeout(t); gz.style.transition="none"; gz.style.width="0%"; }
+  b.addEventListener("mousedown",down); b.addEventListener("mouseup",up); b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
+})();
 
 /* おうちのひと用: コインバッジ1.5秒ながおしで+3(テスト・特別支給) */
 (function(){
