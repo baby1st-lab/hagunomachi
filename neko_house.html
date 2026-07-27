@@ -70,6 +70,9 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .stat{flex:1;background:#fffaf0;border:2.5px solid #c9ae87;border-radius:14px;padding:7px 10px}
 .stat .lb{font-size:10px;font-weight:bold;color:#a58868}
 .stat .bar{height:10px;background:#f2ecdc;border:2px solid #c9ae87;border-radius:99px;overflow:hidden;margin-top:3px}
+.stat .seg{display:flex;gap:3px;margin-top:3px}
+.stat .seg i{flex:1;height:10px;background:#f2ecdc;border:2px solid #c9ae87;border-radius:99px;transition:background .4s}
+.stat .seg i.on{background:#f2b28c}
 .stat .bar i{display:block;height:100%;background:#f2b28c;border-radius:99px;transition:width .6s}
 #msg{width:min(440px,96vw);text-align:center;font-size:13px;font-weight:bold;color:#7a6146;
   background:#fffaf0;border:2.5px solid #c9ae87;border-radius:999px;padding:8px 10px;margin-bottom:8px}
@@ -137,10 +140,13 @@ body{padding-bottom:78px!important}
   <div id="say"></div>
   <div id="bowl"><span class="n" id="bowlN">×1</span></div>
   <div id="cat"></div>
+  <div id="toyBox" style="position:absolute;right:20px;bottom:96px;width:62px;cursor:pointer;display:none;z-index:3">
+    <span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px"></span>
+  </div>
 </div>
 
 <div id="stats">
-  <div class="stat"><div class="lb">🍚 おなか</div><div class="bar"><i id="barFood"></i></div></div>
+  <div class="stat"><div class="lb">おなか</div><div class="seg" id="foodSeg"><i></i><i></i><i></i></div></div>
   <div class="stat"><div class="lb">💗 なかよし</div><div class="bar"><i id="barLove"></i></div></div>
 </div>
 <div id="msg">お湯コインで ごはんを かってあげよう</div>
@@ -150,10 +156,16 @@ body{padding-bottom:78px!important}
     box-shadow:0 3px 0 #dcc06e;cursor:pointer"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><path d="M8 30 Q30 10 52 30 Z" fill="#fff7ec" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"/><path d="M6 32 h48 q-2 16 -24 16 T6 32 Z" fill="#a5c9e8" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"/></svg> ごはんを あげる(<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>1まい)</button>
 </div>
 
-<div id="shopRow" style="margin-top:14px">
+<div id="shopRow" style="margin-top:12px">
   <div class="shopItem" data-id="ball"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50" /></svg><div class="nm">ボール</div><div class="pr"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>2まい</div></div>
   <div class="shopItem" data-id="mouse"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><ellipse cx="27" cy="36" rx="16" ry="12" fill="#ddd7f0"/><circle cx="16" cy="26" r="6" fill="#ddd7f0"/><circle cx="14" cy="25" r="1.5" fill="#8d7b66"/><path d="M43 36 q10 -4 12 -12" fill="none"/></svg><div class="nm">ねずみのおもちゃ</div><div class="pr"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>3まい</div></div>
   <div class="shopItem" data-id="tower"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="24" y="30" width="12" height="24" fill="#e8c99e"/><ellipse cx="30" cy="28" rx="18" ry="7" fill="#d3e7cb"/><ellipse cx="30" cy="10" rx="12" ry="5" fill="#d3e7cb"/><rect x="26" y="12" width="8" height="14" fill="#e8c99e"/></svg><div class="nm">キャットタワー</div><div class="pr"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>5まい</div></div>
+</div>
+
+<div id="koubouRow" style="width:min(440px,96vw);margin:12px 0 4px;text-align:center;display:none">
+  <a href="koubou.html" style="display:inline-block;text-decoration:none;font-family:inherit;font-size:15px;font-weight:bold;
+    background:#a5c9e8;color:#2f4b6b;border-radius:999px;padding:12px 24px;box-shadow:0 4px 0 #7fa9cd">
+    🔧 おもちゃこうぼうで つくってあげる</a>
 </div>
 
 <div id="parent"><div class="inner">
@@ -180,7 +192,7 @@ var COIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx
 /* ===== ねこの状態 ===== */
 var neko = { name:"", fedTotal:0, lastFed:0, love:30, toys:{}, lastSeen:0 };
 function load(){ try{ var s=localStorage.getItem("neko_v1"); if(s){ var o=JSON.parse(s);
-  ["name","fedTotal","lastFed","love","toys","lastSeen"].forEach(function(k){ if(o[k]!==undefined) neko[k]=o[k]; }); } }catch(e){} }
+  ["name","fedTotal","lastFed","love","toys","lastSeen","food","boxed","giftSeen","koubouSeen"].forEach(function(k){ if(o[k]!==undefined) neko[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("neko_v1", JSON.stringify(neko)); }catch(e){} }
 load();
 
@@ -247,34 +259,175 @@ function catSVG(){
     ribbon + '</g></svg>';
 }
 function hoursSinceFed(){ return neko.lastFed ? (Date.now()-neko.lastFed)/3600000 : 99; }
+/* おなかは3メモリ。ごはん1回で+1、6時間ごとに1つ減る(0〜3) */
+function foodLevel_(){
+  if (neko.food === undefined) neko.food = 0;
+  var dec = Math.floor(hoursSinceFed() / 6);
+  return Math.max(0, Math.min(3, neko.food - dec));
+}
 
 /* ===== 描画 ===== */
 var BOWL='<svg viewBox="0 0 80 50" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><path d="M10 22 H70 L64 42 Q40 48 16 42 Z" fill="#a5c9e8"/><ellipse cx="40" cy="20" rx="26" ry="7" fill="#e8c99e"/></svg>';
 function render(){
   q("catName").textContent = neko.name || "ねこ";
   q("cat").innerHTML = catSVG();
-  var food = Math.max(6, 100 - hoursSinceFed()*12);
-  q("barFood").style.width = Math.min(100, food) + "%";
+  var seg = q("foodSeg");
+  if (seg){
+    var lv = foodLevel_();
+    seg.querySelectorAll("i").forEach(function(el, i){ el.classList.toggle("on", i < lv); });
+  }
   q("barLove").style.width = Math.min(100, neko.love) + "%";
   var p = feedsPending();
   if (p > 0){ q("bowl").style.display="block"; q("bowl").classList.add("wiggle");
     q("bowl").innerHTML = BOWL + '<span class="n">×'+p+'</span>'; }
   else q("bowl").style.display="none";
-  renderToys(); refreshCoin();
+  renderToys(); renderToyBox(); renderGifts(); renderKoubou(); refreshCoin();
 }
 var TOYDEFS = {
   ball:  { x:"18%", b:"18px", w:36, svg:'<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50"/></svg>' },
   mouse: { x:"64%", b:"14px", w:42, svg:'<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><ellipse cx="27" cy="36" rx="16" ry="12" fill="#ddd7f0"/><circle cx="16" cy="26" r="6" fill="#ddd7f0"/><circle cx="14" cy="25" r="1.5" fill="#8d7b66"/><path d="M43 36 q10 -4 12 -12" fill="none"/></svg>' },
   tower: { x:"76%", b:"120px", w:84, svg:'<svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="24" y="30" width="12" height="26" fill="#e8c99e"/><ellipse cx="30" cy="28" rx="18" ry="7" fill="#d3e7cb"/><ellipse cx="30" cy="10" rx="12" ry="5" fill="#d3e7cb"/><rect x="26" y="12" width="8" height="14" fill="#e8c99e"/></svg>' }
 };
+/* おもちゃ箱: 部屋に出すのは3個まで。それ以上は箱へ */
+var TOYBOX = '<svg viewBox="0 0 80 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><path d="M8 22 H72 V52 Q72 56 68 56 H12 Q8 56 8 52 Z" fill="#e8c99e"/><path d="M6 14 H74 V22 H6 Z" fill="#f5c9a8"/><path d="M40 14 V56" stroke-width="2.5"/><circle cx="40" cy="30" r="4" fill="#f4d3da"/></svg>';
+function toyBoxed_(id){ return (neko.boxed||[]).indexOf(id) !== -1; }
+function toggleBox(id){
+  if (!neko.boxed) neko.boxed = [];
+  var i = neko.boxed.indexOf(id);
+  if (i === -1) neko.boxed.push(id); else neko.boxed.splice(i, 1);
+  save(); blip(659,.08); render();
+}
+/* こうぼうで つくった でんしゃ(もらいもの)を へやに かざる */
+var TRAIN_COLORS = { mita:["#7fb3e8","#3a6fa8","#e8eef6"], oedo:["#e79ec4","#b8437f","#f7e6ef"],
+  marunouchi:["#e88b7d","#c0392b","#f8e6e2"], ginza:["#f0c274","#c8902f","#faf0da"],
+  shinkansen:["#eef1f6","#3a6fa8","#dfe6ef"], car:["#f4d3da","#d9a3b2","#cfe0ee"],
+  ribbon:["#f4b8b8","#e8788a","#f9e3a8"], cake:["#fff7ec","#f4b8b8","#f4d3da"] };
+var GIFT_TYPE = { car:"car", ribbon:"ribbon", cake:"cake" };
+function giftTrainSVG(id){
+  var c = TRAIN_COLORS[id] || TRAIN_COLORS.mita;
+  if (id === "car") return '<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><circle cx="90" cy="96" r="15" fill="#ddd7f0"/><circle cx="210" cy="96" r="15" fill="#ddd7f0"/><path d="M40 92 V72 Q40 56 62 56 L92 56 Q112 26 158 26 L188 26 Q222 26 238 56 Q262 56 262 76 V92 Z" fill="'+c[0]+'"/><path d="M112 56 Q126 36 158 36 L182 36 Q206 36 216 56 Z" fill="'+c[2]+'"/><circle cx="248" cy="74" r="8" fill="#f9e3a8"/><circle cx="132" cy="72" r="4" fill="#5a4a38" stroke="none"/><circle cx="168" cy="72" r="4" fill="#5a4a38" stroke="none"/></svg>';
+  if (id === "ribbon") return '<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M80 96 H220" stroke-width="8"/><path d="M84 92 L98 44 L124 74 L150 34 L176 74 L202 44 L216 92 Z" fill="'+c[2]+'"/><circle cx="150" cy="30" r="9" fill="'+c[0]+'"/><circle cx="106" cy="42" r="7" fill="'+c[0]+'"/><circle cx="194" cy="42" r="7" fill="'+c[0]+'"/><path d="M150 64 l-22 -14 v22 Z" fill="'+c[1]+'"/><path d="M150 64 l22 -14 v22 Z" fill="'+c[1]+'"/><circle cx="150" cy="64" r="7" fill="'+c[0]+'"/></svg>';
+  if (id === "cake") return '<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="150" cy="102" rx="86" ry="10" fill="#e8dcc4"/><rect x="74" y="56" width="152" height="46" rx="10" fill="'+c[0]+'"/><path d="M74 62 q19 16 38 0 q19 16 38 0 q19 16 38 0 q19 16 38 0 V56 H74 Z" fill="'+c[1]+'"/><rect x="144" y="26" width="12" height="26" rx="4" fill="#fff7ec"/><path d="M150 26 q-8 -10 0 -16 q8 6 0 16" fill="#f9e3a8"/></svg>';
+  return '<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">'+
+    '<circle cx="70" cy="96" r="13" fill="#ddd7f0"/><circle cx="120" cy="96" r="13" fill="#ddd7f0"/>'+
+    '<circle cx="185" cy="96" r="13" fill="#ddd7f0"/><circle cx="235" cy="96" r="13" fill="#ddd7f0"/>'+
+    '<rect x="34" y="34" width="232" height="52" rx="14" fill="'+c[0]+'"/>'+
+    '<rect x="34" y="34" width="232" height="14" rx="7" fill="'+c[2]+'"/>'+
+    '<path d="M34 70 H266" stroke="'+c[1]+'" stroke-width="7"/>'+
+    '<rect x="52" y="46" width="34" height="20" rx="5" fill="#eef4fb"/><rect x="98" y="46" width="34" height="20" rx="5" fill="#eef4fb"/>'+
+    '<rect x="150" y="46" width="34" height="20" rx="5" fill="#eef4fb"/><rect x="200" y="46" width="34" height="20" rx="5" fill="#eef4fb"/>'+
+    '<circle cx="252" cy="76" r="7" fill="#f9e3a8"/><circle cx="46" cy="76" r="7" fill="#f9e3a8"/>'+
+    '<circle cx="238" cy="58" r="3" fill="#5a4a38" stroke="none"/><circle cx="256" cy="58" r="3" fill="#5a4a38" stroke="none"/></svg>';
+}
+function gifts_(){ try{ return JSON.parse(localStorage.getItem("neko_gift_v1")||"[]"); }catch(e){ return []; } }
+function renderGifts(){
+  var room = q("room");
+  room.querySelectorAll(".giftTrain").forEach(function(e){ e.remove(); });
+  var g = gifts_();
+  if (!g.length) return;
+  // 最新の3つを床に並べる
+  g.slice(-3).forEach(function(item, i){
+    var el = document.createElement("div");
+    el.className = "giftTrain";
+    el.style.cssText = "position:absolute;left:"+(8 + i*30)+"%;bottom:"+(6 + i*4)+"px;width:96px;z-index:2;cursor:pointer";
+    el.innerHTML = giftTrainSVG(item.id);
+    el.onclick = function(){
+      catSay("これ、"+ (neko.name||"ぼく") +"に つくってくれた「"+item.name+"」だにゃ! だいじに するにゃ");
+      loveUp(2);
+      var c = q("cat"); c.classList.add("happy");
+      setTimeout(function(){ c.classList.remove("happy"); render(); }, 2400);
+    };
+    room.appendChild(el);
+  });
+  // 新着があったら ねこが気づく
+  var seen = neko.giftSeen || 0;
+  if (g.length > seen){
+    neko.giftSeen = g.length; save();
+    setTimeout(function(){
+      catSay("わあ! 「"+g[g.length-1].name+"」を つくってくれたにゃ!! ありがとにゃ〜");
+      var c = q("cat"); c.classList.add("happy","bounce");
+      setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
+      setTimeout(function(){ c.classList.remove("happy"); }, 3000);
+      purr(); loveUp(5);
+    }, 900);
+  }
+}
+/* かくしようそ: おみせのおもちゃを ぜんぶ かうと こうぼうが あく */
+function renderKoubou(){
+  var row = q("koubouRow"); if (!row) return;
+  var all = Object.keys(PRICES).every(function(id){ return neko.toys[id]; });
+  row.style.display = all ? "block" : "none";
+  if (all && !neko.koubouSeen){
+    neko.koubouSeen = 1; save();
+    setTimeout(function(){
+      catSay("おもちゃ ぜんぶ そろったにゃ!! …あ! おくの ドアが あいたにゃ🔧 こうぼうが つかえるにゃ!");
+      var c = q("cat"); c.classList.add("happy","bounce");
+      setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
+      setTimeout(function(){ c.classList.remove("happy"); }, 3200);
+      purr();
+      [523,659,784,1047].forEach(function(f,i){ blip(f,.2,i*.14); });
+    }, 700);
+  }
+}
+function renderToyBox(){
+  var b = q("toyBox"); if (!b) return;
+  var boxed = (neko.boxed||[]).filter(function(id){ return neko.toys[id]; });
+  if (boxed.length === 0){ b.style.display = "none"; return; }
+  b.style.display = "block";
+  b.innerHTML = TOYBOX + '<span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px">' + boxed.length + '</span>';
+  b.onclick = function(){ openToyBox(); };
+}
+function openToyBox(){
+  var boxed = (neko.boxed||[]).filter(function(id){ return neko.toys[id]; });
+  var out = Object.keys(neko.toys).filter(function(id){ return !toyBoxed_(id); });
+  var p = document.createElement("div");
+  p.id = "boxPanel";
+  p.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:65;display:flex;align-items:center;justify-content:center;padding:20px";
+  var items = boxed.map(function(id){
+    var d = TOYDEFS[id] || {svg:""};
+    return '<button class="bxi" data-id="'+id+'" style="background:#fff;border:2.5px solid #c9ae87;border-radius:14px;padding:8px;cursor:pointer;width:84px">'+
+      '<div style="width:44px;height:44px;margin:0 auto">'+d.svg+'</div>'+
+      '<div style="font-size:11px;font-weight:bold;color:#7a6146;margin-top:4px">だす</div></button>';
+  }).join("");
+  p.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:18px;text-align:center">'+
+    '<h3 style="color:#7a6146;font-size:15px">🧺 おもちゃばこ</h3>'+
+    '<p style="font-size:12px;color:#8d7b66;margin:6px 0 10px">へやに だせるのは 3こまで。えらんで だしてね</p>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">'+ (items || '<span style="font-size:12px;color:#a58868">からっぽだよ</span>') +'</div>'+
+    '<button id="boxClose" style="font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:9px 22px;margin-top:14px;cursor:pointer">とじる</button></div>';
+  document.body.appendChild(p);
+  p.querySelectorAll(".bxi").forEach(function(b2){
+    b2.onclick = function(){
+      if (out.length >= 3){ catSay("へやが いっぱいだにゃ。さきに どれか かたづけてにゃ"); blip(392,.12); return; }
+      toggleBox(b2.dataset.id);
+      p.remove(); openToyBox();
+    };
+  });
+  document.getElementById("boxClose").onclick = function(){ p.remove(); };
+}
 function renderToys(){
   document.querySelectorAll(".toyObj").forEach(function(e){ e.remove(); });
-  Object.keys(neko.toys).forEach(function(id){
+  var out = Object.keys(neko.toys).filter(function(id){ return !toyBoxed_(id); });
+  // 部屋に3個より多い時は、あふれた分を自動で箱へ
+  if (out.length > 3){
+    if (!neko.boxed) neko.boxed = [];
+    out.slice(3).forEach(function(id){ neko.boxed.push(id); });
+    save();
+    out = out.slice(0, 3);
+  }
+  out.forEach(function(id){
     var d = TOYDEFS[id]; if(!d) return;
     var e = document.createElement("div");
     e.className = "toyObj"; e.innerHTML = d.svg;
     e.style.left = d.x; e.style.bottom = d.b; e.style.width = d.w+"px";
-    e.onclick = function(){ playWith(id, e); };
+    e.onclick = function(){ if (e.dataset.lp === "1"){ e.dataset.lp = ""; return; } playWith(id, e); };
+    (function(el, tid){
+      var t = null;
+      function down(){ t = setTimeout(function(){ el.dataset.lp = "1"; toggleBox(tid);
+        catSay("おもちゃばこに かたづけたにゃ🧺"); }, 800); }
+      function up(){ clearTimeout(t); }
+      el.addEventListener("mousedown", down); el.addEventListener("mouseup", up); el.addEventListener("mouseleave", up);
+      el.addEventListener("touchstart", down, {passive:true}); el.addEventListener("touchend", up);
+    })(e, id);
     q("room").appendChild(e);
   });
   document.querySelectorAll(".shopItem").forEach(function(el){
@@ -334,8 +487,14 @@ q("feedBtn").onclick = function(){
     blip(300,.15);
     return;
   }
+  if (foodLevel_() >= 3){
+    catSay("おなか いっぱいだにゃ〜 あとで また たべるにゃ");
+    blip(392,.12);
+    return;
+  }
   feeding = true;
   wSet(wGet() - 1);
+  neko.food = foodLevel_() + 1;
   neko.fedTotal += 1; neko.lastFed = Date.now();
   neko.love = Math.min(100, neko.love + 3); save();
   // ごはんの器が出る→ねこが歩いていく→もぐもぐ→もどる

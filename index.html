@@ -96,11 +96,9 @@ footer a{color:#a5842e}
     <div class="ds">がんばりが ごはんになる</div>
   </a>
 </div>
-<div class="subapps">
-  <a class="sub" href="ufo_catcher.html">🕹 UFOキャッチャー</a>
-  <a class="sub" href="sweet_land.html">🍬 スウィートランド</a>
-  <a class="sub" href="jagaimo_land.html">🥔 じゃがいもランド</a>
-  <a class="sub" href="kodomo_museum.html">🖼 こどもミュージアム</a>
+
+<div style="background:#fdf6dd;border:3px dashed #e8cf7a;border-radius:20px;padding:12px 16px;margin-top:12px;text-align:center;font-size:12.5px;color:#a5842e;font-weight:bold">
+  🎁 ひみつのおへや: あそんでいくと、あたらしい おへやが みつかるかも…?
 </div>
 
 <h2>しくみ <small>HOW IT WORKS</small></h2>
@@ -109,6 +107,17 @@ footer a{color:#a5842e}
   <div class="step"><div class="no">2</div><div class="tx">お湯コインが たまる<small>がんばりが目に見えるかたちで残る</small></div></div>
   <div class="step"><div class="no">3</div><div class="tx">ガチャをまわす・ねこのお世話をする<small>ごほうびは「つぎの現実の行動」につながる設計</small></div></div>
   <div class="step"><div class="no">4</div><div class="tx">画面を閉じて、現実のあそびへ<small>ガチャでじゃがいもが当たったら、本物のじゃがいもがお風呂に浮かびます</small></div></div>
+</div>
+
+
+<h2>はじめての方へ <small>TIPS</small></h2>
+<div class="note">
+  <ul>
+    <li><b>おうちの人の設定</b>は、各画面の右上「せってい(ながおし)」を<b>1.5秒ながおし</b>で開きます(子どもが勝手に触らないように)</li>
+    <li><b>⭐おかわり</b>ボタン: よゆうがある日だけ、追加のタスクを出せます。翌日には自動で消えます</li>
+    <li><b>お湯コインのバッジを1.5秒ながおし</b>: おうちの人がコインを+3枚あげられます(ごほうびの微調整に)</li>
+    <li>タスク・持ち物リスト・ねこの名前などは、すべて設定から自由に変えられます</li>
+  </ul>
 </div>
 
 <h2>おうちの方へ <small>FOR PARENTS</small></h2>
@@ -131,6 +140,11 @@ footer a{color:#a5842e}
   使ってみて「うちの子はこうだった」「ここが分かりにくい」など、ひとことでも感想をもらえるととても助かります。紹介してくれた人にそのまま返信してください。子どもの反応(良くも悪くも)が、次の改良の材料になります。
 </div>
 
+
+<div style="text-align:center;margin-top:14px">
+  <button onclick="fbOpen()" style="font-family:inherit;font-size:15px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:13px 30px;box-shadow:0 4px 0 #dcc06e;cursor:pointer">💬 かんそう・ようぼうを おくる</button>
+</div>
+
 <footer>
   はぐのまち — つくっているのは、育休をひかえた ふつうの父です。<br>
   開発の記録: <a href="https://www.threads.com/@ha_papa_hug" rel="noopener">Threads @ha_papa_hug</a><br>
@@ -138,5 +152,61 @@ footer a{color:#a5842e}
 </footer>
 
 </div>
+<!-- ふぃーどばっく(共通パーツ) -->
+<div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+    <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。送信ボタンでメールが開きます(下書きが入っています)。</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
+    <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="fbSend()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📧 メールで おくる</button>
+      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピー(LINEに貼る)</button>
+      <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
+    </div>
+    <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
+  </div>
+</div>
+<script>
+var FB_TO = "hagunomachi.feedback@gmail.com";
+var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
+function fbOpen(){
+  var p=document.getElementById("fbPanel"); p.style.display="flex";
+  var c=document.getElementById("fbChips");
+  if(!c.dataset.built){ c.dataset.built="1";
+    FB_TAGS.forEach(function(t){
+      var b=document.createElement("button");
+      b.textContent=t; b.dataset.on="";
+      b.style.cssText="font-family:inherit;font-size:12px;font-weight:bold;border:2px solid #c9ae87;background:#fff;color:#7a6146;border-radius:999px;padding:6px 12px;cursor:pointer";
+      b.onclick=function(){ var on=b.dataset.on==="1"; b.dataset.on=on?"":"1";
+        b.style.background=on?"#fff":"#f2d98a"; };
+      c.appendChild(b);
+    });
+  }
+}
+function fbClose(){ document.getElementById("fbPanel").style.display="none";
+  document.getElementById("fbDone").style.display="none"; }
+function fbBody(){
+  var tags=[].slice.call(document.querySelectorAll("#fbChips button"))
+    .filter(function(b){return b.dataset.on==="1";}).map(function(b){return b.textContent;});
+  var t=document.getElementById("fbText").value.trim();
+  return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
+    "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
+}
+function fbSend(){
+  var url="mailto:"+FB_TO+"?subject="+encodeURIComponent("はぐのまち かんそう・ようぼう")+
+    "&body="+encodeURIComponent(fbBody());
+  location.href=url;
+  var d=document.getElementById("fbDone"); d.textContent="メールアプリが開かない場合は「コピー」でLINEに貼ってください"; d.style.display="block";
+}
+function fbCopy(){
+  var v=fbBody();
+  var d=document.getElementById("fbDone");
+  try{ navigator.clipboard.writeText(v).then(function(){ d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }); }
+  catch(e){ var ta=document.getElementById("fbText"); ta.select(); document.execCommand("copy");
+    d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }
+}
+</script>
+
 </body>
 </html>
