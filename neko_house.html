@@ -15,7 +15,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:6px 13px;
   font-size:13.5px;font-weight:bold;color:#7a6146;display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 rgba(141,123,102,.18)}
 .badge svg{width:19px;height:19px}
-#nameBadge{flex:1;text-align:center;justify-content:center}
+#nameBadge{text-align:center;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ===== へや ===== */
 #room{position:relative;width:min(440px,96vw);height:340px;border:4px solid #8d7b66;border-radius:20px;overflow:hidden;
@@ -91,17 +91,33 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
+/* ===== 共通ナビ(全アプリ統一・2026-07-27 UI標準化) ===== */
+#navBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
+  width:min(560px,96vw);margin:0 auto 8px;padding:0 4px}
+#navBar .nv{display:flex;align-items:center;gap:4px;text-decoration:none;background:rgba(255,250,240,.95);
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:bold;
+  color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer}
+#navBar .nv.on{background:#f2d98a;border-color:#dcc06e}
+#navBar .nv.coin{border-color:#dcc06e}
+#navBar .nv.set{position:relative;overflow:hidden}
+#navBar .nv.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
+@media (max-width:430px){ #navBar .nv{font-size:12px;padding:6px 10px} }
 </style>
 </head>
 <body>
 
-<div id="hud">
-  <a class="badge" href="kuruma_parking.html" style="text-decoration:none">🚗</a>
-  <a class="badge" href="mitooshi_calendar.html" style="text-decoration:none">📅</a>
-  <a class="badge" href="ofuro_gacha.html" style="text-decoration:none">♨</a>
-  <div class="badge" id="coinBadge" title="1.5秒ながおしで おうちのひとが+3まい"><span id="coinIco"></span>× <span id="coinN">0</span></div>
-  <div class="badge" id="nameBadge">🐱 <span id="catName">ねこ</span></div>
-  <div class="badge" id="setBtn" style="position:relative;overflow:hidden;white-space:nowrap">⚙ おうちのひと<span style="font-size:9px">(ながおし)</span><span id="pbGauge" style="position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px"></span></div>
+<div id="navBar">
+  <a class="nv " href="kuruma_parking.html">🚗 おしたく</a>
+  <a class="nv " href="mitooshi_calendar.html">📅 カレンダー</a>
+  <a class="nv " href="ofuro_gacha.html">♨ ガチャ</a>
+  <a class="nv on" href="neko_house.html">🐱 ねこ</a>
+  <div class="nv coin" id="navCoin" title="1.5秒ながおしで おうちのひとが+3まい">🪙 × <span id="navCoinN">0</span></div>
+  <div class="nv set" id="navSet">⚙ おうちのひと<span class="gz" id="navGauge"></span></div>
+</div>
+<div id="hud" style="justify-content:center">
+  <div class="badge" id="nameBadge" style="flex:0 1 auto;max-width:90vw">🐱 <span id="catName">ねこ</span></div>
+  <div style="display:none"><span id="coinBadge"><span id="coinIco"></span><span id="coinN">0</span></span>
+  <span id="setBtn"><span id="pbGauge"></span></span></div>
 </div>
 
 <div id="room">
@@ -123,7 +139,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
     box-shadow:0 3px 0 #dcc06e;cursor:pointer">🍚 ごはんを あげる(🪙1まい)</button>
 </div>
 
-<div id="shopRow">
+<div id="shopRow" style="margin-top:14px">
   <div class="shopItem" data-id="ball"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50" /></svg><div class="nm">ボール</div><div class="pr">🪙2まい</div></div>
   <div class="shopItem" data-id="mouse"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><ellipse cx="27" cy="36" rx="16" ry="12" fill="#ddd7f0"/><circle cx="16" cy="26" r="6" fill="#ddd7f0"/><circle cx="14" cy="25" r="1.5" fill="#8d7b66"/><path d="M43 36 q10 -4 12 -12" fill="none"/></svg><div class="nm">ねずみのおもちゃ</div><div class="pr">🪙3まい</div></div>
   <div class="shopItem" data-id="tower"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="24" y="30" width="12" height="24" fill="#e8c99e"/><ellipse cx="30" cy="28" rx="18" ry="7" fill="#d3e7cb"/><ellipse cx="30" cy="10" rx="12" ry="5" fill="#d3e7cb"/><rect x="26" y="12" width="8" height="14" fill="#e8c99e"/></svg><div class="nm">キャットタワー</div><div class="pr">🪙5まい</div></div>
@@ -147,7 +163,7 @@ function wGet(){ try{ return Math.max(0, JSON.parse(localStorage.getItem("yucoin
 function wSet(n){ try{ localStorage.setItem("yucoin_wallet_v1", JSON.stringify({n:Math.max(0,n)})); }catch(e){} refreshCoin(); }
 function feedsPending(){ try{ return parseInt(localStorage.getItem("neko_feed_v1")||"0",10); }catch(e){ return 0; } }
 function feedsSet(n){ try{ localStorage.setItem("neko_feed_v1", String(Math.max(0,n))); }catch(e){} }
-function refreshCoin(){ q("coinN").textContent = wGet(); }
+function refreshCoin(){ q("coinN").textContent = wGet(); var n=q("navCoinN"); if(n) n.textContent = wGet(); }
 var COIN='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>';
 
 /* ===== ねこの状態 ===== */

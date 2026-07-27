@@ -228,18 +228,34 @@ body.night #nekoNow{color:#d8cdb4}
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
+/* ===== 共通ナビ(全アプリ統一・2026-07-27 UI標準化) ===== */
+#navBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
+  width:min(560px,96vw);margin:0 auto 8px;padding:0 4px}
+#navBar .nv{display:flex;align-items:center;gap:4px;text-decoration:none;background:rgba(255,250,240,.95);
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:bold;
+  color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer}
+#navBar .nv.on{background:#f2d98a;border-color:#dcc06e}
+#navBar .nv.coin{border-color:#dcc06e}
+#navBar .nv.set{position:relative;overflow:hidden}
+#navBar .nv.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
+@media (max-width:430px){ #navBar .nv{font-size:12px;padding:6px 10px} }
 </style>
 </head>
 <body>
 
-<div id="hud">
-  <div id="coinBadge" title="1.5秒ながおしで おうちのひとが+3まい"><span id="coinIco"></span>× <span id="coinN">0</span></div>
+<div id="navBar">
+  <a class="nv on" href="kuruma_parking.html">🚗 おしたく</a>
+  <a class="nv " href="mitooshi_calendar.html">📅 カレンダー</a>
+  <a class="nv " href="ofuro_gacha.html">♨ ガチャ</a>
+  <a class="nv " href="neko_house.html">🐱 ねこ</a>
+  <div class="nv coin" id="navCoin" title="1.5秒ながおしで おうちのひとが+3まい">🪙 × <span id="navCoinN">0</span></div>
+  <div class="nv set" id="navSet">⚙ おうちのひと<span class="gz" id="navGauge"></span></div>
+</div>
+<div style="display:none">
+  <div id="coinBadge"><span id="coinIco"></span><span id="coinN">0</span></div>
   <div id="maruBadge">🌸× <span id="maruN">0</span></div>
-  <div class="tab on" id="tabTask">🚗 おしたく</div>
-  <div class="tab" id="tabTicket" style="display:none">⏱ タイマー</div>
-  <a class="tab" id="tabCal" href="mitooshi_calendar.html" style="text-decoration:none;color:inherit">📅 カレンダー</a>
-  <a class="tab" href="ofuro_gacha.html" style="text-decoration:none;color:inherit">♨ ガチャ</a>
-  <div class="tab" id="parentBtn"><span id="pbGauge"></span><span>おうちのひと<br>(ながおし)</span></div>
+  <div class="tab" id="tabTask">おしたく</div><div class="tab" id="tabTicket">タイマー</div>
+  <div class="tab" id="parentBtn"><span id="pbGauge"></span></div>
 </div>
 
 <div id="taskPage">
@@ -311,7 +327,7 @@ input,textarea{-webkit-user-select:text;user-select:text}
 </div>
 
 <div id="parent"><div class="inner" style="position:relative"><button onclick="closeParent()" style="position:absolute;top:10px;right:12px;background:#e8dcc4;border:none;border-radius:50%;width:34px;height:34px;font-size:16px;font-weight:bold;color:#7a6146;cursor:pointer;box-shadow:none;margin:0;padding:0">✕</button>
-  <h3>せってい(おうちのひと)</h3>
+  <h3>おうちのひと(せってい)</h3>
   <p><b>おしたくボード</b>: タスクを1個おわるたびに、お湯コイン+1。<br>
   <b>⭐おかわり</b>: よゆうがある日だけ、追加のタスクを出せます(翌日にはきえます。子は1日3個まで追加OK)。<br>
   <b>お湯コインのバッジを1.5秒ながおし</b>すると、おうちの人が+3枚あげられます(ごほうびの微調整に)。<br>
@@ -446,7 +462,7 @@ if (!store.papa) store.papa = { d:"", done:[] };
 /* パパのおしたく(設定から編集可能。文字列に絵文字ごと持つ) */
 if (!store.papaDef) store.papaDef = {
   asa: ["🤖 おそうじロボット スイッチON","🗑 ゴミだし","🥤 すいとう・コップを セット","🎒 ほいくえんバッグを こどもと チェック"],
-  yoru: ["📒 れんらくちょうを よむ(LINEの1画面)","👕 おきがえ ほじゅう(×3+ビニール袋)","🍽 すいとう・しょっきを あらう"]
+  yoru: ["📒 れんらくちょうを よむ","👕 おきがえ ほじゅう","🍽 すいとう・しょっきを あらう"]
 };
 /* ほいくえんバッグの中身(チェックだけ・コインなし。設定から編集可能) */
 if (!store.bagDef) store.bagDef = ["うわばき(週はじめ)","きがえ 上下","肌着","靴下","おむつ ほじゅう","水筒","コップ","タオル","ビニールぶくろ","エプロン・三角巾(クッキングの日)"];
@@ -1128,6 +1144,24 @@ function closeParent(){ q("parent").style.display="none"; }
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
 
 q("coinIco").innerHTML=COIN;
+/* 共通ナビの配線 */
+(function(){
+  var origRefresh = refreshCoin;
+  refreshCoin = function(){ origRefresh(); var n=q("navCoinN"); if(n) n.textContent = walletGet(); };
+  // 設定(1.5秒ながおし)
+  var t=null, b=q("navSet"), gz=q("navGauge");
+  function down(){ gz.style.transition="width 1.5s linear"; gz.style.width="100%";
+    t=setTimeout(function(){ openParent(); gz.style.transition="none"; gz.style.width="0%"; },1500); }
+  function up(){ clearTimeout(t); gz.style.transition="none"; gz.style.width="0%"; }
+  b.addEventListener("mousedown",down); b.addEventListener("mouseup",up); b.addEventListener("mouseleave",up);
+  b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
+  // コイン(1.5秒ながおしで+3)
+  var t2=null, c=q("navCoin");
+  function d2(){ t2=setTimeout(function(){ grantCoin(3); },1500); }
+  function u2(){ clearTimeout(t2); }
+  c.addEventListener("mousedown",d2); c.addEventListener("mouseup",u2); c.addEventListener("mouseleave",u2);
+  c.addEventListener("touchstart",d2,{passive:true}); c.addEventListener("touchend",u2);
+})();
 refreshCoin();
 renderBoard();
 updateTrip();

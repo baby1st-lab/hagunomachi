@@ -146,21 +146,33 @@ button.badge{cursor:pointer;font-family:inherit}
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
+/* ===== 共通ナビ(全アプリ統一・2026-07-27 UI標準化) ===== */
+#navBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
+  width:min(560px,96vw);margin:0 auto 8px;padding:0 4px}
+#navBar .nv{display:flex;align-items:center;gap:4px;text-decoration:none;background:rgba(255,250,240,.95);
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:bold;
+  color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer}
+#navBar .nv.on{background:#f2d98a;border-color:#dcc06e}
+#navBar .nv.coin{border-color:#dcc06e}
+#navBar .nv.set{position:relative;overflow:hidden}
+#navBar .nv.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
+@media (max-width:430px){ #navBar .nv{font-size:12px;padding:6px 10px} }
 </style>
 </head>
 <body>
 
-<div id="hud">
-  <div style="display:flex;gap:6px;align-items:center">
-    <a class="badge" href="kuruma_parking.html" style="text-decoration:none">🚗</a>
-    <a class="badge" href="mitooshi_calendar.html" style="text-decoration:none">📅</a>
-    <a class="badge" href="neko_house.html" style="text-decoration:none">🐱</a>
-    <div class="badge" title="1.5秒ながおしで おうちのひとが+3まい"><span id="coinIcon" title="1.5秒ながおしで おうちのひとが+3まい"></span>× <span id="coins">0</span></div>
-  </div>
-  <div style="display:flex;gap:8px">
-    <button class="badge" id="zukanBtn">ずかん</button>
-    <button class="badge" id="parentBtn"><span id="pbGauge"></span><span>おうちのひと(ながおし)</span></button>
-  </div>
+<div id="navBar">
+  <a class="nv " href="kuruma_parking.html">🚗 おしたく</a>
+  <a class="nv " href="mitooshi_calendar.html">📅 カレンダー</a>
+  <a class="nv on" href="ofuro_gacha.html">♨ ガチャ</a>
+  <a class="nv " href="neko_house.html">🐱 ねこ</a>
+  <div class="nv coin" id="navCoin" title="1.5秒ながおしで おうちのひとが+3まい">🪙 × <span id="navCoinN">0</span></div>
+  <div class="nv set" id="navSet">⚙ おうちのひと<span class="gz" id="navGauge"></span></div>
+</div>
+<div id="hud" style="justify-content:center;gap:8px">
+  <button class="badge" id="zukanBtn">ずかん</button>
+  <div style="display:none"><span id="coinIcon"></span><span id="coins">0</span>
+  <button id="parentBtn"><span id="pbGauge"></span></button></div>
 </div>
 
 <div id="stage">
@@ -344,7 +356,7 @@ function idleMsg(){
   if (store.prom.used) return "やくそく まもれて えらい!";
   return "「おやくそく まもります!」を おして コインをもらおう!";
 }
-refreshHud();
+refreshHud(); if(document.getElementById("navCoinN")) document.getElementById("navCoinN").textContent = wGet();
 setMsg(idleMsg());
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshHud(); });
 

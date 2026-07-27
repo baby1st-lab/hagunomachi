@@ -88,23 +88,34 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
+/* ===== 共通ナビ(全アプリ統一・2026-07-27 UI標準化) ===== */
+#navBar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;
+  width:min(560px,96vw);margin:0 auto 8px;padding:0 4px}
+#navBar .nv{display:flex;align-items:center;gap:4px;text-decoration:none;background:rgba(255,250,240,.95);
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:bold;
+  color:#7a6146;box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer}
+#navBar .nv.on{background:#f2d98a;border-color:#dcc06e}
+#navBar .nv.coin{border-color:#dcc06e}
+#navBar .nv.set{position:relative;overflow:hidden}
+#navBar .nv.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
+@media (max-width:430px){ #navBar .nv{font-size:12px;padding:6px 10px} }
 </style>
 </head>
 <body>
 
+<div id="navBar">
+  <a class="nv " href="kuruma_parking.html">🚗 おしたく</a>
+  <a class="nv on" href="mitooshi_calendar.html">📅 カレンダー</a>
+  <a class="nv " href="ofuro_gacha.html">♨ ガチャ</a>
+  <a class="nv " href="neko_house.html">🐱 ねこ</a>
+  <div class="nv coin" id="navCoin" title="1.5秒ながおしで おうちのひとが+3まい">🪙 × <span id="navCoinN">0</span></div>
+  <div class="nv set" id="navSet">⚙ おうちのひと<span class="gz" id="navGauge"></span></div>
+</div>
+
 <div id="head">
-  <div id="headTop">
-    <div style="display:flex;gap:5px;align-items:center">
-      <a href="kuruma_parking.html" style="text-decoration:none;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:5px 10px;font-size:14px">🚗</a>
-      <a href="ofuro_gacha.html" style="text-decoration:none;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:5px 10px;font-size:14px">♨</a>
-      <a href="neko_house.html" style="text-decoration:none;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:5px 10px;font-size:14px">🐱</a>
-    </div>
-    <div id="today">☀ きょうは</div>
-    <div style="display:flex;gap:5px;align-items:center">
-      <div id="setBtn">⚙ おうちのひと<span style="font-size:9px">(ながおし)</span><div id="pbGauge"></div></div>
-    </div>
-  </div>
+  <div id="today">☀ きょうは</div>
   <div id="todayBig"></div>
+  <div style="display:none"><div id="setBtn"><div id="pbGauge"></div></div></div>
 </div>
 
 <div id="strip"></div>
@@ -126,7 +137,6 @@ input,textarea{-webkit-user-select:text;user-select:text}
   <div id="evList"></div>
 </div>
 
-<div id="backRow"><a href="kuruma_parking.html">🚗 おしたくボードへ もどる</a></div>
 
 
 <script>
