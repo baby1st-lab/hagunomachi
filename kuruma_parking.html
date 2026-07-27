@@ -381,10 +381,6 @@ body{padding-bottom:78px!important}
   <div id="editBag"></div>
   <div class="row"><button onclick="addBagDef()">+ ついか</button></div>
   </div>
-  <div class="row" style="margin-top:10px">
-    <button onclick="fbOpen()">💬 かんそう・ようぼうを おくる</button>
-    <button onclick="location.href='index.html'">🏠 はぐのまちトップ</button>
-  </div>
 <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
   <details id="bkup" style="margin-top:14px;border-top:2px dashed #dcc06e;padding-top:10px">
     <summary style="font-size:13px;font-weight:bold;color:#a58868;cursor:pointer">🗄 データのバックアップ(ふだんは使いません)</summary>
@@ -396,6 +392,10 @@ body{padding-bottom:78px!important}
     </div>
     <p style="font-size:11.5px;color:#a99f8c;margin-top:6px">※読み込むと、いまの記録は上書きされます。</p>
   </details>
+  <div class="row" style="margin-top:10px">
+    <button onclick="fbOpen()">💬 かんそう・ようぼうを おくる</button>
+    <button onclick="location.href='index.html'">🏠 はぐのまちトップ</button>
+  </div>
   <button class="close" onclick="closeParent()">とじる</button>
 </div></div>
 
@@ -463,7 +463,7 @@ var DEFAULT_TASKS = {
 var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:false, notifySec:60,
   vehAsa:"bike", vehYoru:"car" };
 function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
-  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1","cleaned2"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
 load();
 if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
@@ -496,6 +496,7 @@ if (!store.papaDef) store.papaDef = {
 if (!store.bagDef) store.bagDef = ["うわばき(週はじめ)","きがえ 上下","肌着","靴下","おむつ ほじゅう","水筒","コップ","タオル","ビニールぶくろ"];
 if (!store.bag) store.bag = { d:"", done:[] };
 store.bagDef = store.bagDef.map(function(t){ return String(t).replace(/×3/g,"").replace(/ +$/,""); });
+if (!store.cleaned2){ store.bagDef = store.bagDef.filter(function(t){ return t.indexOf("エプロン") === -1; }); store.cleaned2 = 1; save(); }
 function papaToday_(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
 function renderPapa(){
   // 朝夜分割への移行(旧: done=[] → 新: done={asa:[],yoru:[]})
