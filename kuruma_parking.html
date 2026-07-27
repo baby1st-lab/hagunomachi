@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-title" content="おしたく">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>おしたくボード & おでかけタイマー</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -166,11 +169,18 @@ body.night #clkDigits{color:#f5ead3}
 #bnFace{flex:0 0 84px;cursor:pointer;animation:bnstroll 16s ease-in-out infinite}
 #bnFace svg{width:84px;height:auto;display:block}
 #bnFace:active svg{transform:scale(.93)}
+#bnFace.slp{animation:none}
 @keyframes bnstroll{0%{transform:translateX(0) scaleX(-1)}
   45%{transform:translateX(92px) scaleX(-1)}
   50%{transform:translateX(92px) scaleX(1)}
   95%,100%{transform:translateX(0) scaleX(1)}}
 #nekoNow{width:100%;text-align:center;font-size:12.5px;font-weight:bold;color:#a58868;margin:-6px 0 8px}
+/* SplitView等の狭い幅でヘッドメニューが崩れる対策(妻指摘 2026-07-27) */
+@media (max-width:560px){
+  #hud{flex-wrap:wrap;gap:4px;justify-content:center}
+  .tab{font-size:11.5px;padding:6px 8px}
+  #coinBadge{font-size:12px;padding:5px 9px}
+}
 body.night #nekoNow{color:#d8cdb4}
 #bnFace.joy svg{animation:bnjump .45s ease 2}
 @keyframes bnjump{50%{transform:translateY(-10px)}}
@@ -223,7 +233,7 @@ body.night #nekoNow{color:#d8cdb4}
   <div id="coinBadge"><span id="coinIco"></span>× <span id="coinN">0</span></div>
   <div id="maruBadge">🌸× <span id="maruN">0</span></div>
   <div class="tab on" id="tabTask">🚗 おしたく</div>
-  <div class="tab" id="tabTicket">⏱ タイマー</div>
+  <div class="tab" id="tabTicket" style="display:none">⏱ タイマー</div>
   <a class="tab" id="tabCal" href="mitooshi_calendar.html" style="text-decoration:none;color:inherit">📅 カレンダー</a>
   <a class="tab" href="ofuro_gacha.html" style="text-decoration:none;color:inherit">♨ ガチャ</a>
   <div class="tab" id="parentBtn"><span id="pbGauge"></span><span>せってい<br>(ながおし)</span></div>
@@ -255,6 +265,10 @@ body.night #nekoNow{color:#d8cdb4}
     <div id="papaCard">
       <div id="papaHead" onclick="togglePapa()">👔 パパのおしたく <span id="papaCount"></span><span id="papaArrow">▸</span></div>
       <div id="papaRows" style="display:none"></div>
+    </div>
+    <div id="bagCard" style="width:100%;margin:8px 0 0;background:rgba(255,250,240,.9);border:2.5px solid #d8c9ab;border-radius:16px;overflow:hidden">
+      <div onclick="toggleBag()" style="font-size:13px;font-weight:bold;color:#8d7b66;padding:9px 14px;cursor:pointer;display:flex;gap:6px;align-items:center">🎒 バッグのなかみ <span id="bagCount"></span><span id="bagArrow" style="margin-left:auto;transition:transform .2s">▸</span></div>
+      <div id="bagRows" style="display:none;padding:0 10px 10px"></div>
     </div>
   </div>
 </div>
@@ -311,6 +325,15 @@ body.night #nekoNow{color:#d8cdb4}
   <h3>⭐ おかわりの きほんセット(星ボタンで出るタスク)</h3>
   <div id="editStretch"></div>
   <div class="row"><button onclick="addStretchDef()">+ ついか</button></div>
+  <h3>👔 パパのおしたく(あさ)</h3>
+  <div id="editPapaAsa"></div>
+  <div class="row"><button onclick="addPapaDef('asa')">+ ついか</button></div>
+  <h3>👔 パパのおしたく(よる)</h3>
+  <div id="editPapaYoru"></div>
+  <div class="row"><button onclick="addPapaDef('yoru')">+ ついか</button></div>
+  <h3>🎒 バッグのなかみリスト</h3>
+  <div id="editBag"></div>
+  <div class="row"><button onclick="addBagDef()">+ ついか</button></div>
   <p style="font-size:11px;color:#a58868;margin:4px 0">💡 のりものは、タイマー画面で はしっている車をタップすると変えられます</p>
   <h3>☀ あさのタスク(タップで絵を変更/↑↓で並べ替え)</h3>
   <div id="editAsa"></div>
@@ -351,6 +374,7 @@ var ICONS={
  youchien:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="18" y="24" width="44" height="44" rx="12" fill="#b7d9a8"/><path d="M28 24 Q28 12 40 12 Q52 12 52 24" fill="none"/><rect x="28" y="36" width="24" height="18" rx="6" fill="#fff7ec"/><path d="M18 40 Q12 42 14 50 M62 40 Q68 42 66 50"/></svg>',
  kumon:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="14" y="18" width="40" height="50" rx="6" fill="#fff7ec"/><path d="M22 30 h24 M22 40 h24 M22 50 h16"/><path d="M48 62 L62 24 L70 27 L56 65 L46 68 Z" fill="#f9e3a8"/><path d="M62 24 L70 27 L72 21 Q70 16 65 18 Z" fill="#f4d3da"/></svg>',
  oekaki:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 60 Q30 48 44 56 Q58 64 68 54"/><rect x="20" y="14" width="12" height="34" rx="5" fill="#f4b8b8"/><path d="M20 22 h12"/><rect x="40" y="10" width="12" height="38" rx="5" fill="#a5c9e8"/><path d="M40 18 h12"/></svg>',
+ dryer:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><circle cx="30" cy="28" r="17" fill="#a5c9e8"/><path d="M45 20 L62 22 Q66 22 66 26 V30 Q66 34 62 34 L45 36 Z" fill="#cfe0ee"/><path d="M26 44 L22 62 Q21 67 27 67 L33 67 Q38 67 37 62 L34 45" fill="#f4d3da"/><circle cx="30" cy="28" r="7" fill="#fff7ec"/><path d="M70 20 q4 3 0 6 M73 28 q4 3 0 6 M70 36 q4 3 0 6" stroke-width="2.5"/></svg>',
  katazuke:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="34" width="56" height="30" rx="6" fill="#f0e3c8"/><path d="M12 42 H68"/><circle cx="30" cy="26" r="9" fill="#f4d3da"/><rect x="44" y="18" width="16" height="16" rx="4" fill="#cfe0ee"/><path d="M40 8 q6 6 0 10" stroke="#a8cf9e"/></svg>',
  nenne:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M46 8 a20 20 0 1 0 14 34 a16 16 0 0 1 -14 -34 Z" fill="#f9e3a8"/><rect x="10" y="48" width="60" height="18" rx="9" fill="#cfe0ee"/><rect x="10" y="44" width="24" height="12" rx="6" fill="#fff7ec"/><path d="M52 20 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/></svg>',
  ehon:'<svg viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M12 20 Q26 13 40 20 V62 Q26 55 12 62 Z" fill="#cfe0ee"/><path d="M68 20 Q54 13 40 20 V62 Q54 55 68 62 Z" fill="#f4d3da"/><path d="M19 28 Q28 24 34 27 M19 36 Q28 32 34 35 M46 27 Q54 24 61 28"/><path d="M52 34 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/></svg>'
@@ -385,7 +409,7 @@ var DEFAULT_TASKS = {
 var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:false, notifySec:60,
   vehAsa:"bike", vehYoru:"car" };
 function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
-  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
 load();
 if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
@@ -395,25 +419,20 @@ if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
 (store.tasks.asa||[]).forEach(function(t){ if(t.name==="ようちえんじゅんび"){ t.name="ほいくえんじゅんび"; } });
 // パパのおしたく(初期リスト。妻の指摘=バッグ準備は子どもとチェック)
 if (!store.papa) store.papa = { d:"", done:[] };
-var PAPA_TASKS = {
-  asa: [
-    ["🤖","おそうじロボット スイッチON"],
-    ["🗑","ゴミだし"],
-    ["🥤","すいとう・コップを セット"],
-    ["🎒","ほいくえんバッグを こどもと チェック"]
-  ],
-  yoru: [
-    ["📒","れんらくちょうを よむ(LINEの1画面)"],
-    ["👕","おきがえ ほじゅう(上下・肌着・靴下×3+ビニール袋)"],
-    ["🍽","すいとう・しょっきを あらう"]
-  ]
+/* パパのおしたく(設定から編集可能。文字列に絵文字ごと持つ) */
+if (!store.papaDef) store.papaDef = {
+  asa: ["🤖 おそうじロボット スイッチON","🗑 ゴミだし","🥤 すいとう・コップを セット","🎒 ほいくえんバッグを こどもと チェック"],
+  yoru: ["📒 れんらくちょうを よむ(LINEの1画面)","👕 おきがえ ほじゅう(×3+ビニール袋)","🍽 すいとう・しょっきを あらう"]
 };
+/* ほいくえんバッグの中身(チェックだけ・コインなし。設定から編集可能) */
+if (!store.bagDef) store.bagDef = ["うわばき(週はじめ)","きがえ 上下×3","肌着×3","靴下×3","おむつ ほじゅう","水筒","コップ","タオル","ビニールぶくろ","エプロン・三角巾(クッキングの日)"];
+if (!store.bag) store.bag = { d:"", done:[] };
 function papaToday_(){ var d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
 function renderPapa(){
   // 朝夜分割への移行(旧: done=[] → 新: done={asa:[],yoru:[]})
   if (Array.isArray(store.papa.done)) store.papa.done = { asa: [], yoru: [] };
   if (store.papa.d !== papaToday_()){ store.papa.d = papaToday_(); store.papa.done = { asa: [], yoru: [] }; save(); }
-  var tasks = PAPA_TASKS[mode] || PAPA_TASKS.asa;
+  var tasks = (store.papaDef && store.papaDef[mode]) || [];
   var doneArr = store.papa.done[mode] || [];
   var pr = document.getElementById("papaRows"); pr.innerHTML = "";
   var doneN = 0;
@@ -422,7 +441,7 @@ function renderPapa(){
     if (done) doneN++;
     var row = document.createElement("div");
     row.className = "prow" + (done ? " done" : "");
-    row.innerHTML = "<span>"+t[0]+"</span><span>"+t[1]+"</span><span class='chk'>"+(done?"✅":"⬜")+"</span>";
+    row.innerHTML = "<span>"+t+"</span><span class='chk'>"+(done?"✅":"⬜")+"</span>";
     row.onclick = function(){
       var ix = doneArr.indexOf(i);
       if (ix === -1) doneArr.push(i); else doneArr.splice(ix,1);
@@ -432,6 +451,34 @@ function renderPapa(){
     pr.appendChild(row);
   });
   document.getElementById("papaCount").textContent = (mode==="asa"?"あさ ":"よる ") + doneN + "/" + tasks.length;
+  renderBag();
+}
+/* 🎒バッグのなかみ(チェックだけ・コインなし) */
+function renderBag(){
+  var el = document.getElementById("bagRows"); if (!el) return;
+  if (store.bag.d !== papaToday_()){ store.bag = { d: papaToday_(), done: [] }; save(); }
+  el.innerHTML = "";
+  var doneN = 0;
+  store.bagDef.forEach(function(t, i){
+    var done = store.bag.done.indexOf(i) !== -1;
+    if (done) doneN++;
+    var row = document.createElement("div");
+    row.className = "prow" + (done ? " done" : "");
+    row.innerHTML = "<span>"+t+"</span><span class='chk'>"+(done?"✅":"⬜")+"</span>";
+    row.onclick = function(){
+      var ix = store.bag.done.indexOf(i);
+      if (ix === -1) store.bag.done.push(i); else store.bag.done.splice(ix,1);
+      save(); renderBag();
+    };
+    el.appendChild(row);
+  });
+  document.getElementById("bagCount").textContent = doneN + "/" + store.bagDef.length;
+}
+function toggleBag(){
+  var r = document.getElementById("bagRows");
+  var open = r.style.display !== "none";
+  r.style.display = open ? "none" : "block";
+  document.getElementById("bagArrow").style.transform = open ? "" : "rotate(90deg)";
 }
 function togglePapa(){
   var c = document.getElementById("papaCard"), r = document.getElementById("papaRows");
@@ -470,6 +517,31 @@ function addStretchDef(){
   store.stretchDef.push({ n: "あたらしい", ic: "oekaki" });
   save(); renderStretchDef();
 }
+/* パパのおしたく・バッグの編集(テキスト+削除+追加のシンプル形式) */
+function renderListEditor_(wrapId, arr, onChange){
+  var w = document.getElementById(wrapId); if (!w) return;
+  w.innerHTML = "";
+  arr.forEach(function(v, i){
+    var d = document.createElement("div"); d.className = "tedit";
+    var inp = document.createElement("input"); inp.value = v; inp.maxLength = 30;
+    inp.oninput = function(){ arr[i] = inp.value; save(); onChange(); };
+    var del = document.createElement("button"); del.textContent = "🗑";
+    del.onclick = function(){ arr.splice(i, 1); save(); renderListEditor_(wrapId, arr, onChange); onChange(); };
+    d.appendChild(inp); d.appendChild(del);
+    w.appendChild(d);
+  });
+}
+function renderPapaBagEditors_(){
+  renderListEditor_("editPapaAsa", store.papaDef.asa, renderPapa);
+  renderListEditor_("editPapaYoru", store.papaDef.yoru, renderPapa);
+  renderListEditor_("editBag", store.bagDef, renderBag);
+}
+function addPapaDef(m){
+  store.papaDef[m].push("あたらしい やること"); save(); renderPapaBagEditors_(); renderPapa();
+}
+function addBagDef(){
+  store.bagDef.push("あたらしい もちもの"); save(); renderPapaBagEditors_(); renderBag();
+}
 function stretchList(){
   if (store.stretch.d !== papaToday_()){ store.stretch = { d:papaToday_(), on:false, extra:[] }; save(); }
   if (!store.stretch.on) return [];
@@ -486,10 +558,16 @@ function stretchList(){
 /* 彼の「もっとふやしたい!」を受ける(その日限り・翌日自動で消える)
    promptダイアログは環境によりブロックされるため、インラインのパネル方式(v2) */
 var STRETCH_SUGGEST = ["トイレ","リュックのじゅんび","ドライヤー","おてつだい","ぬりえ","ダンス"];
-var STRETCH_ICONS = ["oekaki","kumon","ehon","katazuke","hamigaki","ofuro","kigae","gohan","youchien"];
+var STRETCH_ICONS = ["oekaki","kumon","ehon","dryer","katazuke","hamigaki","ofuro","kigae","gohan","youchien"];
 var sgSelIcon = "oekaki";
 function addStretchExtra_(nm){
   if (!nm || !nm.trim()) return;
+  // 妻仕様(2026-07-27): 子どもの追加は1日3個まで(無限増殖→就寝遅延の防止)
+  if ((store.stretch.extra || []).length >= 3){
+    toast("きょうの ついかは 3こまで! つづきは あしたの おたのしみ⭐");
+    blip(392,.15);
+    return;
+  }
   store.stretch.extra.push({ n: nm.trim().slice(0, 12), ic: sgSelIcon }); save();
   blip(784,.1); blip(1047,.12,.12);
   try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}
@@ -701,6 +779,7 @@ function renderBoardNeko(){
   var el = q("boardNeko"); if (!el) return;
   var now = nekoNow_();
   q("bnFace").innerHTML = now.img;
+  q("bnFace").classList.toggle("slp", now.img === NEKO_SLEEP); // 寝てる間は散歩しない
   var cap = q("nekoNow");
   if (cap) cap.textContent = nekoName_() + "は いま: " + now.cap;
   updateClock_();
@@ -1003,6 +1082,7 @@ function openParent(){
     };
   });
   renderStretchDef();
+  renderPapaBagEditors_();
   q("parent").style.display="flex";
 }
 /* renderVehは廃止(2026-07-25): のりもの切替は走っている車のタップ式へ */
