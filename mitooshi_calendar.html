@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-title" content="カレンダー">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -100,7 +100,7 @@ body{padding-bottom:78px!important}
 #appFoot{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;
   background:rgba(255,250,240,.97);border-top:3px solid #c9ae87;box-shadow:0 -3px 10px rgba(141,123,102,.14)}
 #appFoot .fbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:1px;text-decoration:none;color:#a58868;font-size:10.5px;font-weight:bold;padding:7px 2px 9px;
+  gap:1px;text-decoration:none;color:#a58868;font-size:10.5px;font-weight:bold;padding:7px 2px calc(9px + env(safe-area-inset-bottom));
   cursor:pointer;position:relative;background:none;border:none;font-family:inherit}
 #appFoot .fbtn .ic{line-height:0}
 #appFoot .fbtn .ic svg{width:30px;height:26px;display:block}
