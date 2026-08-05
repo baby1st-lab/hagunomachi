@@ -232,7 +232,7 @@ if (!K.cur) startNext_();
 
 function startNext_(){
   var next = TRAINS.filter(function(t){ return K.made.indexOf(t.id) === -1; })[0];
-  K.cur = next ? next.id : TRAINS[0].id;   // 全部作ったら最初から(2両目)
+  K.cur = next ? next.id : TRAINS[K.made.length % TRAINS.length].id;   // 全部作ったら2周目(順番にループ)
   K.bought = {};
   save();
 }
