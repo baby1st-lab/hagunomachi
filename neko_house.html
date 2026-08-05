@@ -108,8 +108,8 @@ input,textarea{-webkit-user-select:text;user-select:text}
   box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
 #topBar .tb svg{width:20px;height:20px}
 #topBar .tb .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
-/* ===== 共通フッター(全アプリ統一 v2・2026-07-27) ===== */
-body{padding-bottom:78px!important}
+/* ===== 共通フッター(全アプリ統一 v2・2026-07-27 / 8-06: 下余白を拡大し工房ボタンとの近接を解消) ===== */
+body{padding-bottom:104px!important}
 #appFoot{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;
   background:rgba(255,250,240,.97);border-top:3px solid #c9ae87;box-shadow:0 -3px 10px rgba(141,123,102,.14)}
 #appFoot .fbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -171,7 +171,7 @@ body{padding-bottom:78px!important}
   <div class="shopItem" data-id="tower"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><rect x="24" y="30" width="12" height="24" fill="#e8c99e"/><ellipse cx="30" cy="28" rx="18" ry="7" fill="#d3e7cb"/><ellipse cx="30" cy="10" rx="12" ry="5" fill="#d3e7cb"/><rect x="26" y="12" width="8" height="14" fill="#e8c99e"/></svg><div class="nm">キャットタワー</div><div class="pr"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>5まい</div></div>
 </div>
 
-<div id="koubouRow" style="width:min(440px,96vw);margin:12px 0 4px;text-align:center;display:none">
+<div id="koubouRow" style="width:min(440px,96vw);margin:12px 0 22px;text-align:center;display:none">
   <a href="koubou.html" style="display:inline-block;text-decoration:none;font-family:inherit;font-size:15px;font-weight:bold;
     background:#a5c9e8;color:#2f4b6b;border-radius:999px;padding:12px 24px;box-shadow:0 4px 0 #7fa9cd">
     🔧 おもちゃこうぼうで つくってあげる</a>
@@ -228,7 +228,7 @@ function sleepSay_(){
 function catSVG(){
   var stage = neko.fedTotal >= 30 ? 2 : (neko.fedTotal >= 10 ? 1 : 0);
   var scale = [0.78, 0.92, 1.05][stage];
-  var ribbon = stage >= 1 ? '<path d="M52 34 l-7 -5 v10 Z M52 34 l7 -5 v10 Z" fill="#e8788a" stroke="#8d7b66" stroke-width="2.5"/><circle cx="52" cy="34" r="3" fill="#f4d3da" stroke="#8d7b66" stroke-width="2"/>' : '';
+  var ribbon = stage >= 1 ? '<path d="M46 19 l-7 -5 v10 Z M46 19 l7 -5 v10 Z" fill="#e8788a" stroke="#8d7b66" stroke-width="2.5"/><circle cx="46" cy="19" r="3" fill="#f4d3da" stroke="#8d7b66" stroke-width="2"/>' : '';
   var fluff = stage === 2 ? '<path d="M20 78 q-8 4 -10 12 M100 78 q8 4 10 12" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linecap="round"/>' : '';
   if (isSleepTime_()){
     // ねむり顔(とじた目+zzz)。うずくまり感はおしり側を下げた姿勢で
@@ -350,6 +350,8 @@ function runTrain(item){
   var oldTrans = c.style.transition;
   c.style.transition = "left 1.4s ease, bottom .3s ease";
   catSay("わっ! でんしゃが うごいたにゃ!! まてまて〜");
+  purr(); // 走りだしの音
+  [392,523,659].forEach(function(f,i){ blip(f,.1,i*.12); }); // ガタンゴトン風
   var stops = ["70%","10%","74%","6%"], i = 0;
   function hop(){
     if (i >= stops.length){
@@ -358,10 +360,11 @@ function runTrain(item){
       setTimeout(function(){
         catSay("はぁ はぁ… つかまえたにゃ! 「" + item.name + "」 はやいにゃ〜");
         loveUp(2);
-        c.classList.add("happy","bounce");
+        purr(); // つかまえた音
+        c.classList.add("bounce"); // 目は開けたまま(happyは使わない: 目を瞑って見えるため)
         setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
         setTimeout(function(){
-          c.classList.remove("happy"); c.style.left = "50%";
+          c.style.left = "50%";
           c.style.transition = oldTrans; railBusy = false; render();
         }, 2600);
       }, 1500);
@@ -437,9 +440,11 @@ function renderKoubou(){
 function renderToyBox(){
   var b = q("toyBox"); if (!b) return;
   var boxed = (neko.boxed||[]).filter(function(id){ return neko.toys[id]; });
-  if (boxed.length === 0){ b.style.display = "none"; return; }
+  // おもちゃを1つでも持っていれば箱は常に見せる(「箱が出ない」対策。空でも開ける)
+  var hasAny = Object.keys(neko.toys||{}).length > 0;
+  if (!hasAny){ b.style.display = "none"; return; }
   b.style.display = "block";
-  b.innerHTML = TOYBOX + '<span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px">' + boxed.length + '</span>';
+  b.innerHTML = TOYBOX + (boxed.length ? '<span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px">' + boxed.length + '</span>' : '');
   b.onclick = function(){ openToyBox(); };
 }
 function openToyBox(){

@@ -917,8 +917,11 @@ function renderSleepRow_(){
   var sb = q("sleepBtn"), wb = q("wakeBtn");
   if (!sb || !wb) return;
   var open = !!sleepOpenEntry_();
-  sb.style.display = open ? "none" : "";
-  wb.style.display = open ? "" : "none";
+  // 「ねる」は夕方17時以降(または深夜〜早朝5時前)だけ表示。朝の支度画面には出さない
+  var h = new Date().getHours();
+  var sleepTime = (h >= 17 || h < 5);
+  sb.style.display = (open || !sleepTime) ? "none" : "";
+  wb.style.display = open ? "" : "none"; // 「おきた」は寝た記録が開いていれば時間帯を問わず表示
 }
 function sleepPress(){
   var log = sleepLoad_();
