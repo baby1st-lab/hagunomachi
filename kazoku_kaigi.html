@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>わが家の会議室</title>
+<style>
+:root{ --ink:#5a4a38; --sub:#8d7b66; --line:#c9ae87; --bg:#fdf6e9; --card:#fffcf4;
+  --k:#7fb3e8; --w:#e79ec4; --f:#9ec9a5; --accent:#e8937c; --gold:#f2d98a; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;background:var(--bg);color:var(--ink);
+  padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+#top{position:sticky;top:0;z-index:40;background:rgba(253,246,233,.97);border-bottom:3px solid var(--line);
+  padding:10px 14px calc(8px);display:flex;align-items:baseline;gap:10px}
+#top h1{font-size:17px}
+#top .d{font-size:12px;color:var(--sub)}
+#top .cd{margin-left:auto;font-size:12px;font-weight:bold;color:#b83280;background:#fff5f7;
+  border:2px solid #fbb6ce;border-radius:999px;padding:3px 12px}
+.page{display:none;max-width:760px;margin:0 auto;padding:14px}
+.page.on{display:block}
+h2{font-size:15px;margin:6px 0 10px;display:flex;align-items:center;gap:8px}
+h2 .hint{font-size:11px;color:var(--sub);font-weight:normal}
+.card{background:var(--card);border:3px solid var(--line);border-radius:16px;padding:12px;margin-bottom:14px}
+button{font-family:inherit;font-weight:bold;border:none;border-radius:12px;cursor:pointer}
+input,textarea,select{font-family:inherit;font-size:14px;border:2px solid var(--line);border-radius:10px;
+  padding:8px;background:#fff;color:var(--ink);width:100%}
+textarea{min-height:90px;line-height:1.7}
+/* ダッシュボード */
+.dashGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:3px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat .big{font-size:22px;font-weight:bold}
+.stat .lb{font-size:11px;color:var(--sub)}
+#top3 li{list-style:none;padding:8px 4px;border-bottom:1.5px dashed #e8dcc4;font-size:14px;display:flex;gap:8px;align-items:center}
+/* やることボード */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.col h3{font-size:13px;text-align:center;border-radius:999px;padding:5px;margin-bottom:8px;color:#fff}
+.col.K h3{background:var(--k)} .col.W h3{background:var(--w)} .col.F h3{background:var(--f)}
+.task{background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px;margin-bottom:7px;font-size:13.5px;
+  display:flex;gap:7px;align-items:flex-start}
+.task.done{opacity:.45}
+.task.done .nm{text-decoration:line-through}
+.task .chk{width:22px;height:22px;min-width:22px;border:2.5px solid var(--line);border-radius:7px;background:#fff;
+  font-size:14px;line-height:1;padding:0}
+.task.done .chk{background:var(--gold);border-color:#d8b74a}
+.task .due{font-size:10.5px;color:#b83280;font-weight:bold;white-space:nowrap}
+.task .del{margin-left:auto;color:#c9ae87;background:none;font-size:15px;padding:0 3px}
+.addRow{display:flex;gap:6px;margin-top:6px}
+.addRow button{background:var(--accent);color:#fff;padding:8px 14px;white-space:nowrap}
+/* 議題箱 */
+.gd{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.gd .t{font-size:14.5px;font-weight:bold;display:flex;gap:8px;align-items:center}
+.gd .note{font-size:12.5px;color:var(--sub);margin-top:3px;line-height:1.6}
+.gd .dec{margin-top:7px;background:#f0fff4;border:2px solid #9ae6b4;border-radius:10px;padding:7px;font-size:13px}
+.gd .dec b{color:#2f855a}
+.gd .ops{display:flex;gap:6px;margin-top:7px}
+.gd .ops button{font-size:12px;padding:6px 12px;background:#e8dcc4;color:var(--ink)}
+.gd .ops button.pri{background:var(--accent);color:#fff}
+.badge{font-size:10px;color:#fff;background:var(--accent);border-radius:999px;padding:2px 8px}
+.badge.done{background:#9ae6b4;color:#22543d}
+/* ガント */
+#gantt{overflow-x:auto}
+.gRow{display:flex;align-items:center;margin-bottom:6px}
+.gName{width:130px;min-width:130px;font-size:12px;font-weight:bold;padding-right:6px;line-height:1.4}
+.gName .gdel{color:#c9ae87;background:none;font-size:12px;padding:0 2px}
+.gTrack{position:relative;height:26px;background:#f6eeda;border-radius:8px;flex:1;min-width:520px}
+.gBar{position:absolute;top:3px;bottom:3px;border-radius:7px;font-size:10.5px;color:#fff;font-weight:bold;
+  display:flex;align-items:center;padding:0 6px;overflow:hidden;white-space:nowrap;cursor:pointer}
+.gBar.c0{background:var(--k)} .gBar.c1{background:var(--w)} .gBar.c2{background:var(--f)}
+.gBar.c3{background:#c9a5e8} .gBar.done{opacity:.4}
+#gHead{position:relative;height:20px;min-width:520px;margin-left:130px}
+#gHead span{position:absolute;font-size:10px;color:var(--sub);transform:translateX(-50%)}
+#gToday{position:absolute;top:0;bottom:0;width:2.5px;background:#e53e3e;z-index:3}
+/* カレンダー */
+#calHead{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px}
+#calHead button{background:#e8dcc4;padding:5px 14px;font-size:15px}
+#calHead .m{font-size:16px;font-weight:bold}
+.calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.calGrid .wd{font-size:10.5px;text-align:center;color:var(--sub);padding:3px 0}
+.cday{min-height:64px;background:#fff;border:1.5px solid #e8dcc4;border-radius:8px;padding:3px;font-size:10.5px;cursor:pointer}
+.cday .n{font-size:11px;font-weight:bold;color:var(--sub)}
+.cday.today{border-color:var(--accent);border-width:2.5px}
+.cday.out{opacity:.35}
+.cday .ev{background:#fdeff5;border-radius:5px;padding:1px 3px;margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#b83280}
+.cday .gv{background:#eef6fd;color:#2b6cb0}
+/* 会議モード */
+.step{background:#fff;border:2.5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start}
+.step .no{width:30px;height:30px;min-width:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:bold}
+.step.on{border-color:var(--accent);background:#fff8f5}
+.step .tt{font-weight:bold;font-size:14.5px}
+.step .dd{font-size:12.5px;color:var(--sub);margin-top:2px;line-height:1.6}
+/* とりこみ・共有 */
+.mono{font-size:12px}
+.share{background:var(--k);color:#fff;padding:10px 16px;font-size:14px}
+.okmsg{font-size:12px;color:#2f855a;font-weight:bold;margin-top:6px;display:none}
+/* フッター */
+#foot{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:rgba(255,250,240,.97);
+  border-top:3px solid var(--line)}
+#foot button{flex:1;background:none;color:var(--sub);font-size:10px;padding:8px 2px calc(10px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:2px;align-items:center;border-radius:0}
+#foot button .i{font-size:19px}
+#foot button.on{color:var(--ink);background:#fff3dd}
+@media(max-width:560px){ .board{grid-template-columns:1fr} .dashGrid{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+
+<div id="top">
+  <h1>🏠 わが家の会議室</h1>
+  <span class="d" id="todayStr"></span>
+  <span class="cd" id="countdown"></span>
+</div>
+
+<!-- ダッシュボード -->
+<div class="page on" id="pg-dash">
+  <div class="dashGrid">
+    <div class="stat"><div class="big" id="stTask">0</div><div class="lb">のこりのタスク</div></div>
+    <div class="stat"><div class="big" id="stAgenda">0</div><div class="lb">話し合いたいこと</div></div>
+    <div class="stat"><div class="big" id="stDone7">0</div><div class="lb">この7日でおわった数</div></div>
+    <div class="stat"><div class="big" id="stNext">-</div><div class="lb">直近のよてい</div></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h2>⭐ いま大事な3つ <span class="hint">期限が近い順</span></h2>
+    <ul id="top3"></ul>
+  </div>
+  <div class="card">
+    <h2>📅 こんしゅうの よてい <span class="hint">3件だけ表示・くわしくは「よてい」タブ</span></h2>
+    <ul id="homeEv" style="list-style:none;font-size:13.5px;line-height:2.1"></ul>
+  </div>
+  <div class="card">
+    <h2>🌸 さいきん おわったこと <span class="hint">おつかれさま欄</span></h2>
+    <ul id="doneList" style="list-style:none;font-size:13px;color:var(--sub);line-height:2"></ul>
+  </div>
+</div>
+
+<!-- やることボード -->
+<div class="page" id="pg-task">
+  <h2>✅ ふたりのやることボード</h2>
+  <div class="board">
+    <div class="col K"><h3>パパ</h3><div id="colK"></div></div>
+    <div class="col W"><h3>ママ</h3><div id="colW"></div></div>
+    <div class="col F"><h3>ふたりで</h3><div id="colF"></div></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="addRow">
+      <select id="tWho" style="width:90px"><option value="K">パパ</option><option value="W">ママ</option><option value="F">ふたり</option></select>
+      <input id="tName" placeholder="やること(例: 陣バッグの最終チェック)">
+      <input id="tDue" type="date" style="width:135px">
+      <button onclick="addTask()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 議題箱 -->
+<div class="page" id="pg-agenda">
+  <h2>💬 話し合いリスト <span class="hint">思いついた時に放り込む</span></h2>
+  <div id="agList"></div>
+  <div class="card">
+    <div class="addRow"><input id="agTitle" placeholder="議題(例: 入院中の上の子の夜の流れ)"><button onclick="addAgenda()">追加</button></div>
+    <input id="agNote" placeholder="ひとことメモ(任意)" style="margin-top:6px">
+  </div>
+  <div class="card">
+    <h2>📜 決定ずみのこと</h2>
+    <div id="agDone"></div>
+  </div>
+</div>
+
+<!-- ガント+カレンダー -->
+<div class="page" id="pg-plan">
+  <h2>📊 出産までの準備チャート</h2>
+  <div class="card">
+    <div id="gHead"></div>
+    <div id="gantt"></div>
+    <div class="addRow" style="flex-wrap:wrap">
+      <input id="gName2" placeholder="準備すること" style="flex:2;min-width:130px">
+      <input id="gStart" type="date" style="width:130px"><input id="gEnd" type="date" style="width:130px">
+      <button onclick="addGantt()">追加</button>
+    </div>
+  </div>
+  <h2>📅 カレンダー</h2>
+  <div class="card">
+    <div id="calHead"><button onclick="calMove(-1)">◀</button><span class="m" id="calM"></span><button onclick="calMove(1)">▶</button></div>
+    <div class="calGrid" id="calGrid"></div>
+    <div class="addRow"><input id="evDate" type="date" style="width:140px"><input id="evName" placeholder="よてい(例: 検診)"><button onclick="addEv()">追加</button></div>
+    <p style="font-size:11px;color:var(--sub);margin-top:6px">ピンク=よてい / 青=準備の締切。タイムツリーの完全な代わりではないけど、家族の予定はここに集約できます</p>
+  </div>
+</div>
+
+<!-- 会議モード -->
+<div class="page" id="pg-meet">
+  <h2>🕯 家族会議モード <span class="hint">15分で回す</span></h2>
+  <div class="step" data-s="0"><div class="no">1</div><div><div class="tt">今週よかったこと(2分)</div><div class="dd">お互い1つずつ。ここから始めると、そのあとの話し合いがあったかくなる</div></div></div>
+  <div class="step" data-s="1"><div class="no">2</div><div><div class="tt">議題を3つまで(8分)</div><div class="dd">議題箱の上から。決まったら「決定にする」を押す。決まらなければ「持ち越し」でいい</div></div></div>
+  <div class="step" data-s="2"><div class="no">3</div><div><div class="tt">来週の3つ(4分)</div><div class="dd">やることボードから今週やる3つに⭐(期限を入れるだけでもOK)</div></div></div>
+  <div class="step" data-s="3"><div class="no">4</div><div><div class="tt">おわり(1分)</div><div class="dd">ぎゅーして解散。LINEボタンで決定事項をふたりのトークに送る</div></div></div>
+  <div class="card">
+    <h2>🎙 会議メモのとりこみ</h2>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:6px">録音はボイスメモ/チャッピーでOK。文字起こしをここに貼ると会議ログとして保存されます</p>
+    <textarea id="minutes" placeholder="文字起こしやメモを貼り付け"></textarea>
+    <div class="addRow"><button onclick="saveLog()">ログとして保存</button></div>
+    <div class="okmsg" id="logOk">保存しました</div>
+    <div id="logList" style="margin-top:10px;font-size:12.5px;color:var(--sub)"></div>
+  </div>
+</div>
+
+<!-- SNS: 投稿ストックと素材 -->
+<div class="page" id="pg-sns">
+  <div class="dashGrid" style="margin-bottom:12px">
+    <div class="stat"><div class="big" id="stStock">0</div><div class="lb">投稿ストック残</div></div>
+    <div class="stat"><div class="big" id="stSozai">0</div><div class="lb">まだ撮ってない素材</div></div>
+  </div>
+  <h2>📝 投稿ストック <span class="hint">会議で話して貯める。タップで状態が進む</span></h2>
+  <div id="stockList"></div>
+  <div class="card">
+    <div class="addRow">
+      <input id="skTitle" placeholder="投稿のタイトルや1行目(例: じゃがいもガチャの話)">
+      <button onclick="addStock()">追加</button>
+    </div>
+  </div>
+  <h2>📷 撮りためる素材リスト <span class="hint">タップで撮った/まだ を切替</span></h2>
+  <div class="card"><div id="sozaiList"></div>
+    <div class="addRow"><input id="szName" placeholder="素材(例: バスボールおもちゃ100個の写真)"><button onclick="addSozai()">追加</button></div>
+  </div>
+</div>
+
+<!-- とりこみ・共有 -->
+<div class="page" id="pg-io">
+  <h2>📥 クロードからのとりこみ</h2>
+  <div class="card">
+    <p style="font-size:12.5px;color:var(--sub);line-height:1.7;margin-bottom:8px">
+      クロードが出す「会議パック」をここに貼って「とりこむ」を押すと、議題・タスク・チャートに反映されます。コピペの体裁崩れはこの箱が吸収します</p>
+    <textarea id="packIn" class="mono" placeholder="#PACK から始まるテキストを貼り付け"></textarea>
+    <div class="addRow"><button onclick="importPack()">とりこむ</button></div>
+    <div class="okmsg" id="packOk"></div>
+  </div>
+  <h2>📤 LINEでママに共有</h2>
+  <div class="card">
+    <p style="font-size:12.5px;color:var(--sub);margin-bottom:8px">今の状態を読みやすいテキストにします(記号なし・短め)</p>
+    <div class="addRow" style="flex-wrap:wrap">
+      <button class="share" onclick="shareText('today')">きょうの分</button>
+      <button class="share" onclick="shareText('meet')">会議のまとめ</button>
+      <button class="share" onclick="shareText('week')">今週の全体</button>
+    </div>
+    <textarea id="shareOut" style="margin-top:8px" placeholder="ここに出ます → 全選択してLINEへ。スマホならそのままLINEが開きます"></textarea>
+    <div class="addRow"><button onclick="copyShare()">コピー</button><button onclick="openLine()">LINEをひらく</button></div>
+    <div class="okmsg" id="shareOk">コピーしました</div>
+  </div>
+  <div class="card">
+    <h2>💾 バックアップ</h2>
+    <div class="addRow"><button onclick="exportJson()">書き出し(コピー)</button><button onclick="importJson()">読み込み(貼り付けから)</button></div>
+    <textarea id="bkArea" class="mono" placeholder="書き出し結果 / 読み込み用の貼り付け欄" style="margin-top:8px"></textarea>
+  </div>
+</div>
+
+<div id="foot">
+  <button class="on" data-pg="dash"><span class="i">🏠</span>ホーム</button>
+  <button data-pg="task"><span class="i">✅</span>やること</button>
+  <button data-pg="agenda"><span class="i">💬</span>議題</button>
+  <button data-pg="meet"><span class="i">🕯</span>会議</button>
+  <button data-pg="sns"><span class="i">📝</span>投稿</button>
+  <button data-pg="plan"><span class="i">📊</span>よてい</button>
+  <button data-pg="io"><span class="i">📮</span>共有</button>
+</div>
+
+<script>
+function q(id){ return document.getElementById(id); }
+var S = { tasks:[], agendas:[], gantt:[], events:[], logs:[], stocks:[], sozai:[], due:"" };
+try{ var raw = localStorage.getItem("kaigi_v1"); if (raw){ var o = JSON.parse(raw);
+  Object.keys(S).forEach(function(k){ if (o[k] !== undefined) S[k] = o[k]; }); } }catch(e){}
+function save(){ try{ localStorage.setItem("kaigi_v1", JSON.stringify(S)); }catch(e){} renderAll(); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function today0(){ var d = new Date(); d.setHours(0,0,0,0); return d; }
+function fmtMD(s){ if(!s) return ""; var d = new Date(s + "T00:00:00"); return (d.getMonth()+1) + "/" + d.getDate(); }
+function esc(t){ return String(t||"").replace(/[<>&"]/g, function(c){ return {"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]; }); }
+
+/* ===== タブ ===== */
+document.querySelectorAll("#foot button").forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll("#foot button").forEach(function(x){ x.classList.remove("on"); });
+    document.querySelectorAll(".page").forEach(function(p){ p.classList.remove("on"); });
+    b.classList.add("on"); q("pg-" + b.dataset.pg).classList.add("on");
+    window.scrollTo(0,0);
+  };
+});
+
+/* ===== ダッシュボード ===== */
+function renderDash(){
+  var open = S.tasks.filter(function(t){ return !t.done; });
+  q("stTask").textContent = open.length;
+  q("stAgenda").textContent = S.agendas.filter(function(a){ return a.status !== "done"; }).length;
+  var wk = Date.now() - 7*86400000;
+  q("stDone7").textContent = S.tasks.filter(function(t){ return t.done && t.doneAt && t.doneAt > wk; }).length;
+  var evs = S.events.filter(function(e){ return new Date(e.date + "T00:00:00") >= today0(); })
+    .sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+  q("stNext").textContent = evs.length ? fmtMD(evs[0].date) + " " + evs[0].name.slice(0,5) : "-";
+  var sorted = open.slice().sort(function(a,b){ return (a.due||"9999") < (b.due||"9999") ? -1 : 1; }).slice(0,3);
+  q("top3").innerHTML = sorted.map(function(t){
+    return "<li><span>" + ({K:"🔵",W:"🌸",F:"🟢"}[t.who]||"") + "</span> " + esc(t.name) +
+      (t.due ? ' <span style="margin-left:auto;color:#b83280;font-size:11px;font-weight:bold">' + fmtMD(t.due) + "</span>" : "") + "</li>";
+  }).join("") || "<li style='color:#a58868'>タスクはぜんぶ完了!</li>";
+  var dn = S.tasks.filter(function(t){ return t.done; }).sort(function(a,b){ return (b.doneAt||0)-(a.doneAt||0); }).slice(0,8);
+  q("doneList").innerHTML = dn.map(function(t){
+    return "<li>✔ " + esc(t.name) + "（" + ({K:"パパ",W:"ママ",F:"ふたり"}[t.who]||"") + "）</li>";
+  }).join("") || "<li>まだありません</li>";
+  var hv = S.events.filter(function(e){ return new Date(e.date + "T00:00:00") >= today0(); })
+    .sort(function(a,b){ return a.date < b.date ? -1 : 1; }).slice(0,3);
+  q("homeEv").innerHTML = hv.map(function(e){
+    return '<li><b style="color:#b83280">' + fmtMD(e.date) + "</b>　" + esc(e.name) + "</li>";
+  }).join("") || "<li style='color:#a58868;font-size:12.5px'>よていはありません</li>";
+}
+
+/* ===== タスク ===== */
+function taskHtml(t){
+  return '<div class="task' + (t.done ? " done" : "") + '">' +
+    '<button class="chk" onclick="togTask(\'' + t.id + '\')">' + (t.done ? "✓" : "") + "</button>" +
+    '<div style="flex:1"><div class="nm">' + esc(t.name) + "</div>" +
+    (t.due ? '<div class="due">〆 ' + fmtMD(t.due) + "</div>" : "") + "</div>" +
+    '<button class="del" onclick="delTask(\'' + t.id + '\')">×</button></div>';
+}
+function renderTasks(){
+  ["K","W","F"].forEach(function(w){
+    var el = q("col" + w);
+    var list = S.tasks.filter(function(t){ return t.who === w; })
+      .sort(function(a,b){ return (a.done?1:0)-(b.done?1:0) || ((a.due||"9999") < (b.due||"9999") ? -1 : 1); });
+    el.innerHTML = list.map(taskHtml).join("") || '<div style="font-size:12px;color:#a58868;text-align:center;padding:8px">なし</div>';
+  });
+}
+function addTask(){
+  var n = q("tName").value.trim(); if (!n) return;
+  S.tasks.push({ id:uid(), who:q("tWho").value, name:n, due:q("tDue").value||"", done:false, doneAt:null });
+  q("tName").value = ""; q("tDue").value = ""; save();
+}
+function togTask(id){ S.tasks.forEach(function(t){ if (t.id === id){ t.done = !t.done; t.doneAt = t.done ? Date.now() : null; } }); save(); }
+function delTask(id){ S.tasks = S.tasks.filter(function(t){ return t.id !== id; }); save(); }
+
+/* ===== 議題 ===== */
+function renderAgendas(){
+  var open = S.agendas.filter(function(a){ return a.status !== "done"; });
+  q("agList").innerHTML = open.map(function(a){
+    return '<div class="gd"><div class="t"><span class="badge">未討議</span>' + esc(a.title) + "</div>" +
+      (a.note ? '<div class="note">' + esc(a.note) + "</div>" : "") +
+      '<div class="ops"><button class="pri" onclick="decideAgenda(\'' + a.id + '\')">決定にする</button>' +
+      '<button onclick="delAgenda(\'' + a.id + '\')">削除</button></div></div>';
+  }).join("") || '<div class="card" style="color:#a58868;font-size:13px">議題はありません。思いついたら下から追加</div>';
+  var done = S.agendas.filter(function(a){ return a.status === "done"; }).slice().reverse();
+  q("agDone").innerHTML = done.map(function(a){
+    return '<div class="gd"><div class="t"><span class="badge done">決定</span>' + esc(a.title) + "</div>" +
+      (a.decision ? '<div class="dec"><b>決めたこと:</b> ' + esc(a.decision) + "</div>" : "") + "</div>";
+  }).join("") || '<div style="font-size:12.5px;color:#a58868">まだありません</div>';
+}
+function addAgenda(){
+  var t = q("agTitle").value.trim(); if (!t) return;
+  S.agendas.push({ id:uid(), title:t, note:q("agNote").value.trim(), status:"open", decision:"", at:Date.now() });
+  q("agTitle").value = ""; q("agNote").value = ""; save();
+}
+function decideAgenda(id){
+  var d = prompt("決めたことをひとことで(あとでLINE共有に載ります)");
+  if (d === null) return;
+  S.agendas.forEach(function(a){ if (a.id === id){ a.status = "done"; a.decision = d; a.at = Date.now(); } });
+  save();
+}
+function delAgenda(id){ S.agendas = S.agendas.filter(function(a){ return a.id !== id; }); save(); }
+
+/* ===== ガント ===== */
+var G_START = new Date("2026-08-01T00:00:00"), G_END = new Date("2026-09-30T00:00:00");
+function gx(d){ return Math.max(0, Math.min(1, (d - G_START) / (G_END - G_START))); }
+function renderGantt(){
+  var head = q("gHead");
+  head.innerHTML = '<div id="gToday" style="left:' + (gx(today0())*100) + '%"></div>';
+  for (var d = new Date(G_START); d <= G_END; d.setDate(d.getDate()+7)){
+    head.insertAdjacentHTML("beforeend",
+      '<span style="left:' + (gx(d)*100) + '%">' + (d.getMonth()+1) + "/" + d.getDate() + "</span>");
+  }
+  var el = q("gantt");
+  el.innerHTML = S.gantt.map(function(g, i){
+    var s = new Date((g.start||"2026-08-01") + "T00:00:00"), e = new Date((g.end||g.start||"2026-08-07") + "T00:00:00");
+    var l = gx(s)*100, w = Math.max(3, (gx(e)-gx(s))*100 + 1.5);
+    return '<div class="gRow"><div class="gName">' + esc(g.name) +
+      ' <button class="gdel" onclick="delGantt(\'' + g.id + '\')">×</button></div>' +
+      '<div class="gTrack"><div class="gBar c' + (i%4) + (g.done ? " done" : "") + '" style="left:' + l + "%;width:" + w + '%" ' +
+      'onclick="togGantt(\'' + g.id + '\')">' + fmtMD(g.start) + "〜" + fmtMD(g.end) + "</div></div></div>";
+  }).join("") || '<div style="font-size:13px;color:#a58868">まだ何もありません。下から追加(バーをタップで完了)</div>';
+}
+function addGantt(){
+  var n = q("gName2").value.trim(); if (!n) return;
+  S.gantt.push({ id:uid(), name:n, start:q("gStart").value||"2026-08-10", end:q("gEnd").value||q("gStart").value||"2026-08-17", done:false });
+  q("gName2").value = ""; q("gStart").value = ""; q("gEnd").value = ""; save();
+}
+function togGantt(id){ S.gantt.forEach(function(g){ if (g.id === id) g.done = !g.done; }); save(); }
+function delGantt(id){ S.gantt = S.gantt.filter(function(g){ return g.id !== id; }); save(); }
+
+/* ===== カレンダー ===== */
+var calBase = new Date();
+function calMove(n){ calBase.setMonth(calBase.getMonth() + n); renderCal(); }
+function ymd(d){ return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2); }
+function renderCal(){
+  var y = calBase.getFullYear(), m = calBase.getMonth();
+  q("calM").textContent = y + "年" + (m+1) + "月";
+  var first = new Date(y, m, 1), start = new Date(first); start.setDate(1 - first.getDay());
+  var html = ["日","月","火","水","木","金","土"].map(function(w){ return '<div class="wd">' + w + "</div>"; }).join("");
+  var td = ymd(today0());
+  for (var i = 0; i < 42; i++){
+    var d = new Date(start); d.setDate(start.getDate() + i);
+    var key = ymd(d);
+    var evs = S.events.filter(function(e){ return e.date === key; });
+    var gds = S.gantt.filter(function(g){ return g.end === key && !g.done; });
+    html += '<div class="cday' + (d.getMonth() !== m ? " out" : "") + (key === td ? " today" : "") + '" ' +
+      'onclick="q(\'evDate\').value=\'' + key + '\'">' +
+      '<div class="n">' + d.getDate() + "</div>" +
+      evs.map(function(e){ return '<div class="ev">' + esc(e.name) + "</div>"; }).join("") +
+      gds.map(function(g){ return '<div class="ev gv">〆' + esc(g.name) + "</div>"; }).join("") + "</div>";
+  }
+  q("calGrid").innerHTML = html;
+}
+function addEv(){
+  var d = q("evDate").value, n = q("evName").value.trim();
+  if (!d || !n) return;
+  S.events.push({ id:uid(), date:d, name:n });
+  q("evName").value = ""; save();
+}
+
+/* ===== 投稿ストック・素材 ===== */
+var SK_ST = ["案", "清書ずみ", "投稿ずみ"];
+function renderSns(){
+  var open = S.stocks.filter(function(s){ return s.st < 2; });
+  q("stStock").textContent = open.length;
+  q("stSozai").textContent = S.sozai.filter(function(s){ return !s.done; }).length;
+  q("stockList").innerHTML = S.stocks.slice().reverse().map(function(s){
+    var cls = ["", "done", "done"][0];
+    return '<div class="gd" style="opacity:' + (s.st === 2 ? ".45" : "1") + '">' +
+      '<div class="t"><span class="badge' + (s.st === 2 ? " done" : "") + '" style="cursor:pointer" ' +
+      'onclick="cycStock(\'' + s.id + '\')">' + SK_ST[s.st] + "</span>" + esc(s.title) +
+      '<button class="del" style="margin-left:auto;background:none;color:#c9ae87" onclick="delStock(\'' + s.id + '\')">×</button></div></div>';
+  }).join("") || '<div class="card" style="color:#a58868;font-size:13px">まだありません。会議で出た案をここへ</div>';
+  q("sozaiList").innerHTML = S.sozai.map(function(s){
+    return '<div class="task' + (s.done ? " done" : "") + '">' +
+      '<button class="chk" onclick="togSozai(\'' + s.id + '\')">' + (s.done ? "✓" : "") + "</button>" +
+      '<div class="nm" style="flex:1">' + esc(s.name) + "</div>" +
+      '<button class="del" onclick="delSozai(\'' + s.id + '\')">×</button></div>';
+  }).join("") || '<div style="font-size:12.5px;color:#a58868;padding:4px">まだありません</div>';
+}
+function addStock(){
+  var t = q("skTitle").value.trim(); if (!t) return;
+  S.stocks.push({ id:uid(), title:t, st:0 });
+  q("skTitle").value = ""; save();
+}
+function cycStock(id){ S.stocks.forEach(function(s){ if (s.id === id) s.st = (s.st + 1) % 3; }); save(); }
+function delStock(id){ S.stocks = S.stocks.filter(function(s){ return s.id !== id; }); save(); }
+function addSozai(){
+  var n = q("szName").value.trim(); if (!n) return;
+  S.sozai.push({ id:uid(), name:n, done:false });
+  q("szName").value = ""; save();
+}
+function togSozai(id){ S.sozai.forEach(function(s){ if (s.id === id) s.done = !s.done; }); save(); }
+function delSozai(id){ S.sozai = S.sozai.filter(function(s){ return s.id !== id; }); save(); }
+
+/* ===== 会議ログ ===== */
+function saveLog(){
+  var t = q("minutes").value.trim(); if (!t) return;
+  S.logs.push({ id:uid(), date:ymd(today0()), text:t });
+  q("minutes").value = ""; save();
+  var ok = q("logOk"); ok.style.display = "block"; setTimeout(function(){ ok.style.display = "none"; }, 1800);
+}
+function renderLogs(){
+  q("logList").innerHTML = S.logs.slice(-5).reverse().map(function(l){
+    return "<div style='border-top:1.5px dashed #e8dcc4;padding:6px 0'><b>" + l.date + "</b> " + esc(l.text.slice(0,60)) + (l.text.length > 60 ? "…" : "") + "</div>";
+  }).join("");
+}
+
+/* ===== 会議パックとりこみ =====
+   形式(1行1項目・#で始まる):
+   #AGENDA タイトル | メモ
+   #TASK K|やること|2026-08-12   (K/W/F)
+   #GANTT 名前|2026-08-08|2026-08-14
+   #EVENT 2026-08-15|検診
+   #NOTE 自由文(議題のメモとして追加) */
+function importPack(){
+  var txt = q("packIn").value;
+  var n = 0;
+  txt.split("\n").forEach(function(line){
+    line = line.trim();
+    try{
+      if (line.indexOf("#AGENDA") === 0){
+        var p = line.slice(7).split("|");
+        S.agendas.push({ id:uid(), title:(p[0]||"").trim(), note:(p[1]||"").trim(), status:"open", decision:"", at:Date.now() }); n++;
+      } else if (line.indexOf("#TASK") === 0){
+        var p2 = line.slice(5).split("|");
+        var who = (p2[0]||"F").trim().toUpperCase();
+        if (["K","W","F"].indexOf(who) === -1) who = "F";
+        S.tasks.push({ id:uid(), who:who, name:(p2[1]||"").trim(), due:(p2[2]||"").trim(), done:false, doneAt:null }); n++;
+      } else if (line.indexOf("#GANTT") === 0){
+        var p3 = line.slice(6).split("|");
+        S.gantt.push({ id:uid(), name:(p3[0]||"").trim(), start:(p3[1]||"").trim(), end:(p3[2]||p3[1]||"").trim(), done:false }); n++;
+      } else if (line.indexOf("#EVENT") === 0){
+        var p4 = line.slice(6).split("|");
+        S.events.push({ id:uid(), date:(p4[0]||"").trim(), name:(p4[1]||"").trim() }); n++;
+      } else if (line.indexOf("#STOCK") === 0){
+        S.stocks.push({ id:uid(), title:line.slice(6).trim(), st:0 }); n++;
+      } else if (line.indexOf("#SOZAI") === 0){
+        S.sozai.push({ id:uid(), name:line.slice(6).trim(), done:false }); n++;
+      }
+    }catch(e){}
+  });
+  save();
+  q("packIn").value = "";
+  var ok = q("packOk"); ok.textContent = n + "件とりこみました"; ok.style.display = "block";
+  setTimeout(function(){ ok.style.display = "none"; }, 2500);
+}
+
+/* ===== LINE共有(プレーンテキスト・記号最小) ===== */
+function shareText(mode){
+  var out = [];
+  if (mode === "today"){
+    out.push("【きょうの分】" + (new Date().getMonth()+1) + "/" + new Date().getDate());
+    var open = S.tasks.filter(function(t){ return !t.done; }).sort(function(a,b){ return (a.due||"9999") < (b.due||"9999") ? -1 : 1; }).slice(0,5);
+    open.forEach(function(t){ out.push("・" + ({K:"パパ",W:"ママ",F:"ふたり"}[t.who]) + "：" + t.name + (t.due ? "（〆" + fmtMD(t.due) + "）" : "")); });
+  } else if (mode === "meet"){
+    out.push("【家族会議のまとめ】" + (new Date().getMonth()+1) + "/" + new Date().getDate());
+    var dec = S.agendas.filter(function(a){ return a.status === "done"; }).slice(-5);
+    if (dec.length){ out.push("決めたこと"); dec.forEach(function(a){ out.push("・" + a.title + (a.decision ? "→" + a.decision : "")); }); }
+    var open2 = S.agendas.filter(function(a){ return a.status !== "done"; });
+    if (open2.length){ out.push("持ち越し"); open2.forEach(function(a){ out.push("・" + a.title); }); }
+  } else {
+    out.push("【今週の全体】");
+    out.push("のこりタスク " + S.tasks.filter(function(t){ return !t.done; }).length + "件");
+    var evs = S.events.filter(function(e){ return new Date(e.date+"T00:00:00") >= today0(); }).sort(function(a,b){ return a.date < b.date ? -1 : 1; }).slice(0,4);
+    evs.forEach(function(e){ out.push("・" + fmtMD(e.date) + " " + e.name); });
+    var gd = S.gantt.filter(function(g){ return !g.done; }).slice(0,5);
+    if (gd.length){ out.push("準備中"); gd.forEach(function(g){ out.push("・" + g.name + "（〜" + fmtMD(g.end) + "）"); }); }
+  }
+  q("shareOut").value = out.join("\n");
+}
+function copyShare(){
+  var t = q("shareOut"); t.select(); t.setSelectionRange(0, 99999);
+  try{ document.execCommand("copy"); }catch(e){}
+  if (navigator.clipboard) navigator.clipboard.writeText(t.value).catch(function(){});
+  var ok = q("shareOk"); ok.style.display = "block"; setTimeout(function(){ ok.style.display = "none"; }, 1800);
+}
+function openLine(){
+  var t = q("shareOut").value;
+  if (!t){ shareText("today"); t = q("shareOut").value; }
+  location.href = "https://line.me/R/share?text=" + encodeURIComponent(t);
+}
+
+/* ===== バックアップ ===== */
+function exportJson(){
+  q("bkArea").value = JSON.stringify(S);
+  q("bkArea").select(); try{ document.execCommand("copy"); }catch(e){}
+  if (navigator.clipboard) navigator.clipboard.writeText(q("bkArea").value).catch(function(){});
+}
+function importJson(){
+  try{
+    var o = JSON.parse(q("bkArea").value);
+    if (!o || !o.tasks) throw new Error("形式が違います");
+    S = o; save(); alert("読み込みました");
+  }catch(e){ alert("読み込めませんでした: " + e.message); }
+}
+
+/* ===== 全体描画 ===== */
+function renderAll(){
+  var d = new Date();
+  q("todayStr").textContent = (d.getMonth()+1) + "/" + d.getDate() + "（" + "日月火水木金土"[d.getDay()] + "）";
+  var cdEl = q("countdown");
+  if (!S.due){
+    cdEl.textContent = "タップして予定日を設定";
+  } else {
+    var due = new Date(S.due + "T00:00:00");
+    var left = Math.ceil((due - today0()) / 86400000);
+    cdEl.textContent = left >= 0 ? "赤ちゃんが生まれるまで あと" + left + "日ごろ" : "4人家族 " + (-left) + "日目";
+  }
+  cdEl.onclick = function(){
+    var v = prompt("予定日を入力(例: 2026-09-01)※この端末にだけ保存されます", S.due || "");
+    if (v === null) return;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v.trim())){ S.due = v.trim(); save(); }
+    else if (v.trim() === ""){ S.due = ""; save(); }
+    else alert("2026-09-01 の形式で入力してください");
+  };
+  renderDash(); renderTasks(); renderAgendas(); renderGantt(); renderCal(); renderLogs(); renderSns();
+}
+renderAll();
+</script>
+</body>
+</html>
