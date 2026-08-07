@@ -74,9 +74,9 @@ textarea{min-height:90px;line-height:1.7}
 #calHead{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px}
 #calHead button{background:#e8dcc4;padding:5px 14px;font-size:15px}
 #calHead .m{font-size:16px;font-weight:bold}
-.calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.calGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
 .calGrid .wd{font-size:10.5px;text-align:center;color:var(--sub);padding:3px 0}
-.cday{min-height:64px;background:#fff;border:1.5px solid #e8dcc4;border-radius:8px;padding:3px;font-size:10.5px;cursor:pointer}
+.cday{min-height:64px;min-width:0;overflow:hidden;background:#fff;border:1.5px solid #e8dcc4;border-radius:8px;padding:3px;font-size:10.5px;cursor:pointer}
 .cday .n{font-size:11px;font-weight:bold;color:var(--sub)}
 .cday.today{border-color:var(--accent);border-width:2.5px}
 .cday.out{opacity:.35}
@@ -116,7 +116,7 @@ textarea{min-height:90px;line-height:1.7}
     <div class="stat"><div class="big" id="stTask">0</div><div class="lb">のこりのタスク</div></div>
     <div class="stat"><div class="big" id="stAgenda">0</div><div class="lb">話し合いたいこと</div></div>
     <div class="stat"><div class="big" id="stDone7">0</div><div class="lb">この7日でおわった数</div></div>
-    <div class="stat"><div class="big" id="stNext">-</div><div class="lb">直近のよてい</div></div>
+    <div class="stat"><div class="big" id="stNext">-</div><div class="lb" id="stNextLb" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">直近のよてい</div></div>
   </div>
   <div class="card" style="margin-top:12px">
     <h2>⭐ いま大事な3つ <span class="hint">期限が近い順</span></h2>
@@ -166,7 +166,7 @@ textarea{min-height:90px;line-height:1.7}
 
 <!-- ガント+カレンダー -->
 <div class="page" id="pg-plan">
-  <h2>📊 出産までの準備チャート</h2>
+  <h2>📊 じゅんびチャート <span class="hint">家のこと全般OK。バーをタップで完了</span></h2>
   <div class="card">
     <div id="gHead"></div>
     <div id="gantt"></div>
@@ -291,7 +291,8 @@ function renderDash(){
   q("stDone7").textContent = S.tasks.filter(function(t){ return t.done && t.doneAt && t.doneAt > wk; }).length;
   var evs = S.events.filter(function(e){ return new Date(e.date + "T00:00:00") >= today0(); })
     .sort(function(a,b){ return a.date < b.date ? -1 : 1; });
-  q("stNext").textContent = evs.length ? fmtMD(evs[0].date) + " " + evs[0].name.slice(0,5) : "-";
+  q("stNext").textContent = evs.length ? fmtMD(evs[0].date) : "-";
+  q("stNextLb").textContent = evs.length ? evs[0].name : "直近のよてい";
   var sorted = open.slice().sort(function(a,b){ return (a.due||"9999") < (b.due||"9999") ? -1 : 1; }).slice(0,3);
   q("top3").innerHTML = sorted.map(function(t){
     return "<li><span>" + ({K:"🔵",W:"🌸",F:"🟢"}[t.who]||"") + "</span> " + esc(t.name) +
@@ -361,9 +362,26 @@ function decideAgenda(id){
 function delAgenda(id){ S.agendas = S.agendas.filter(function(a){ return a.id !== id; }); save(); }
 
 /* ===== ガント ===== */
-var G_START = new Date("2026-08-01T00:00:00"), G_END = new Date("2026-09-30T00:00:00");
+var G_START, G_END;
+function gRange_(){
+  var s = null, e = null;
+  S.gantt.forEach(function(g){
+    var a = new Date((g.start||"") + "T00:00:00"), b = new Date((g.end||g.start||"") + "T00:00:00");
+    if (!isNaN(a) && (s === null || a < s)) s = a;
+    if (!isNaN(b) && (e === null || b > e)) e = b;
+  });
+  var t0 = today0();
+  if (s === null){ s = new Date(t0); e = new Date(t0); e.setDate(e.getDate() + 42); }
+  else {
+    s = new Date(Math.min(s, t0)); e = new Date(Math.max(e, t0));
+    s.setDate(s.getDate() - 2); e.setDate(e.getDate() + 5);
+    if ((e - s) < 21*86400000) e = new Date(s.getTime() + 21*86400000);
+  }
+  G_START = s; G_END = e;
+}
 function gx(d){ return Math.max(0, Math.min(1, (d - G_START) / (G_END - G_START))); }
 function renderGantt(){
+  gRange_();
   var head = q("gHead");
   head.innerHTML = '<div id="gToday" style="left:' + (gx(today0())*100) + '%"></div>';
   for (var d = new Date(G_START); d <= G_END; d.setDate(d.getDate()+7)){
