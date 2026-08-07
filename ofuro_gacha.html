@@ -55,12 +55,12 @@ button.badge{cursor:pointer;font-family:inherit}
   border:2.5px solid #c9ae87;border-radius:999px;padding:7px 20px;text-align:center;max-width:88vw}
 
 /* ===== コイン ===== */
-#coinBtn{position:fixed;bottom:140px;left:50%;transform:translateX(-50%);cursor:pointer;z-index:6;
+#coinBtn{position:fixed;bottom:132px;right:14px;left:auto;transform:none;cursor:pointer;z-index:6;
   display:flex;align-items:center;gap:9px;white-space:nowrap;
   filter:drop-shadow(0 5px 4px rgba(141,123,102,.3));transition:opacity .3s}
-#coinBtn .icon{flex:0 0 56px;width:56px;line-height:0}
+#coinBtn .icon{flex:0 0 48px;width:48px;line-height:0}
 #coinBtn.off{opacity:.25;pointer-events:none}
-#coinBtn .icon svg{width:56px;height:56px;display:block}
+#coinBtn .icon svg{width:48px;height:48px;display:block}
 #coinBtn .lbl{font-size:13px;font-weight:bold;color:#a58868}
 #flyCoin{position:fixed;width:52px;z-index:9;pointer-events:none;display:none;transition:all .7s cubic-bezier(.4,-0.2,.7,1)}
 
@@ -205,7 +205,7 @@ body{padding-bottom:78px!important}
 </div>
 
 <button id="promiseBtn">✋ おやくそく まもります!</button>
-<div id="coinBtn" class="off"><span class="icon"></span><div class="lbl">コインをいれる</div></div>
+<div id="coinBtn" class="off"><span class="icon"></span><div class="lbl">コインをタップ!</div></div>
 <div id="gtoast"></div>
 <div id="flyPrize"></div>
 <div id="flyCoin"></div>
@@ -470,7 +470,7 @@ function refreshPromise(){
   var b = q("promiseBtn");
   if (store.prom.used){
     b.classList.add("used");
-    b.textContent = "✅ きょうは できたね!";
+    b.textContent = "✅ きょうの おやくそくは おしたよ";
   } else {
     b.classList.remove("used");
     b.textContent = "✋ おやくそく まもります!";

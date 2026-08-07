@@ -148,7 +148,7 @@ body{padding-bottom:104px!important}
   <div id="railTrack"></div>
   <div id="railCar" title="タップで はしるよ"></div>
   <div id="cat"></div>
-  <div id="toyBox" style="position:absolute;right:20px;bottom:96px;width:62px;cursor:pointer;display:none;z-index:3">
+  <div id="toyBox" style="position:absolute;left:16px;bottom:120px;width:62px;cursor:pointer;display:none;z-index:3">
     <span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px"></span>
   </div>
 </div>
@@ -164,7 +164,7 @@ body{padding-bottom:104px!important}
     box-shadow:0 3px 0 #dcc06e;cursor:pointer"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><path d="M8 30 Q30 10 52 30 Z" fill="#fff7ec" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"/><path d="M6 32 h48 q-2 16 -24 16 T6 32 Z" fill="#a5c9e8" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"/></svg> ごはんを あげる(<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>1まい)</button>
 </div>
 
-<div style="width:min(440px,96vw);font-size:12px;font-weight:bold;color:#a58868;margin:14px 0 4px 4px">🎁 おみせ(お湯コインで かえるよ)</div>
+<div id="shopTitle" style="width:min(440px,96vw);font-size:12px;font-weight:bold;color:#a58868;margin:14px 0 4px 4px">🎁 おみせ(お湯コインで かえるよ)</div>
 <div id="shopRow">
   <div class="shopItem" data-id="ball"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3"><circle cx="30" cy="30" r="20" fill="#a5c9e8"/><path d="M30 10 A20 20 0 0 1 30 50 M10 30 H50" /></svg><div class="nm">ボール</div><div class="pr"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>2まい</div></div>
   <div class="shopItem" data-id="mouse"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round"><ellipse cx="27" cy="36" rx="16" ry="12" fill="#ddd7f0"/><circle cx="16" cy="26" r="6" fill="#ddd7f0"/><circle cx="14" cy="25" r="1.5" fill="#8d7b66"/><path d="M43 36 q10 -4 12 -12" fill="none"/></svg><div class="nm">ねずみのおもちゃ</div><div class="pr"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;vertical-align:-4px"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg>3まい</div></div>
@@ -425,6 +425,9 @@ function renderKoubou(){
   var row = q("koubouRow"); if (!row) return;
   var all = Object.keys(PRICES).every(function(id){ return neko.toys[id]; });
   row.style.display = all ? "block" : "none";
+  var st = q("shopTitle"), sr = q("shopRow");
+  if (st) st.style.display = all ? "none" : "";
+  if (sr) sr.style.display = all ? "none" : "";
   if (all && !neko.koubouSeen){
     neko.koubouSeen = 1; save();
     setTimeout(function(){
@@ -462,7 +465,7 @@ function openToyBox(){
   p.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:18px;text-align:center">'+
     '<h3 style="color:#7a6146;font-size:15px">🧺 おもちゃばこ</h3>'+
     '<p style="font-size:12px;color:#8d7b66;margin:6px 0 10px">へやに だせるのは 3こまで。えらんで だしてね</p>'+
-    '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">'+ (items || '<span style="font-size:12px;color:#a58868">からっぽだよ</span>') +'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">'+ (items || '<span style="font-size:12px;color:#a58868;line-height:1.8">いまは からっぽ。<br>へやの おもちゃを <b>ながおし</b>すると<br>ここに おかたづけできるよ</span>') +'</div>'+
     '<button id="boxClose" style="font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:9px 22px;margin-top:14px;cursor:pointer">とじる</button></div>';
   document.body.appendChild(p);
   p.querySelectorAll(".bxi").forEach(function(b2){
