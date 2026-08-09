@@ -292,10 +292,6 @@ body{padding-bottom:78px!important}
       </svg><span id="clkDigits"></span></div>
     </div>
     <div id="nekoNow"></div>
-    <div id="sleepRow">
-      <button id="sleepBtn" onclick="sleepPress()">🌙 ねる</button>
-      <button id="wakeBtn" onclick="wakePress()" style="display:none">☀ おきた</button>
-    </div>
     <div id="board">
       <div id="boardTitle">きょうの おしたく</div>
       <div id="boardSub" style="text-align:center;font-size:11.5px;font-weight:bold;color:#a58868;margin-top:2px">1つ できると お湯コイン +1</div>
@@ -357,8 +353,6 @@ body{padding-bottom:78px!important}
   <div class="row">お湯コイン: <b id="pCoin">0</b>まい
     <button onclick="grantCoin(1)">+1(がんばったね)</button>
     <button onclick="grantCoin(-1)">-1</button></div>
-  <h3>😴 ねむりの きろく(おうちの人だけ見ます・子には数字を見せません)</h3>
-  <div id="sleepParentList" style="font-size:12.5px;color:#7a6146;line-height:1.9"></div>
   <div style="display:none">
   <h3>タイマー</h3>
   <div class="row" style="align-items:center;gap:10px">じかん:
@@ -804,13 +798,16 @@ function completeTask(t,row){
     // お湯コインが飛んでいく
     var fc=document.createElement("div");
     fc.className="flycoin"; fc.innerHTML=COIN;
-    var r=row.getBoundingClientRect(), b=q("coinBadge").getBoundingClientRect();
+    var tgt = q("footCoin") || q("coinBadge");
+    var r=row.getBoundingClientRect(), b=tgt.getBoundingClientRect();
     fc.style.left=(r.right-50)+"px"; fc.style.top=r.top+"px";
     document.body.appendChild(fc);
     requestAnimationFrame(function(){ requestAnimationFrame(function(){
       fc.style.left=b.left+"px"; fc.style.top=b.top+"px"; fc.style.transform="scale(.5)"; fc.style.opacity=".5";
     });});
     setTimeout(function(){ fc.remove(); walletAdd(1);
+      var fcb = q("footCoin");
+      if (fcb){ fcb.classList.add("pulse"); setTimeout(function(){ fcb.classList.remove("pulse"); },500); }
       q("coinBadge").classList.add("pulse");
       setTimeout(function(){ q("coinBadge").classList.remove("pulse"); },500);
       blip(1175,.1,0,"triangle");
@@ -1222,6 +1219,10 @@ function renderEditor(m){
   });
 }
 function addTask(m){
+  if (store.tasks[m].length >= 10){
+    alert("タスクは10こまでにしています。それ以上は「⭐おかわりチャレンジ」で当日だけ増やせます(やりすぎて就寝が遅れる対策)");
+    return;
+  }
   store.tasks[m].push({ id: "t"+Date.now(), name:"あたらしいタスク", icon: ICONKEYS[store.tasks[m].length % ICONKEYS.length] });
   save(); renderEditor(m); renderBoard();
 }
@@ -1331,7 +1332,6 @@ function dataImport(input){
 
 /* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */
 setTimeout(function(){ firstTip("oshitaku", "おしたくボード", "できた ことを タップすると、くるまが はしって <b>お湯コイン +1</b>。<br>ためた コインは、おふろガチャや ねこのおうちで つかえます。"); }, 600);
-setTimeout(function(){ firstTip("sleepbtn", "🌙 ねる / ☀ おきた", "ねる まえに <b>「🌙 ねる」</b>を おしてね。" + nekoName_() + "も いっしょに ねんねするよ。<br>おきたら <b>「☀ おきた」</b>を おしてね。コインは つきません。おうちの人だけが、ねむった じかんを あとで見られます。"); }, 900);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
 
 q("coinIco").innerHTML=COIN; if(q("footCoinIco")) q("footCoinIco").innerHTML=COIN;
