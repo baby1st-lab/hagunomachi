@@ -215,7 +215,7 @@ body.night #nekoNow{color:#d8cdb4}
 #tbtns a.gacha{background:#8fc7e8;box-shadow:0 4px 0 #6da7c9}
 
 /* ===== せってい ===== */
-#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
+#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:16px}
 #parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:400px;width:100%;padding:18px;max-height:88vh;overflow-y:auto}
 #parent h3{color:#7a6146;font-size:15px;margin:14px 0 6px}
 #parent p{font-size:12px;color:#8d7b66;line-height:1.8}
@@ -820,14 +820,12 @@ function completeTask(t,row){
     q("maruBadge").classList.add("pulse");
     setTimeout(function(){ q("maruBadge").classList.remove("pulse"); },600);
     if (store.maru % 25 === 0){
-      setTimeout(function(){ toast("🌸 はなまる "+store.maru+"こ たっせい! かぞくで おいわいしよう!"); confetti(40); fanfare(); },1200);
+      setTimeout(function(){ toast("🌸 はなまる "+store.maru+"こ たっせい! かぞくで おいわいしよう!"); confetti(10); blip(659,.15); blip(784,.2,.16,"triangle"); },1200);
     }
     renderBoard(t.id); // 今できた行だけ、はなまるが回って出る
-    if(!t.stretch){
-      var list=store.tasks[mode];
-      var all=list.every(function(x){ return store.done[mode][x.id]; });
-      if(all){ setTimeout(function(){ fanfare(); confetti(30); },900); }
-    }
+    var listAll=store.tasks[mode].concat(stretchList());
+    var allDone=listAll.length>0 && listAll.every(function(x){ return store.done[mode][x.id]; });
+    if(allDone){ setTimeout(function(){ fanfare(); confetti(30); },900); }
     rolling=false;
   }, 2100);
 }
