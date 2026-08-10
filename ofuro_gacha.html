@@ -9,7 +9,7 @@
 <title>おふろガチャ</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
-body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;overflow:hidden;
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;min-height:100dvh;overflow:hidden;
   background:linear-gradient(#dcedf5,#e8f3f7 45%,#f5ecd7);color:#5a4a38}
 .bubblebg{position:fixed;border:2.5px solid rgba(141,123,102,.25);border-radius:50%;background:rgba(255,255,255,.5);
   animation:floatup linear infinite;pointer-events:none}
@@ -27,8 +27,8 @@ button.badge{cursor:pointer;font-family:inherit}
 
 /* ===== ガチャ本体 ===== */
 #stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding-top:120px;padding-bottom:250px}
-@media (max-height:760px){ #stage{padding-top:104px;padding-bottom:218px} #stage svg{max-height:33vh} }
+  padding-top:110px;padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+@media (max-height:760px){ #stage{padding-top:92px} #machine{width:min(56vw,218px)} #coinBtn{margin-top:64px!important} }
 #machine{position:relative;width:min(72vw,300px)}
 #machine.shake{animation:mshake .12s linear 9}
 @keyframes mshake{0%{transform:translateX(0) rotate(0)}25%{transform:translateX(-4px) rotate(-1deg)}75%{transform:translateX(4px) rotate(1deg)}}
@@ -51,11 +51,11 @@ button.badge{cursor:pointer;font-family:inherit}
 #slotLbl{font-size:10px;font-weight:bold;color:#a58868;margin-top:4px}
 #outlet{position:absolute;left:50%;bottom:-58px;transform:translateX(-50%);width:96px;height:52px;
   background:#fff7ec;border:4px solid #8d7b66;border-radius:14px}
-#msg{margin-top:74px;font-size:15px;font-weight:bold;color:#7a6146;background:rgba(255,250,240,.9);
-  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 20px;text-align:center;max-width:88vw}
+#msg{position:fixed;top:108px;left:50%;transform:translateX(-50%);z-index:8;font-size:15px;font-weight:bold;color:#7a6146;background:rgba(255,250,240,.94);
+  border:2.5px solid #c9ae87;border-radius:999px;padding:7px 20px;text-align:center;max-width:88vw;white-space:nowrap}
 
 /* ===== コイン ===== */
-#coinBtn{position:fixed;bottom:140px;left:50%;transform:translateX(-50%);cursor:pointer;z-index:6;
+#coinBtn{margin-top:70px;cursor:pointer;z-index:6;
   display:flex;align-items:center;gap:9px;white-space:nowrap;
   filter:drop-shadow(0 5px 4px rgba(141,123,102,.3));transition:opacity .3s}
 #coinBtn .icon{flex:0 0 56px;width:56px;line-height:0}
@@ -92,9 +92,9 @@ button.badge{cursor:pointer;font-family:inherit}
 @keyframes cfall{to{transform:translateY(110vh) rotate(720deg)}}
 
 /* ===== ずかん ===== */
-#zukan{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:94;display:none;align-items:center;justify-content:center;padding:16px}
+#zukan{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:94;display:none;align-items:center;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
 #zukan .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;
-  max-height:82vh;overflow-y:auto;padding:18px}
+  max-height:78vh;max-height:calc(100dvh - 76px);overflow-y:auto;padding:18px}
 #zukan h3{text-align:center;color:#7a6146;margin-bottom:12px}
 #zgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .zcell{background:#f5edda;border:2.5px solid #dcc9a2;border-radius:14px;aspect-ratio:1;position:relative;
@@ -113,9 +113,9 @@ button.badge{cursor:pointer;font-family:inherit}
   color:#7a6146;border-radius:999px;padding:9px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;font-family:inherit}
 
 /* ===== おうちのひとパネル ===== */
-#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
-#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:380px;width:100%;padding:20px;max-height:86vh;overflow-y:auto}
-#promiseBtn{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:6;white-space:nowrap;max-width:94vw;
+#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:20px 20px calc(20px + env(safe-area-inset-bottom))}
+#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:380px;width:100%;padding:20px;max-height:78vh;max-height:calc(100dvh - 76px);overflow-y:auto}
+#promiseBtn{margin-top:14px;z-index:6;white-space:nowrap;max-width:94vw;
   font-family:inherit;font-size:14px;font-weight:bold;border:none;border-radius:999px;
   padding:12px 22px;background:#8fc7e8;color:#fff;box-shadow:0 5px 0 #6da7c9;cursor:pointer;white-space:nowrap}
 #zukanBtn svg{width:26px;height:26px}
@@ -125,7 +125,7 @@ button.badge{cursor:pointer;font-family:inherit}
   transition:all .8s cubic-bezier(.4,-0.1,.6,1)}
 #flyPrize svg{width:100%;height:auto}
 #cfgWrap{display:none}
-#promiseBtn:active{transform:translate(-50%,4px);box-shadow:0 1px 0 #6da7c9}
+#promiseBtn:active{transform:translateY(4px);box-shadow:0 1px 0 #6da7c9}
 #promiseBtn.used{background:#dcc9a2;box-shadow:0 5px 0 #c4b28a;pointer-events:none}
 #gtoast{position:fixed;left:50%;transform:translateX(-50%);top:64px;width:max-content;max-width:88vw;white-space:normal;text-align:center;line-height:1.6;background:rgba(122,97,70,.94);color:#fff;
   font-size:14px;font-weight:bold;border-radius:999px;padding:10px 22px;z-index:80;display:none;text-align:center;max-width:90vw}
@@ -202,10 +202,10 @@ body{padding-bottom:78px!important}
     <div id="capsule"></div>
   </div>
   <div id="msg" style="display:none"></div>
+  <div id="coinBtn" class="off"><span class="icon"></span><div class="lbl">コインをタップ!</div></div>
+  <button id="promiseBtn">✋ おやくそく まもります!</button>
 </div>
 
-<button id="promiseBtn">✋ おやくそく まもります!</button>
-<div id="coinBtn" class="off"><span class="icon"></span><div class="lbl">コインをタップ!</div></div>
 <div id="gtoast"></div>
 <div id="flyPrize"></div>
 <div id="flyCoin"></div>
@@ -370,7 +370,7 @@ function firstTip(id, title, body){
   if (seen[id]) return;
   var w = document.createElement("div");
   w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
-  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38">'
+  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38;max-height:calc(100dvh - 80px);overflow-y:auto">'
     + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
     + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
     + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
@@ -719,7 +719,7 @@ refreshPromise();
 </script>
 <!-- ふぃーどばっく(共通パーツ) -->
 <div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:78vh;max-height:calc(100dvh - 72px);overflow:auto">
     <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
     <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>

@@ -9,7 +9,7 @@
 <title>おしたくボード & おでかけタイマー</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;min-height:100dvh;color:#5a4a38;
   background:linear-gradient(#dcedf5,#e8f3f7 40%,#f0ead6);transition:background 1s}
 /* 夜モード: 部屋の明かりでボードを見ている雰囲気 */
 body.night{background:linear-gradient(#454f6e,#57628a 40%,#6a688a)}
@@ -215,8 +215,8 @@ body.night #nekoNow{color:#d8cdb4}
 #tbtns a.gacha{background:#8fc7e8;box-shadow:0 4px 0 #6da7c9}
 
 /* ===== せってい ===== */
-#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:16px}
-#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:400px;width:100%;padding:18px;max-height:88vh;overflow-y:auto}
+#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:400px;width:100%;padding:18px;max-height:78vh;max-height:calc(100dvh - 72px);overflow-y:auto}
 #parent h3{color:#7a6146;font-size:15px;margin:14px 0 6px}
 #parent p{font-size:12px;color:#8d7b66;line-height:1.8}
 #parent .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center;font-size:12px}
@@ -715,7 +715,7 @@ document.getElementById("stretchBtn").onclick = function(){
     var ip = document.createElement("div");
     ip.id = "stretchInfo";
     ip.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:20px";
-    ip.innerHTML = '<div style="background:#fffcf4;border:4px solid #dcc06e;border-radius:22px;max-width:340px;padding:20px;text-align:center">'+
+    ip.innerHTML = '<div style="background:#fffcf4;border:4px solid #dcc06e;border-radius:22px;max-width:340px;padding:20px;text-align:center;max-height:calc(100dvh - 80px);overflow-y:auto">'+
       '<div style="font-size:30px">⭐</div>'+
       '<div style="font-size:15px;font-weight:bold;color:#7a6146;margin:8px 0">おかわりチャレンジ</div>'+
       '<div style="font-size:13px;color:#8d7b66;line-height:1.8">よゆうがある日だけ、すきなタスクをふやせるよ。<br>ふやしたぶんは、あしたには きえるよ。<br>(1日3こまで)</div>'+
@@ -1278,7 +1278,7 @@ function firstTip(id, title, body){
   if (seen[id]) return;
   var w = document.createElement("div");
   w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
-  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38">'
+  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38;max-height:calc(100dvh - 80px);overflow-y:auto">'
     + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
     + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
     + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
@@ -1357,7 +1357,7 @@ updateTrip();
 </script>
 <!-- ふぃーどばっく(共通パーツ) -->
 <div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:78vh;max-height:calc(100dvh - 72px);overflow:auto">
     <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
     <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>

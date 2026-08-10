@@ -9,7 +9,7 @@
 <title>ねこのおうち</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
-body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;color:#5a4a38;
+body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;min-height:100dvh;color:#5a4a38;
   background:linear-gradient(#f5ecd7,#f0e4cc);display:flex;flex-direction:column;align-items:center;padding:10px 10px 104px}
 #hud{display:flex;gap:8px;align-items:center;width:min(440px,96vw);margin-bottom:8px}
 .badge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;border-radius:999px;padding:6px 13px;
@@ -91,8 +91,8 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .shopItem .pr svg{width:16px;height:16px;vertical-align:-3px}
 .shopItem.owned{opacity:.55;pointer-events:none}
 .shopItem.owned .pr::after{content:"✓もってる";display:block;font-size:10px}
-#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
-#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:20px}
+#parent{position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:95;display:none;align-items:center;justify-content:center;padding:20px 20px calc(20px + env(safe-area-inset-bottom))}
+#parent .inner{background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:20px;max-height:78vh;max-height:calc(100dvh - 76px);overflow-y:auto}
 #parent h3{color:#7a6146;font-size:15px;margin-bottom:6px}
 #parent p{font-size:12px;color:#8d7b66;line-height:1.8}
 #parent input{font-family:inherit;font-size:15px;font-weight:bold;padding:8px 12px;border:2.5px solid #c9ae87;border-radius:12px;width:100%;margin:6px 0}
@@ -462,7 +462,7 @@ function openToyBox(){
       '<div style="width:44px;height:44px;margin:0 auto">'+d.svg+'</div>'+
       '<div style="font-size:11px;font-weight:bold;color:#7a6146;margin-top:4px">だす</div></button>';
   }).join("");
-  p.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:18px;text-align:center">'+
+  p.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:360px;width:100%;padding:18px;text-align:center;max-height:calc(100dvh - 80px);overflow-y:auto">'+
     '<h3 style="color:#7a6146;font-size:15px">🧺 おもちゃばこ</h3>'+
     '<p style="font-size:12px;color:#8d7b66;margin:6px 0 10px">へやに だせるのは 3こまで。えらんで だしてね</p>'+
     '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">'+ (items || '<span style="font-size:12px;color:#a58868;line-height:1.8">いまは からっぽ。<br>へやの おもちゃを <b>ながおし</b>すると<br>ここに おかたづけできるよ</span>') +'</div>'+
@@ -517,7 +517,7 @@ function firstTip(id, title, body){
   if (seen[id]) return;
   var w = document.createElement("div");
   w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
-  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38">'
+  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38;max-height:calc(100dvh - 80px);overflow-y:auto">'
     + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
     + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
     + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
@@ -741,7 +741,7 @@ setInterval(sayLine, 45000);
 </script>
 <!-- ふぃーどばっく(共通パーツ) -->
 <div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
+  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:78vh;max-height:calc(100dvh - 72px);overflow:auto">
     <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
     <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
