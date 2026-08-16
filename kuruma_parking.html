@@ -271,7 +271,7 @@ body.night #kirariCard{background:rgba(255,253,246,.94)}
   border:none;border-bottom:2px dashed #dcc9a2;background:transparent;padding:2px}
 .tedit button{padding:6px 9px!important;font-size:12px!important}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:rgba(122,97,70,.92);color:#fff;
-  font-size:13px;font-weight:bold;border-radius:999px;padding:9px 20px;z-index:70;display:none;max-width:90vw;text-align:center}
+  font-size:13px;font-weight:bold;border-radius:999px;padding:9px 20px;z-index:10000;display:none;max-width:90vw;text-align:center}
 
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea{-webkit-user-select:text;user-select:text}
@@ -529,7 +529,7 @@ var DEFAULT_TASKS = {
 var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:false, notifySec:60,
   vehAsa:"bike", vehYoru:"car" };
 function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
-  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1","cleaned2","kirari","kirariDef"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1","cleaned2","kirari","kirariDef","stretchNightPass"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
 load();
 if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
@@ -567,6 +567,7 @@ if (!store.cleaned2){ store.bagDef = store.bagDef.filter(function(t){ return t.i
    うんちなど「その日かぎりのレアな達成」を祝う独立枠。常設タスクにすると
    「できなかった日」が残るため、押した日だけ残る設計(失敗は可視化しない)。
    記録: store.kirari = { "2026-08-13": ["うんち"] } / こうもく: store.kirariDef */
+var KIRARI_ENABLED = false;         // 2026-08-17 K「いらんかも」につき非表示(データ・コードは温存。戻す時はtrue)
 var KIRARI_MAX = 3;                 // 1日の上限(おかわりと同じ思想: 無限にしない)
 var KIRARI_COIN = 3;                // 1回のお湯コイン
 var KIRARI_KEEP_DAYS = 180;         // 記録の保持日数(古いものから間引く)
@@ -724,11 +725,15 @@ var sgSelIcon = "oekaki";
 /* ねこが寝たら「あたらしいタスクの追加」だけ閉店(チェックは可) */
 function nekoAsleep_(){
   var d = new Date(), t = d.getHours()*60 + d.getMinutes();
-  return (t >= 1230 || t < 420); // 20:30〜翌4:00
+  return (t >= 1230 || t < 240); // 20:30〜翌4:00(2026-08-17: 420=7:00になっていたバグを240=4:00に修正。朝の⭐が押せなかった)
+}
+/* パパ解除(2026-08-17): ⭐ボタン3秒長押しで当日だけ夜間ブロックを解除 */
+function nightBlocked_(){
+  return nekoAsleep_() && store.stretchNightPass !== papaToday_();
 }
 function addStretchExtra_(nm){
-  if (nekoAsleep_()){
-    toast("ねこが ねたよ🌙 あたらしい おしごとは あしたの おたのしみ!");
+  if (nightBlocked_()){
+    toast("ねこが ねたよ🌙(よる8じはん〜あさ4じは おやすみ) あたらしい おしごとは あしたの おたのしみ!");
     blip(330,.15);
     var old = document.getElementById("stretchAddPanel"); if (old) old.remove();
     return;
@@ -786,9 +791,30 @@ function addStretchTask(){
   };
   p.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
+/* ⭐長押し3秒=パパ解除(当日のみ)。子には案内しない(2026-08-17) */
+var stretchLPTimer = null, stretchLPFired = false;
+(function(){
+  var sb = document.getElementById("stretchBtn");
+  sb.addEventListener("pointerdown", function(){
+    stretchLPFired = false;
+    if (!nightBlocked_()) return;
+    clearTimeout(stretchLPTimer);
+    stretchLPTimer = setTimeout(function(){
+      stretchLPFired = true;
+      store.stretchNightPass = papaToday_(); save();
+      toast("🔓 パパかいじょ! きょうだけ よるの⭐OK");
+      blip(784,.1); blip(1047,.1,.12);
+      try{ navigator.vibrate && navigator.vibrate([40,30,40]); }catch(e){}
+    }, 3000);
+  });
+  ["pointerup","pointerleave","pointercancel"].forEach(function(ev){
+    sb.addEventListener(ev, function(){ clearTimeout(stretchLPTimer); });
+  });
+})();
 document.getElementById("stretchBtn").onclick = function(){
-  if (nekoAsleep_() && !(store.stretch.on)){
-    toast("ねこが ねたよ🌙 ⭐おかわりは あした あそぼう!");
+  if (stretchLPFired){ stretchLPFired = false; return; }
+  if (nightBlocked_() && !(store.stretch.on)){
+    toast("ねこが ねたよ🌙(よる8じはん〜あさ4じは おやすみ) ⭐は あした あそぼう!");
     blip(330,.15);
     return;
   }
@@ -838,6 +864,16 @@ function toast(t){ var e=q("toast"); e.textContent=t; e.style.display="block";
 /* ===== ⭐️ きらり: 表示・えらぶシート・演出 ===== */
 function renderKirari(freshName){
   var card = q("kirariCard"); if (!card) return;
+  if (!KIRARI_ENABLED){
+    card.style.display = "none";
+    ["editKirari","kirariLog"].forEach(function(id){
+      var el = q(id); if (!el) return;
+      if (el.previousElementSibling && el.previousElementSibling.tagName === "H3") el.previousElementSibling.style.display = "none";
+      if (id === "editKirari" && el.nextElementSibling && el.nextElementSibling.className === "row") el.nextElementSibling.style.display = "none";
+      el.style.display = "none";
+    });
+    return;
+  }
   var list = kirariTodayList_();
   var full = list.length >= KIRARI_MAX;
   var btn = q("kirariBtn"), txt = q("kirariBtnTxt");
@@ -1504,8 +1540,12 @@ function openParent(){
 }
 /* renderVehは廃止(2026-07-25): のりもの切替は走っている車のタップ式へ */
 function grantCoin(k){ walletAdd(k); toast("お湯コイン "+(k>0?"+":"")+k+" (いま"+walletGet()+"まい)"); blip(1047,.1,0,"triangle"); }
-function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard(); toast("きょうの「できた」をリセットしました"); }
-function resetDone(m){ store.done[m]={}; save(); renderBoard(); toast((m==="asa"?"あさ":"よる")+"の「できた」をリセットしました"); }
+function resetToday(){ store.done={asa:{},yoru:{}}; save(); renderBoard();
+  blip(523,.12); try{ navigator.vibrate && navigator.vibrate(50); }catch(e){}
+  toast("✅ きょうの「できた」をリセットしたよ"); }
+function resetDone(m){ store.done[m]={}; save(); renderBoard();
+  blip(523,.12); try{ navigator.vibrate && navigator.vibrate(50); }catch(e){}
+  toast("✅ "+(m==="asa"?"あさ":"よる")+"の「できた」をリセットしたよ"); }
 
 /* ===== はじめてだけ出るヒント ===== */
 function firstTip(id, title, body){
