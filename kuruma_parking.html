@@ -844,8 +844,17 @@ if (store.date !== today){ store.date = today; store.done = {asa:{},yoru:{}}; sa
 var mode = (function(){ var h=new Date().getHours(); return (h>=4 && h<15) ? "asa" : "yoru"; })();
 
 var audioCtx=null;
+/* iOS対策(2026-08-17): ホーム画面復帰・ロック解除後にAudioContextがsuspendedのまま
+   戻り音が鳴らなくなる既知問題。最初のタップと復帰時に必ずresumeする */
+document.addEventListener("pointerdown", function(){
+  try{ if(audioCtx && audioCtx.state==="suspended") audioCtx.resume(); }catch(e){}
+}, true);
+document.addEventListener("visibilitychange", function(){
+  try{ if(!document.hidden && audioCtx && audioCtx.state==="suspended") audioCtx.resume(); }catch(e){}
+});
 function q(id){ return document.getElementById(id); }
 function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
   var o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t||"square"; o.frequency.value=f;
   g.gain.setValueAtTime(.06,audioCtx.currentTime+(w||0)); g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
   o.connect(g); g.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
