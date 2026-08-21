@@ -435,6 +435,9 @@ body{padding-bottom:78px!important}
   <div class="row"><button onclick="addKirariDef()">+ ついか</button></div>
   <h3>⭐️ これまでの きらり(あたらしい順に10件)</h3>
   <div id="kirariLog"></div>
+  <h3>⏱ できたきろく(14日分)</h3>
+  <p style="font-size:11.5px;color:#8d7b66;line-height:1.7;margin-bottom:6px">ぜんぶできた日は「できた時刻」を、とちゅうで終わった日は定点(あさ9:30/よる22:30)の「できた数」を自動で記録します。だんだん早くなるのが見えます。</p>
+  <div id="recList" style="font-size:12px;line-height:2;color:#7a6146"></div>
   <h3 style="cursor:pointer;user-select:none" onclick="var e=document.getElementById('papaSec');e.style.display=e.style.display==='none'?'block':'none'">👔 パパ・ママのおしたく / 🎒バッグ ▼(タップでひらく)</h3>
   <div id="papaSec" style="display:none">
   <h3>👔 パパ・ママのおしたく(あさ)</h3>
@@ -839,9 +842,68 @@ document.getElementById("stretchBtn").onclick = function(){
 document.getElementById("stretchBtn").classList.toggle("on", store.stretch.on && store.stretch.d===papaToday_());
 if (store.maru === undefined) store.maru = 0;
 q("maruN").textContent = store.maru;
-var today = new Date().toISOString().slice(0,10);
-if (store.date !== today){ store.date = today; store.done = {asa:{},yoru:{}}; save(); }
+/* ===== できた時刻の記録(2026-08-21 K要望) =====
+   store.rec = { "2026-08-21": { asa:{s:"07:58",e:"08:41",n:4,t:4}, yoru:{cp:"22:30",n:3,t:4} } }
+   s=最初のタスク完了時刻 / e=ぜんぶできた時刻 / cp=定点記録した時刻(あさ9:30・よる22:30) / n=できた数 / t=全体数 */
+var REC_CP = { asa: 9*60+30, yoru: 22*60+30 };  // 定点(分)
+function recPad_(n){ return ("0"+n).slice(-2); }
+function localDay_(d){ d = d || new Date(); return d.getFullYear()+"-"+recPad_(d.getMonth()+1)+"-"+recPad_(d.getDate()); }
+function hhmm_(){ var d=new Date(); return recPad_(d.getHours())+":"+recPad_(d.getMinutes()); }
+if (!store.rec || typeof store.rec !== "object") store.rec = {};
+function recEntry_(dayKey, m){
+  if (!store.rec[dayKey]) store.rec[dayKey] = {};
+  if (!store.rec[dayKey][m]) store.rec[dayKey][m] = {};
+  return store.rec[dayKey][m];
+}
+function recTrim_(){ var ks = Object.keys(store.rec).sort(); while (ks.length > 90){ delete store.rec[ks.shift()]; } }
+function recCount_(m){
+  var all = (store.tasks[m]||[]).concat(stretchList());
+  var dn = 0; all.forEach(function(x){ if (store.done[m] && store.done[m][x.id]) dn++; });
+  return { n: dn, t: all.length };
+}
+function recStart_(m){
+  var r = recEntry_(localDay_(), m);
+  if (!r.s) r.s = hhmm_();
+  recTrim_(); save();
+}
+function recAllDone_(m){
+  var r = recEntry_(localDay_(), m), c = recCount_(m);
+  r.e = hhmm_(); r.n = c.n; r.t = c.t;
+  recTrim_(); save();
+}
+function recCheckpoint_(){
+  // 定点をすぎていて、まだ完了も定点記録もない時だけ「そのときの状態」を1回記録
+  var now = new Date(), hm = now.getHours()*60 + now.getMinutes();
+  var changed = false;
+  ["asa","yoru"].forEach(function(m){
+    if (hm < REC_CP[m]) return;
+    var r = recEntry_(localDay_(), m);
+    if (r.e || r.cp) return;
+    var c = recCount_(m);
+    if (c.n === 0 && !r.s) return;  // 1つもやっていない日(未使用)は記録しない
+    r.cp = (m==="asa"?"9:30":"22:30"); r.n = c.n; r.t = c.t; changed = true;
+  });
+  if (changed){ recTrim_(); save(); }
+}
+function recFinalizePrev_(prevKey){
+  // 日付が変わる時、前日のやり残し状態を締めの記録として保存(定点前に閉じた日の保険)
+  if (!prevKey) return;
+  ["asa","yoru"].forEach(function(m){
+    var r = recEntry_(prevKey, m);
+    if (r.e || r.cp){ return; }
+    var c = recCount_(m);
+    if (c.n === 0 && !r.s){ return; }
+    r.cp = "しめ"; r.n = c.n; r.t = c.t;
+  });
+  recTrim_();
+}
+/* 日付リセット: 従来はtoISOString(UTC)基準で日本時間の朝9時に「できた」が消えるバグがあった
+   →ローカル日付(0時リセット)に修正(2026-08-21) */
+var today = localDay_();
+if (store.date !== today){ recFinalizePrev_(store.date); store.date = today; store.done = {asa:{},yoru:{}}; save(); }
 var mode = (function(){ var h=new Date().getHours(); return (h>=4 && h<15) ? "asa" : "yoru"; })();
+recCheckpoint_();
+setInterval(recCheckpoint_, 60000);
 
 var audioCtx=null;
 /* iOS対策(2026-08-17): ホーム画面復帰・ロック解除後にAudioContextがsuspendedのまま
@@ -851,6 +913,7 @@ document.addEventListener("pointerdown", function(){
 }, true);
 document.addEventListener("visibilitychange", function(){
   try{ if(!document.hidden && audioCtx && audioCtx.state==="suspended") audioCtx.resume(); }catch(e){}
+  try{ if(!document.hidden) recCheckpoint_(); }catch(e){}
 });
 function q(id){ return document.getElementById(id); }
 function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -1058,9 +1121,13 @@ function renderBoard(newId){
   renderPapa();
   renderKirari();
   var all=list.length>0 && list.every(function(t){ return store.done[mode][t.id]; });
-  q("perfect").querySelector(".inner").textContent = mode==="asa"
+  var pfMsg = mode==="asa"
     ? "🎉 ぜんぶできた! いってらっしゃい!"
     : "🌙 ぜんぶできた! えほんをよんだら、おふとんで おやすみなさい";
+  var pfRec = (store.rec[localDay_()]||{})[mode] || {};
+  var pfTime = pfRec.e ? ('<div style="font-size:12.5px;color:#a58868;margin-top:4px">⏱ ' + pfRec.e + "に ぜんぶできた" + (pfRec.s ? "(" + pfRec.s + " スタート)" : "") + "</div>") : "";
+  q("perfect").querySelector(".inner").innerHTML = pfMsg + pfTime +
+    '<div style="margin-top:8px"><button type="button" onclick="shareRecordCard_()" style="font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:9px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer">📸 きろくカード(ほぞん・シェア)</button></div>';
   q("perfect").style.display = all? "block":"none";
 }
 var rolling=false;
@@ -1073,6 +1140,7 @@ function completeTask(t,row){
   try{navigator.vibrate&&navigator.vibrate(30);}catch(e){}
   setTimeout(function(){
     store.done[mode][t.id]=true; save();
+    recStart_(mode);
     blip(784,.12); blip(1047,.16,.12,"triangle");
     // お湯コインが飛んでいく
     var fc=document.createElement("div");
@@ -1101,9 +1169,10 @@ function completeTask(t,row){
     if (store.maru % 25 === 0){
       setTimeout(function(){ toast("🌸 はなまる "+store.maru+"こ たっせい! かぞくで おいわいしよう!"); confetti(10); blip(659,.15); blip(784,.2,.16,"triangle"); },1200);
     }
-    renderBoard(t.id); // 今できた行だけ、はなまるが回って出る
     var listAll=store.tasks[mode].concat(stretchList());
     var allDone=listAll.length>0 && listAll.every(function(x){ return store.done[mode][x.id]; });
+    if(allDone){ recAllDone_(mode); }
+    renderBoard(t.id); // 今できた行だけ、はなまるが回って出る(完了時刻も出る)
     if(allDone){ setTimeout(function(){ fanfare(); confetti(30); },900); }
     rolling=false;
   }, 2100);
@@ -1238,6 +1307,132 @@ function renderSleepParent_(){
     var dur = mins == null ? "(ねむり中)" : (Math.floor(mins / 60) + "時間" + (mins % 60) + "分");
     return "🌙 " + fmt(e.sleep) + " → ☀ " + fmt(e.wake) + "　" + dur;
   }).join("<br>");
+}
+/* ===== きろくカード(2026-08-21): ぜんぶできたらスクショ画像を生成→シェア(SNS投稿用) ===== */
+function svgToImg_(svg){
+  return new Promise(function(res){
+    try{
+      // ICONSのsvgはxmlns属性を持たないものがあり、そのままだと画像として無効になる(要付与)
+      if (svg.indexOf("xmlns=") === -1) svg = svg.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ');
+      var img = new Image();
+      img.onload = function(){ res(img); };
+      img.onerror = function(){ res(null); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }catch(e){ res(null); }
+  });
+}
+function buildRecCard_(){
+  // タスクの絵(ボードと同じアイコン)を読み込んでから描く(2026-08-21 K要望: 文字だけだと見づらい)
+  var list = store.tasks[mode].concat(stretchList()).slice(0, 8);
+  return Promise.all(list.map(function(t){ return svgToImg_(ICONS[t.icon] || ICONS.kigae); }))
+    .then(function(imgs){ return drawRecCard_(list, imgs); });
+}
+function drawRecCard_(list, imgs){
+  var c = document.createElement("canvas"); c.width = 1080; c.height = 1350;
+  var x = c.getContext("2d");
+  var FONT = '"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif';
+  var isAsa = (mode === "asa");
+  // 背景
+  x.fillStyle = isAsa ? "#fdf8ee" : "#232842"; x.fillRect(0,0,1080,1350);
+  x.strokeStyle = "#c9ae87"; x.lineWidth = 10;
+  var r = 48, m = 42;
+  x.beginPath(); x.moveTo(m+r, m); x.arcTo(1080-m, m, 1080-m, 1350-m, r); x.arcTo(1080-m, 1350-m, m, 1350-m, r);
+  x.arcTo(m, 1350-m, m, m, r); x.arcTo(m, m, 1080-m, m, r); x.closePath();
+  x.fillStyle = isAsa ? "#fffdf7" : "#2c3252"; x.fill(); x.stroke();
+  var ink = isAsa ? "#7a6146" : "#f0e8d8";
+  var sub = isAsa ? "#a58868" : "#b8b09a";
+  // ヘッダ
+  x.textAlign = "center";
+  x.fillStyle = ink;
+  x.font = "bold 54px " + FONT;
+  x.fillText((isAsa ? "☀ あさ" : "🌙 よる") + "の おしたく", 540, 170);
+  var d = new Date();
+  var youbi = ["にち","げつ","か","すい","もく","きん","ど"][d.getDay()];
+  x.font = "bold 40px " + FONT; x.fillStyle = sub;
+  x.fillText(d.getFullYear() + "ねん " + (d.getMonth()+1) + "がつ " + d.getDate() + "にち(" + youbi + ")", 540, 240);
+  // メイン
+  x.font = "bold 96px " + FONT; x.fillStyle = isAsa ? "#d9930d" : "#f2d98a";
+  x.fillText("ぜんぶ できた!", 540, 400);
+  var rec = (store.rec[localDay_()] || {})[mode] || {};
+  x.font = "bold 52px " + FONT; x.fillStyle = ink;
+  var tline = rec.e ? ((rec.s ? rec.s + " → " : "") + rec.e + " かんりょう") : hhmm_() + " かんりょう";
+  x.fillText("⏱ " + tline, 540, 500);
+  // タスクリスト(ボードと同じ絵+名前+はなまる)
+  var yy = 600, lh = Math.min(92, Math.floor(580 / Math.max(list.length,1)));
+  var iconSize = Math.min(76, lh - 8);
+  x.textAlign = "left";
+  list.forEach(function(t, i){
+    if (imgs[i]){
+      // 絵の背景に丸を敷く(ボードの雰囲気)
+      x.fillStyle = isAsa ? "#f6efe0" : "#3a4066";
+      x.beginPath(); x.arc(200 + iconSize/2, yy - iconSize/2 + 12, iconSize/2 + 8, 0, Math.PI*2); x.fill();
+      x.drawImage(imgs[i], 200, yy - iconSize + 12, iconSize, iconSize);
+    }
+    x.font = "bold 48px " + FONT; x.fillStyle = ink;
+    x.fillText(t.name, 200 + iconSize + 34, yy);
+    x.font = "bold 50px " + FONT;
+    x.fillStyle = "#e8788a";
+    x.fillText("💮", 880, yy);
+    yy += lh;
+  });
+  // フッタ
+  x.textAlign = "center";
+  x.font = "bold 34px " + FONT; x.fillStyle = sub;
+  x.fillText("できたこと ぜんぶで " + (store.maru||0) + "こ", 540, 1230);
+  x.font = "30px " + FONT;
+  x.fillText("おしたくボード", 540, 1290);
+  return c;
+}
+function showCardOverlay_(url){
+  var ov = document.createElement("div");
+  ov.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.72);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:12px";
+  var img = document.createElement("img");
+  img.src = url;
+  img.style.cssText = "max-width:82vw;max-height:66vh;max-height:calc(100dvh - 220px);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.35)";
+  var hint = document.createElement("div");
+  hint.textContent = "がぞうを ながおし → 「写真に追加」で ほぞんできるよ";
+  hint.style.cssText = "color:#fff;font-size:13px;font-weight:bold;text-align:center";
+  var cl = document.createElement("button");
+  cl.textContent = "とじる";
+  cl.style.cssText = "font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 30px;box-shadow:0 3px 0 #dcc06e;cursor:pointer";
+  cl.onclick = function(){ ov.remove(); };
+  ov.appendChild(img); ov.appendChild(hint); ov.appendChild(cl);
+  document.body.appendChild(ov);
+}
+function shareRecordCard_(){
+  buildRecCard_().then(function(c){
+    c.toBlob(function(blob){
+      if (!blob){ toast("がぞうを つくれなかった…もういちど おしてね"); return; }
+      var f = null;
+      try{ f = new File([blob], "oshitaku_" + localDay_() + ".png", { type: "image/png" }); }catch(e){}
+      if (f && navigator.canShare && navigator.canShare({ files: [f] }) && navigator.share){
+        navigator.share({ files: [f] }).catch(function(){ showCardOverlay_(URL.createObjectURL(blob)); });
+      } else {
+        showCardOverlay_(URL.createObjectURL(blob));
+      }
+    }, "image/png");
+  }).catch(function(){ toast("がぞうを つくれなかった…もういちど おしてね"); });
+}
+/* ===== できたきろくの一覧(おうちのひとパネル) ===== */
+function renderRec_(){
+  var el = q("recList"); if (!el) return;
+  var ks = Object.keys(store.rec||{}).sort().slice(-14).reverse();
+  if (!ks.length){ el.innerHTML = "まだ記録がありません。あしたから自動で貯まります。"; return; }
+  el.innerHTML = ks.map(function(k){
+    var p = k.split("-");
+    var lbl = parseInt(p[1],10) + "/" + parseInt(p[2],10);
+    var day = store.rec[k];
+    function fmt(m, ico){
+      var r = day[m];
+      if (!r || (!r.e && !r.cp && !r.s)) return "";
+      if (r.e) return ico + " <b>" + r.e + "</b> ぜんぶ✅" + (r.s ? '<span style="color:#a99f8c">(' + r.s + "〜)</span>" : "");
+      var when = (r.cp === "しめ") ? "その日のさいご" : r.cp + "じてん";
+      return ico + " " + (r.n||0) + "/" + (r.t||"?") + '<span style="color:#a99f8c">(' + when + ")</span>";
+    }
+    var a = fmt("asa","☀"), y = fmt("yoru","🌙");
+    if (!a && !y) return "";
+    return "<b>" + lbl + "</b>　" + [a,y].filter(Boolean).join("　");
+  }).filter(Boolean).join("<br>");
 }
 /* 時計(園の「時計を意識する」方針に合わせて常時表示) */
 function updateClock_(){
@@ -1545,6 +1740,7 @@ function openParent(){
   renderPapaBagEditors_();
   renderKirariDef_();
   renderKirariLog_();
+  renderRec_();
   q("parent").style.display="flex";
 }
 /* renderVehは廃止(2026-07-25): のりもの切替は走っている車のタップ式へ */
@@ -1565,7 +1761,7 @@ function firstTip(id, title, body){
   w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
   w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38;max-height:calc(100dvh - 80px);overflow-y:auto">'
     + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
-    + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
+    + '<div style="font-size:13.5px;line-height:1.8;text-align:left">' + body + '</div>'
     + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
   w.querySelector("button").onclick = function(){
     seen[id] = 1;

@@ -96,7 +96,6 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
   <div id="rail"><div id="railLine"></div><div id="trainSvg"></div></div>
   <div id="progress"></div>
   <div id="hint"></div>
-  <button id="doneBtn">🎉 かんせい!</button>
 </div>
 
 <div id="shopTtl">🔩 ぶひんや(タップで かう)</div>
@@ -262,9 +261,8 @@ function render(){
     ps.appendChild(d);
   });
   var next = PARTS.filter(function(p){ return !K.bought[p.key]; })[0];
-  q("hint").textContent = st >= 4 ? "ぜんぶ そろった! 「かんせい!」を おしてね"
+  q("hint").textContent = st >= 4 ? "ぜんぶ そろった!"
     : (next ? "つぎは「" + next.name + "」を かおう(" + next.price + "まい)" : "");
-  q("doneBtn").style.display = st >= 4 ? "block" : "none";
   renderGarage();
   refreshCoin();
 }
@@ -296,10 +294,13 @@ function buyPart(p, el){
   var sv = q("trainSvg");
   sv.style.transition = "transform .3s"; sv.style.transform = "scale(1.06)";
   setTimeout(function(){ sv.style.transform = ""; }, 320);
+  // 4つそろったら自動でかんせい(2026-08-21: 「かんせい!」ボタンは廃止。ひと呼吸おいてお祝い)
+  if (step_() >= 4) setTimeout(finishToy_, 800);
 }
 
-/* ===== かんせい! ===== */
-q("doneBtn").onclick = function(){
+/* ===== かんせい!(自動) ===== */
+function finishToy_(){
+  if (step_() < 4) return;
   var t = curTrain();
   K.made.push(t.id); save();
   fanfare();
@@ -316,7 +317,7 @@ q("doneBtn").onclick = function(){
   }catch(e){}
   startNext_();
   render();
-};
+}
 function closeCel(){ q("cel").style.display = "none"; }
 
 /* ===== コイン長押しで+3(おうちのひと) ===== */
@@ -330,6 +331,8 @@ function closeCel(){ q("cel").style.display = "none"; }
 
 q("footCoinIco").innerHTML = COIN;
 render();
+// 旧バージョンで「4つそろったのに かんせいボタンを押していない」状態の救済(自動完成)
+if (step_() >= 4) setTimeout(finishToy_, 800);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) render(); });
 </script>
 </body>

@@ -376,7 +376,7 @@ function firstTip(id, title, body){
   w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
   w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38;max-height:calc(100dvh - 80px);overflow-y:auto">'
     + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
-    + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
+    + '<div style="font-size:13.5px;line-height:1.8;text-align:left">' + body + '</div>'
     + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
   w.querySelector("button").onclick = function(){
     seen[id] = 1;
@@ -637,10 +637,13 @@ function closeZukan(){ q("zukan").style.display = "none"; }
   btn.addEventListener("touchstart",down,{passive:true}); btn.addEventListener("touchend",up);
 })();
 function renderParent(){
-  q("pCoins").textContent = wGet();
-  q("pProm").textContent = store.prom.used ? " 済み" : " まだ";
+  try{
+    q("pCoins").textContent = wGet();
+    q("pProm").textContent = store.prom.used ? " 済み" : " まだ";
+  }catch(e){ try{ gtoast("⚠ 表示エラー: " + e.message); }catch(e2){} }
   // やくそくボタン1回でもらえるコイン枚数 + 復活ボタン
-  var pm = q("promMax"); pm.innerHTML = "";
+  var pm = q("promMax"); if (!pm){ renderCfgRows_(); return; }
+  pm.innerHTML = "";
   [1,2,3].forEach(function(n){
     var b = document.createElement("button");
     b.type = "button";
@@ -662,24 +665,34 @@ function renderParent(){
     renderParent(); refreshPromise();
   };
   pm.appendChild(rz);
-  // 景品ごとの在庫トグル+確定指定
-  var cfg = q("prizeCfg"); cfg.innerHTML = "";
-  PRIZES.forEach(function(p){
-    var row = document.createElement("div");
-    row.className = "pz";
-    var inStock = store.stock[p.id] !== false;
-    row.innerHTML = '<span class="pname2">' + (p.rare?"☆":"") + p.name + '</span>';
-    var b1 = document.createElement("button");
-    b1.textContent = inStock ? "在庫あり" : "在庫なし";
-    b1.className = inStock ? "" : "off2";
-    b1.onclick = function(){ store.stock[p.id] = !inStock; save(); renderParent(); };
-    var b2 = document.createElement("button");
-    b2.textContent = (store.forced===p.id) ? "つぎ確定中!" : "つぎ確定";
-    if (store.forced===p.id) b2.className = "next";
-    b2.onclick = function(){ store.forced = (store.forced===p.id) ? "" : p.id; save(); renderParent(); };
-    row.appendChild(b1); row.appendChild(b2);
-    cfg.appendChild(row);
-  });
+  renderCfgRows_();
+}
+/* 景品ごとの在庫トグル+確定指定(2026-08-21: renderParentから独立。
+   他の描画が失敗してもここは生き残り、失敗したらエラーを画面に出す) */
+function renderCfgRows_(){
+  var cfg = q("prizeCfg"); if (!cfg) return;
+  try{
+    if (!store.stock || typeof store.stock !== "object") store.stock = {};
+    cfg.innerHTML = "";
+    PRIZES.forEach(function(p){
+      var row = document.createElement("div");
+      row.className = "pz";
+      var inStock = store.stock[p.id] !== false;
+      row.innerHTML = '<span class="pname2">' + (p.rare?"☆":"") + p.name + '</span>';
+      var b1 = document.createElement("button");
+      b1.textContent = inStock ? "在庫あり" : "在庫なし";
+      b1.className = inStock ? "" : "off2";
+      b1.onclick = function(){ store.stock[p.id] = !inStock; save(); renderCfgRows_(); };
+      var b2 = document.createElement("button");
+      b2.textContent = (store.forced===p.id) ? "つぎ確定中!" : "つぎ確定";
+      if (store.forced===p.id) b2.className = "next";
+      b2.onclick = function(){ store.forced = (store.forced===p.id) ? "" : p.id; save(); renderCfgRows_(); };
+      row.appendChild(b1); row.appendChild(b2);
+      cfg.appendChild(row);
+    });
+  }catch(e){
+    cfg.innerHTML = '<div style="color:#c00000;font-size:12px;font-weight:bold">⚠ 設定を表示できませんでした(' + e.message + ')。この画面をスクショしてパパに送ってください</div>';
+  }
 }
 function addCoin(n){
   wSet(wGet() + n); refreshHud();
@@ -700,7 +713,23 @@ function toggleCfg(){
   var open = w.style.display === "block";
   w.style.display = open ? "none" : "block";
   b.textContent = open ? "▼ 在庫・確定ガチャの設定をひらく" : "▲ 在庫・確定ガチャの設定をとじる";
+  // 2026-08-21修正: 開いた中身がパネルの見えている範囲の下に出て「出てこない」ように見えていた。
+  // →開くとき①中身をその場で描画(空なら) ②パネル内を自動スクロールして設定の頭を見せる
+  if (!open){
+    var cfg = q("prizeCfg");
+    if (!cfg || !cfg.children.length) renderCfgRows_();
+    setTimeout(function(){
+      try{
+        var inner = q("parent").querySelector(".inner");
+        inner.scrollTop += (b.getBoundingClientRect().top - inner.getBoundingClientRect().top) - 14;
+      }catch(e){ try{ b.scrollIntoView(); }catch(e2){} }
+    }, 60);
+  }
 }
+/* 2026-08-21: 画面に出ないエラーの見える化(Kの端末でボタン行が空になる不具合の調査用) */
+window.addEventListener("error", function(ev){
+  try{ gtoast("⚠ エラーが起きました: " + (ev.message||"").slice(0,80)); }catch(e){}
+});
 function closeParent(){ q("parent").style.display = "none"; }
 /* データのバックアップ(ずかん+在庫+コイン) */
 function bakOut(){

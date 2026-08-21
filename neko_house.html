@@ -519,7 +519,7 @@ function firstTip(id, title, body){
   w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
   w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38;max-height:calc(100dvh - 80px);overflow-y:auto">'
     + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
-    + '<div style="font-size:13.5px;line-height:1.7">' + body + '</div>'
+    + '<div style="font-size:13.5px;line-height:1.8;text-align:left">' + body + '</div>'
     + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
   w.querySelector("button").onclick = function(){
     seen[id] = 1;
