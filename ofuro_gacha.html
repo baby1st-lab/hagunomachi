@@ -233,7 +233,7 @@ body{padding-bottom:78px!important}
 
 <div id="parent"><div class="inner">
   <h3>おうちのひとメニュー</h3>
-  <p>基本の流れ: 子が水色の「<b>おやくそく まもります!</b>」を押す(<b>1日1回だけ</b>)→コインが出る→ガチャ→出た子とお風呂へ。<br>
+  <p>基本の流れ: 子が水色の「<b>おやくそく まもります!</b>」を押す(<b>1日の回数は下で設定</b>。初期は1回)→コインが出る→ガチャ→出た子とお風呂へ。<br>
   ※「これから おふろ入る?」「はみがきする?」など、<b>その日の約束を決めてから押させる</b>のがコツです。ハンドルは必ず本人に回させる。ごほうびは終わったあとでなく<b>行動の入口</b>に置きます。<br>
   <b>コインのバッジを1.5秒ながおし</b>すると、おうちの人が+3枚あげられます。</p>
   <p>いまのコイン: <b id="pCoins">0</b>まい / やくそくボタン: きょうは<b id="pProm">まだ</b></p>
@@ -244,6 +244,10 @@ body{padding-bottom:78px!important}
   </div>
   <h3>「おやくそく」1回でもらえるコイン</h3>
   <div class="row" id="promMax"></div>
+  <h3>1日に「おやくそく」を おせる かいすう</h3>
+  <p style="margin:2px 0 6px;font-size:12.5px;color:#8d7b66">約束が複数ある日は増やせます(例:「YouTubeやめる」「帰ったらお風呂」で2回)。<b>回数だけ増やして、その場の交渉には使わないこと。</b></p>
+  <div class="row" id="promPer"></div>
+  <div class="row" id="promReset"></div>
   <div class="row"><button id="cfgToggle" onclick="toggleCfg()">▼ 在庫・確定ガチャの設定をひらく</button></div>
   <div id="cfgWrap">
     <p>「在庫」OFF=その景品は出ない(<b>家に現物がある物だけ出す</b>使い方。にんじんが出たら本物を持ってお風呂へ!)。「つぎ確定」=次の1回だけその景品が必ず出る。</p>
@@ -288,21 +292,24 @@ var store = { coins: 0, owned: {}, resetArm: false,
   stock: {},          // {id:false}=在庫なし(排出停止)
   forced: "",         // 次回確定の景品id
   promCoins: 1,       // やくそくボタン1回でもらえる枚数
+  promPerDay: 1,      // 1日に押せる回数(約束が複数ある日は2〜3に)
   lastPrize: "",      // 直前の景品(2連続防止)
   lastSeen: null,     // 前回ずかんを見た時点の所持数(NEW表示用)
-  prom: { date:"", used:false } };
+  prom: { date:"", n:0 } };
 function load(){ try{ var s = localStorage.getItem("ofuro_gacha_v1"); if(s){ var o = JSON.parse(s);
-  ["coins","owned","stock","forced","promCoins","lastPrize","lastSeen","prom"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["coins","owned","stock","forced","promCoins","promPerDay","lastPrize","lastSeen","prom"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("ofuro_gacha_v1", JSON.stringify({
   coins:store.coins, owned:store.owned, stock:store.stock, forced:store.forced,
-  promCoins:store.promCoins, lastPrize:store.lastPrize, lastSeen:store.lastSeen, prom:store.prom })); }catch(e){} }
+  promCoins:store.promCoins, promPerDay:store.promPerDay, lastPrize:store.lastPrize, lastSeen:store.lastSeen, prom:store.prom })); }catch(e){} }
 load();
 if (!store.lastSeen){ store.lastSeen = {}; for (var lk in store.owned) store.lastSeen[lk] = store.owned[lk]; save(); }
 // 見通しカレンダー連携: キャラ絵の共有辞書を書き出す(mitooshi_calendar.htmlが読む)
 try{ var icm={}; PRIZES.forEach(function(p){ icm[p.id]=p.svg; }); localStorage.setItem("prize_icons_v1", JSON.stringify(icm)); }catch(e){}
-if (store.prom.used === undefined) store.prom = { date: store.prom.date || "", used: (store.prom.n || 0) > 0 };
+if (!store.promPerDay || store.promPerDay < 1) store.promPerDay = 1;
+if (store.prom.n === undefined) store.prom = { date: store.prom.date || "", n: (store.prom.used ? 1 : 0) };
 var gToday = new Date().toISOString().slice(0,10);
-if (store.prom.date !== gToday){ store.prom = { date:gToday, used:false }; save(); }
+if (store.prom.date !== gToday){ store.prom = { date:gToday, n:0 }; save(); }
+function promLeft(){ return Math.max(0, (Number(store.promPerDay)||1) - (Number(store.prom.n)||0)); }
 
 /* ===== 共通財布(お湯コイン: おしたくボード・おでかけタイマーと共有) ===== */
 function wGet(){ try{ return Math.max(0, JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0); }catch(e){ return 0; } }
@@ -470,17 +477,21 @@ function pick(){
 /* ===== やくそくボタン(押した分だけコイン・1日上限あり) ===== */
 function refreshPromise(){
   var b = q("promiseBtn");
-  if (store.prom.used){
+  var left = promLeft();
+  var per  = Number(store.promPerDay)||1;
+  if (left <= 0){
     b.classList.add("used");
     b.textContent = "✅ きょうの おやくそくは おしたよ";
   } else {
     b.classList.remove("used");
-    b.textContent = "✋ おやくそく まもります!";
+    b.textContent = (per > 1)
+      ? "✋ おやくそく まもります! (あと" + left + "かい)"
+      : "✋ おやくそく まもります!";
   }
 }
 q("promiseBtn").onclick = function(){
-  if (store.prom.used) return;
-  store.prom.used = true;
+  if (promLeft() <= 0) return;
+  store.prom.n = (Number(store.prom.n)||0) + 1;
   var n = Number(store.promCoins) || 1;
   wSet(wGet() + n); save();
   refreshHud(); refreshPromise();
@@ -639,7 +650,7 @@ function closeZukan(){ q("zukan").style.display = "none"; }
 function renderParent(){
   try{
     q("pCoins").textContent = wGet();
-    q("pProm").textContent = store.prom.used ? " 済み" : " まだ";
+    q("pProm").textContent = (promLeft() <= 0) ? " ぜんぶ おした" : ("あと" + promLeft() + "かい おせる");
   }catch(e){ try{ gtoast("⚠ 表示エラー: " + e.message); }catch(e2){} }
   // やくそくボタン1回でもらえるコイン枚数 + 復活ボタン
   var pm = q("promMax"); if (!pm){ renderCfgRows_(); return; }
@@ -656,15 +667,38 @@ function renderParent(){
     };
     pm.appendChild(b);
   });
-  var rz = document.createElement("button");
-  rz.type = "button";
-  rz.textContent = "きょうの「おやくそく」を もう1回おせるようにする";
-  rz.onclick = function(){
-    store.prom.used = false; save();
-    gtoast("やくそくボタンが また押せるようになりました");
-    renderParent(); refreshPromise();
-  };
-  pm.appendChild(rz);
+  // 1日に押せる回数
+  var pp = q("promPer");
+  if (pp){
+    pp.innerHTML = "";
+    [1,2,3].forEach(function(n){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = n + "かい";
+      b.className = ((Number(store.promPerDay)||1)===n) ? "on" : "";
+      b.onclick = function(){
+        store.promPerDay = n; save();
+        gtoast("1日に " + n + "回 おせるようになりました");
+        renderParent(); refreshPromise();
+      };
+      pp.appendChild(b);
+    });
+  }
+  // きょうの回数をリセット(独立した行に置く)
+  var pr = q("promReset");
+  if (pr){
+    pr.innerHTML = "";
+    var rz = document.createElement("button");
+    rz.type = "button";
+    rz.className = "warn";
+    rz.textContent = "↺ きょうの「おやくそく」を リセット(また押せるようにする)";
+    rz.onclick = function(){
+      store.prom = { date: gToday, n: 0 }; save();
+      gtoast("やくそくボタンが また押せるようになりました");
+      renderParent(); refreshPromise();
+    };
+    pr.appendChild(rz);
+  }
   renderCfgRows_();
 }
 /* 景品ごとの在庫トグル+確定指定(2026-08-21: renderParentから独立。
