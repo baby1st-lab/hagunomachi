@@ -2,533 +2,198 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-title" content="カレンダー">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>ぼくのカレンダー</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>あと なんかい ねたら？</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
-body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;min-height:100dvh;color:#5a4a38;
-  background:radial-gradient(#f6e7c8 9%,transparent 10%) 0 0/30px 30px, linear-gradient(#fdf3e3,#f7e9d0);
-  display:flex;flex-direction:column;align-items:center;padding:12px 0 24px}
-#head{width:min(500px,96vw);text-align:center;margin-bottom:10px}
-#headTop{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-#today{font-size:15px;font-weight:bold;color:#a58868}
-#todayBig{display:flex;gap:8px;justify-content:center;margin-top:4px}
-.dchip{background:#fffaf0;border:3px solid #c9ae87;border-radius:14px;padding:5px 14px;
-  font-size:22px;font-weight:bold;color:#7a6146;min-width:74px}
-.dchip.sun{color:#e8788a;border-color:#e8b4bd}
-.dchip.sat{color:#7d9fc9;border-color:#b4c8de}
-#zukanBadge{background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
-  border-radius:999px;padding:5px 12px;font-size:12px;font-weight:bold;color:#7a6146}
-#setBtn{position:relative;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
-  border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;overflow:hidden}
-#pbGauge{position:absolute;left:0;bottom:0;height:4px;width:0%;background:#e8937c;border-radius:99px}
-
-/* ===== ひょうじ きりかえ(つぎ / カレンダー) ===== */
-#viewRow{display:flex;gap:8px;width:min(500px,96vw);margin:0 auto 10px}
-#viewRow button{flex:1;min-width:0;min-height:64px;font-family:inherit;font-size:15px;font-weight:bold;
-  border:3px solid #c9ae87;border-radius:18px;background:#fffaf0;color:#a58868;cursor:pointer;
-  box-shadow:0 3px 0 rgba(201,174,135,.35)}
-#viewRow button.on{background:#f2d98a;border-color:#dcc06e;color:#7a6146}
-#viewRow button:active{transform:scale(.97)}
-
-/* ===== 月グリッド(紙のカレンダーと同じかたち) ===== */
-#monthWrap{display:none;width:min(500px,96vw)}
-#mNav{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-#mNav button{flex:0 0 64px;min-width:0;min-height:64px;font-family:inherit;font-size:20px;font-weight:bold;
-  border:3px solid #c9ae87;border-radius:18px;background:#fffaf0;color:#7a6146;cursor:pointer;
-  box-shadow:0 3px 0 rgba(201,174,135,.35)}
-#mNav button:active{transform:scale(.95)}
-#mTitle{flex:1;min-width:0;text-align:center;font-size:19px;font-weight:bold;color:#7a6146}
-#mTodayRow{text-align:center;margin-bottom:8px}
-#mTodayBtn{min-height:64px;font-family:inherit;font-size:15px;font-weight:bold;border:3px solid #c9ae87;
-  border-radius:999px;background:#fffaf0;color:#7a6146;padding:0 26px;cursor:pointer;
-  box-shadow:0 3px 0 rgba(201,174,135,.35)}
-#mHead{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin-bottom:3px}
-#mHead div{min-width:0;overflow:hidden;text-align:center;font-size:12px;font-weight:bold;color:#a58868;
-  background:#f6ecd8;border-radius:8px;padding:5px 0}
-#mHead div.sun{color:#e8788a}
-#mHead div.sat{color:#7d9fc9}
-#mGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
-.mcell{min-width:0;overflow:hidden;min-height:66px;background:#fffaf0;border:2.5px solid #e5d9c2;
-  border-radius:10px;padding:3px 1px 2px;text-align:center;cursor:pointer;position:relative}
-.mcell:active{transform:scale(.95)}
-.mcell.w0{background:#fdf0f3}
-.mcell.w6{background:#eef4fb}
-.mcell.other{opacity:.38}
-.mcell.today{border-color:#e8937c;border-width:4px;background:#fff;box-shadow:0 0 0 3px rgba(232,147,124,.25)}
-.mcell .mnum{font-size:19px;font-weight:bold;line-height:1.1;color:#7a6146}
-.mcell.w0 .mnum{color:#e8788a}
-.mcell.w6 .mnum{color:#7d9fc9}
-.mcell .mico{font-size:14px;line-height:1.25;min-height:18px;word-break:break-all}
-.mcell .mpz{font-size:11px;line-height:1.1;min-height:12px;color:#a58868}
-#mHint{text-align:center;font-size:12px;font-weight:bold;color:#a58868;margin-top:8px}
-
-/* ===== まいしゅうの よてい(定期予定) ===== */
-#repWrap{border-top:2px dashed #e5d9c2;margin-top:12px;padding-top:10px}
-#repWrap .rttl{font-size:12px;font-weight:bold;color:#a58868;margin-bottom:6px}
-#repWd{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
-#repWd button{flex:1 1 40px;min-width:0;min-height:44px;font-family:inherit;font-size:13px;font-weight:bold;
-  border:2px solid #c9ae87;border-radius:12px;background:#fff;color:#7a6146;cursor:pointer}
-#repWd button.sel{background:#f2d98a;border-color:#dcc06e}
-#repList{margin-top:8px}
-.repItem{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid #e8dcc4;border-radius:12px;
-  padding:6px 10px;margin-top:5px;font-size:14px;font-weight:bold;color:#7a6146}
-.repItem .del{margin-left:auto;cursor:pointer;font-size:16px;padding:4px 6px}
-
-/* ===== 日にちの帯 ===== */
-#strip{display:flex;gap:10px;overflow-x:auto;width:min(500px,96vw);padding:18px 6px 14px;
-  scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
-#backRow{width:min(500px,96vw);margin-top:12px;text-align:center}
-#backRow a{display:inline-block;text-decoration:none;background:#fffaf0;border:2.5px solid #c9ae87;
-  border-radius:999px;padding:8px 22px;font-size:13px;font-weight:bold;color:#7a6146}
-.day{flex:0 0 96px;background:#fffaf0;border:3px solid #c9ae87;border-radius:22px;padding:8px 6px 10px;
-  text-align:center;cursor:pointer;scroll-snap-align:center;position:relative;transition:transform .2s;
-  box-shadow:0 3px 0 rgba(201,174,135,.35)}
-.day:active{transform:scale(.95)}
-.day.w0{background:#fdf0f3}
-.day.w6{background:#eef4fb}
-.day.past{opacity:.72;background:#f6efe2}
-.day.today{border-color:#e8937c;border-width:4px;background:#fff;box-shadow:0 0 0 5px rgba(232,147,124,.22);}
-.rel{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;
-  background:#c9ae87;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 10px;line-height:1.5}
-.day.today .rel{background:#e8937c}
-.day .wd{font-size:12px;font-weight:bold}
-.day .num{font-size:30px;font-weight:bold;line-height:1.15;color:#7a6146}
-.day .mo{font-size:10px;font-weight:bold;color:#b8916a}
-.day .icons{min-height:30px;font-size:20px;line-height:1.2;margin-top:2px;letter-spacing:1px}
-.day .prizes{display:flex;justify-content:center;gap:2px;min-height:24px;margin-top:2px}
-.day .prizes svg{width:22px;height:22px}
-.day .prizes .more{font-size:11px;font-weight:bold;color:#a58868;align-self:center}
-.wd.sun{color:#e8788a}.wd.sat{color:#7d9fc9}
-
-/* ===== くわしく ===== */
-#detail{width:min(500px,96vw);background:#fffaf0;border:3px solid #c9ae87;border-radius:20px;
-  padding:14px;margin-top:4px;min-height:120px}
-#dTitle{font-size:17px;font-weight:bold;color:#7a6146;text-align:center}
-#dBody{margin-top:8px}
-.dRow{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #e8dcc4;
-  border-radius:14px;padding:8px 12px;margin-top:6px}
-.dRow .big{font-size:26px}
-.dRow svg{width:38px;height:38px;flex:0 0 38px}
-.dRow .lb{font-size:14px;font-weight:bold;color:#7a6146}
-.dNote{text-align:center;font-size:13px;font-weight:bold;color:#a58868;margin-top:10px}
-.newpop{animation:npop .5s ease}
-@keyframes npop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1)}}
-
-/* ===== おうちのひと(編集) ===== */
-#editor{display:none;width:min(500px,96vw);background:#fffcf4;border:3px solid #a58868;border-radius:20px;
-  padding:14px;margin-top:10px}
-#editor h3{font-size:14px;color:#7a6146;margin-bottom:8px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 0}
-.chip{flex:0 0 auto;border:2px solid #c9ae87;background:#fff;border-radius:999px;padding:5px 12px;
-  font-size:12px;font-weight:bold;color:#7a6146;cursor:pointer}
-.chip.sel{background:#f2d98a;border-color:#dcc06e}
-#icoGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}
-#icoGrid button{font-size:22px;padding:8px 0;border:2px solid #e8dcc4;background:#fff;border-radius:12px;cursor:pointer}
-#icoGrid button.sel{border-color:#e8937c;background:#fdeee8}
-#evLabel{width:100%;font-family:inherit;font-size:14px;font-weight:bold;padding:8px 12px;
-  border:2px solid #c9ae87;border-radius:12px;margin-bottom:8px}
-.pbtn{font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;
-  border-radius:999px;padding:9px 20px;box-shadow:0 3px 0 #dcc06e;cursor:pointer}
-#evList{margin-top:10px}
-.evItem{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid #e8dcc4;border-radius:12px;
-  padding:6px 10px;margin-top:5px;font-size:14px;font-weight:bold;color:#7a6146}
-.evItem .del{margin-left:auto;cursor:pointer;font-size:16px}
-
-*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-input,textarea{-webkit-user-select:text;user-select:text}
-/* ===== 共通ヘッダー(コイン・設定) ===== */
-#topBar{display:flex;gap:8px;align-items:center;width:min(500px,96vw);margin:0 auto 8px}
-#topBar .tb{display:flex;align-items:center;gap:5px;background:rgba(255,250,240,.95);border:2.5px solid #c9ae87;
-  border-radius:999px;padding:6px 14px;font-size:13.5px;font-weight:bold;color:#7a6146;
-  box-shadow:0 3px 0 rgba(141,123,102,.18);white-space:nowrap;cursor:pointer;position:relative;overflow:hidden}
-#topBar .tb svg{width:20px;height:20px}
-#topBar .tb .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c;border-radius:99px}
-/* ===== 共通フッター(全アプリ統一 v2・2026-07-27) ===== */
-body{padding-bottom:78px!important}
-#appFoot{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;
-  background:rgba(255,250,240,.97);border-top:3px solid #c9ae87;box-shadow:0 -3px 10px rgba(141,123,102,.14)}
-#appFoot .fbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:1px;text-decoration:none;color:#a58868;font-size:10.5px;font-weight:bold;padding:7px 2px calc(9px + env(safe-area-inset-bottom));
-  cursor:pointer;position:relative;background:none;border:none;font-family:inherit}
-#appFoot .fbtn .ic{line-height:0}
-#appFoot .fbtn .ic svg{width:30px;height:26px;display:block}
-#appFoot .fbtn.on{color:#7a6146}
-#appFoot .fbtn.on::before{content:"";position:absolute;top:0;left:16%;right:16%;height:4px;
-  background:#f2d98a;border-radius:0 0 6px 6px}
-#appFoot .fbtn .cn{font-size:10.5px;font-weight:bold;color:#a5842e}
-#appFoot .fbtn.set{overflow:hidden}
-#appFoot .fbtn.set .gz{position:absolute;left:0;bottom:0;height:3px;width:0%;background:#e8937c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Hiragino Maru Gothic ProN","ヒラギノ丸ゴ ProN",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:linear-gradient(180deg,#fff7e6 0%,#ffeccd 100%);
+  min-height:100vh;color:#4a3728;
+  padding:16px 14px calc(24px + env(safe-area-inset-bottom));
+}
+h1{font-size:22px;text-align:center;margin:4px 0 2px;letter-spacing:.02em}
+.today{text-align:center;font-size:14px;color:#8a7560;margin-bottom:16px}
+.cards{display:flex;flex-direction:column;gap:14px}
+.card{
+  background:#fff;border-radius:22px;padding:16px 16px 14px;
+  box-shadow:0 3px 0 rgba(0,0,0,.06),0 8px 20px rgba(140,110,70,.13);
+  position:relative;overflow:hidden;
+}
+.card.done{opacity:.5}
+.card.today-ev{background:linear-gradient(135deg,#fff3c4,#ffe9a8)}
+.row{display:flex;align-items:center;gap:14px}
+.emoji{font-size:46px;line-height:1;flex-shrink:0;width:56px;text-align:center}
+.info{flex:1;min-width:0}
+.name{font-size:20px;font-weight:700;margin-bottom:2px;word-break:break-word}
+.date{font-size:13px;color:#9b856c}
+.count{margin-top:10px;text-align:center;font-size:17px;color:#6b5744;font-weight:700}
+.count b{font-size:44px;color:#ef7d3d;margin:0 4px;vertical-align:-3px}
+.count.zero{color:#e0512f;font-size:22px}
+.beds{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.bed{width:26px;height:26px;border-radius:8px;background:#ffe3c2;display:flex;align-items:center;justify-content:center;font-size:15px}
+.bed.past{background:#f0ece6;opacity:.45}
+.del{position:absolute;top:8px;right:10px;border:none;background:transparent;font-size:20px;color:#c9bcae;cursor:pointer;padding:6px 8px;line-height:1}
+.addbox{margin-top:20px;background:#fff;border-radius:22px;padding:14px;box-shadow:0 8px 20px rgba(140,110,70,.13)}
+.addbox summary{font-size:16px;font-weight:700;cursor:pointer;list-style:none;text-align:center;padding:6px}
+.addbox summary::-webkit-details-marker{display:none}
+.f{margin-top:10px}
+.f label{display:block;font-size:13px;color:#8a7560;margin-bottom:4px}
+.f input,.f select{width:100%;font-size:17px;padding:11px 12px;border:2px solid #f0e4d2;border-radius:14px;font-family:inherit;background:#fffdfa}
+.emojipick{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.emojipick button{font-size:26px;width:46px;height:46px;border-radius:14px;border:2px solid #f0e4d2;background:#fffdfa;cursor:pointer}
+.emojipick button.sel{border-color:#ef7d3d;background:#fff2e6}
+.save{margin-top:14px;width:100%;padding:15px;font-size:18px;font-weight:700;color:#fff;background:#ef7d3d;border:none;border-radius:16px;cursor:pointer;font-family:inherit}
+.empty{text-align:center;color:#9b856c;padding:30px 10px;font-size:15px;line-height:1.8}
 </style>
 </head>
 <body>
 
-  
+<h1>あと なんかい ねたら？</h1>
+<div class="today" id="todayLabel"></div>
 
-<div id="topBar">
-  <div class="tb coin" id="footCoin" title="1.5秒ながおしで おうちのひとが+3まい"><span id="footCoinIco"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="25" fill="#f9e3a8" stroke="#8d7b66" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="none" stroke="#8d7b66" stroke-width="2" stroke-dasharray="3 4"/><text x="30" y="39" text-anchor="middle" font-size="24" font-weight="bold" fill="#8d7b66" font-family="sans-serif">ゆ</text></svg></span>× <span id="footCoinN">0</span></div>
-  <div style="flex:1"></div>
-  <div class="tb set" id="footSet"><span>おうちのひと</span><span style="font-size:9px">(ながおし)</span><span class="gz" id="footGauge"></span></div>
-</div>
+<div class="cards" id="cards"></div>
 
-<div id="head">
-  <div id="today">☀ きょうは</div>
-  <div id="todayBig"></div>
-  <div style="display:none"><div id="setBtn"><div id="pbGauge"></div></div></div>
-</div>
-
-<div id="viewRow">
-  <button id="viewNext" type="button">🚗 つぎ</button>
-  <button id="viewCal" type="button">📅 カレンダー</button>
-</div>
-
-<div id="monthWrap">
-  <div id="mNav">
-    <button id="mPrev" type="button" title="せんげつ">◀</button>
-    <div id="mTitle"></div>
-    <button id="mNext" type="button" title="つぎのつき">▶</button>
+<details class="addbox">
+  <summary>＋ たのしみを ふやす</summary>
+  <div class="f">
+    <label>なにが あるの？</label>
+    <input id="fName" type="text" placeholder="れい：プール" maxlength="20">
   </div>
-  <div id="mTodayRow"><button id="mTodayBtn" type="button">きょうに もどる</button></div>
-  <div id="mHead">
-    <div class="sun">にち</div><div>げつ</div><div>か</div><div>すい</div>
-    <div>もく</div><div>きん</div><div class="sat">ど</div>
+  <div class="f">
+    <label>いつ？</label>
+    <input id="fDate" type="date">
   </div>
-  <div id="mGrid"></div>
-  <div id="mHint">マスを タップすると よていが みられるよ</div>
-</div>
-
-<div id="strip"></div>
-
-<div id="detail">
-  <div id="dTitle"></div>
-  <div id="dBody"></div>
-</div>
-
-<div id="editor">
-  <h3>📅 よていをつくる(おうちのひと)</h3>
-  <div class="chips" id="dayChips"></div>
-  <div id="icoGrid"></div>
-  <input type="text" id="evLabel" maxlength="10" placeholder="よていのなまえ(ひらがな)">
-  <div style="text-align:center;margin:6px 0 2px">
-    <button class="pbtn" onclick="addEvent()">よていを ついか</button>
+  <div class="f">
+    <label>え を えらぶ</label>
+    <div class="emojipick" id="pick"></div>
   </div>
-  <div id="evList"></div>
-
-  <div id="repWrap">
-    <div class="rttl">🔁 まいしゅうの よてい(ならいごとなど。毎回いれなくてOK)</div>
-    <div id="repWd"></div>
-    <div style="font-size:11.5px;font-weight:bold;color:#a58868;margin-bottom:6px">
-      うえの えらんだ え・なまえで、その ようびに まいしゅう ひょうじされます</div>
-    <div style="text-align:center">
-      <button class="pbtn" onclick="addRep()">まいしゅうの よていに ついか</button>
-    </div>
-    <div id="repList"></div>
-  </div>
-
-  <div style="border-top:2px dashed #e5d9c2;margin-top:12px;padding-top:10px">
-    <div style="font-size:12px;font-weight:bold;color:#a58868;margin-bottom:6px">へいじつの デフォルト(なにも予定がない日)</div>
-    <select id="wdName" onchange="setWdName(this.value)" style="font-family:inherit;font-size:14px;padding:8px 12px;border:2.5px solid #c9ae87;border-radius:12px;background:#fffaf0;color:#7a6146;width:100%">
-      <option value="ほいくえん">🎒 ほいくえん</option>
-      <option value="ようちえん">🎒 ようちえん</option>
-      <option value="こどもえん">🎒 こどもえん</option>
-      <option value="がっこう">🎒 がっこう</option>
-      <option value="おうち">🏠 おうち(えんに行っていない)</option>
-    </select>
-  </div>
-  <div style="text-align:center;margin-top:14px">
-    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
-    <button class="pbtn" style="background:#cfe0ee;color:#5b7ba0" onclick="fbOpen()">💬 かんそう・ようぼう</button>
-  </div>
-  <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
-    <a class="pbtn" href="index.html" style="background:#e8dcc4;text-decoration:none;display:inline-block">🏠 トップ</a>
-    <button class="pbtn" style="background:#e8dcc4" onclick="closeEditor()">とじる</button>
-  </div>
-</div>
-
-
+  <button class="save" id="save">とうろく する</button>
+</details>
 
 <script>
-/* ===== データ ===== */
-function q(id){ return document.getElementById(id); }
-var M = { ev: {} };
-try{ var s = localStorage.getItem("mitooshi_v1"); if (s) M = JSON.parse(s); if(!M.ev) M.ev={}; }catch(e){}
-/* 追加(2026-08-13): 定期予定 M.rep = [{e,l,wd}] / ひょうじモード M.view。既存キーはそのまま */
-if (!M.rep){
-  // これまでコードに直書きしていた「きんようび=🧺もちかえりの日」を定期予定へ移行
-  M.rep = [{ e:"🧺", l:"もちかえりの日", wd:5 }];
-  try{ localStorage.setItem("mitooshi_v1", JSON.stringify(M)); }catch(e){}
-}
-if (M.view !== "next" && M.view !== "cal") M.view = "cal"; // はじめは「カレンダー」
-function save(){ try{ localStorage.setItem("mitooshi_v1", JSON.stringify(M)); }catch(e){} }
-function redrawAll(){ renderStrip(); renderDetail(); renderMonth(); }
-function setWdName(v){ M.wdName = v; save(); redrawAll(); }
-/* ===== はじめてだけ出るヒント ===== */
-function firstTip(id, title, body){
-  var seen = {};
-  try{ seen = JSON.parse(localStorage.getItem("tips_seen_v1") || "{}"); }catch(e){}
-  if (seen[id]) return;
-  var w = document.createElement("div");
-  w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:22px";
-  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:330px;width:100%;padding:20px;text-align:center;font-family:inherit;color:#5a4a38">'
-    + '<div style="font-size:16px;font-weight:bold;color:#7a6146;margin-bottom:8px">' + title + '</div>'
-    + '<div style="font-size:13.5px;line-height:1.8;text-align:left">' + body + '</div>'
-    + '<button style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:11px 28px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:14px">わかった!</button></div>';
-  w.querySelector("button").onclick = function(){
-    seen[id] = 1;
-    try{ localStorage.setItem("tips_seen_v1", JSON.stringify(seen)); }catch(e){}
-    w.remove();
-  };
-  document.body.appendChild(w);
-}
-
-
-var gacha = { owned:{}, hist:[] };
-try{ var g = localStorage.getItem("ofuro_gacha_v1"); if (g){ var go=JSON.parse(g); gacha.owned=go.owned||{}; gacha.hist=go.hist||[]; } }catch(e){}
-var ICONS = {};
-try{ var ic = localStorage.getItem("prize_icons_v1"); if (ic) ICONS = JSON.parse(ic); }catch(e){}
-
-var audioCtx=null;
-function blip(f,d,w){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-  var o=audioCtx.createOscillator(),gn=audioCtx.createGain(); o.type="triangle"; o.frequency.value=f;
-  gn.gain.setValueAtTime(.05,audioCtx.currentTime+(w||0)); gn.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+(w||0)+d);
-  o.connect(gn); gn.connect(audioCtx.destination); o.start(audioCtx.currentTime+(w||0)); o.stop(audioCtx.currentTime+(w||0)+d); }catch(e){} }
-
-/* ===== 日付ユーティリティ ===== */
-var WD = ["にち","げつ","か","すい","もく","きん","ど"];
-function key(d){ return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
-function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
-var today = new Date(); today.setHours(0,0,0,0);
-
-/* その日のごほうび(ガチャ獲得) */
-function prizesOf(dateKey){ return gacha.hist.filter(function(h){ return h.d===dateKey; }); }
-/* その日のよてい。なければ平日=ようちえん/土日=おうち */
-/* のりもの優先(どこへ行くかより「なにで行くか」が彼には重要) */
-var EVICONS = [["🚲","じてんしゃ"],["🚗","くるま"],["🚌","バス"],["🚃","でんしゃ"],
-               ["🎒","ほいくえん"],["🏠","おうち"],["✏️","くもん"],["👫","おともだち"],
-               ["💇","おば(かみきり)"],["🛍","モール"],["🏊","ぷーる"],["🏞","こうえん"],
-               ["🏥","びょういん"],["👶","あかちゃん"],["♨","おふろやさん"],["🎂","たんじょうび"]];
-function eventsOf(d){
-  var evs = M.ev[key(d)] || [];
-  if (evs.length) return evs.slice();
-  var w = d.getDay();
-  var wn = M.wdName || "ほいくえん";
-  var base = (w===0||w===6) ? [{e:"🏠",l:"おうち",auto:1}]
-           : [{e:(wn==="おうち"?"🏠":"🎒"), l:wn, auto:1}];
-  if (w===5) base.push({e:"🧺",l:"もちかえりの日",auto:1}); // 毎週金曜: ロッカーの荷物持ち帰り
-  return base;
-}
-
-/* ===== 帯の描画(過去3日+きょう+先7日) ===== */
-var DAYS = [];
-for (var i=-3;i<=7;i++) DAYS.push(addDays(today,i));
-var selKey = key(today);
-
-function renderStrip(){
-  var st=q("strip"); st.innerHTML="";
-  DAYS.forEach(function(d){
-    var k=key(d), w=d.getDay();
-    var cls="day w"+w+(k===key(today)?" today":(d<today?" past":""));
-    var mo = (d.getDate()===1 || (d.getMonth()!==today.getMonth() && k===key(DAYS.find(function(x){return x.getMonth()!==today.getMonth();})||d)))
-      ? '<div class="mo">'+(d.getMonth()+1)+'がつ</div>' : '<div class="mo">&nbsp;</div>';
-    var evs = eventsOf(d);
-    var icons = evs.slice(0,3).map(function(e){ return e.e; }).join("");
-    var pz = prizesOf(k);
-    var pzHtml = "";
-    if (pz.length){
-      pzHtml = pz.slice(0,2).map(function(p){ return ICONS[p.id]||"🎁"; }).join("");
-      if (pz.length>2) pzHtml += '<span class="more">+'+(pz.length-2)+'</span>';
-    }
-    var diff = Math.round((d - today) / 86400000);
-    var relMap = { "-2":"おととい", "-1":"きのう", "0":"きょう", "1":"あした", "2":"あさって" };
-    var rel = relMap[String(diff)] ? '<div class="rel">'+relMap[String(diff)]+'</div>' : '';
-    st.insertAdjacentHTML("beforeend",
-      '<div class="'+cls+'" data-k="'+k+'">'+rel+mo+
-      '<div class="wd '+(w===0?"sun":w===6?"sat":"")+'">'+WD[w]+'</div>'+
-      '<div class="num">'+d.getDate()+'</div>'+
-      '<div class="icons">'+icons+'</div>'+
-      '<div class="prizes">'+pzHtml+'</div></div>');
-  });
-  st.querySelectorAll(".day").forEach(function(el){
-    el.onclick=function(){ selKey=el.dataset.k; blip(659,.08); try{navigator.vibrate&&navigator.vibrate(20);}catch(e){} renderDetail(); };
-  });
-  var t=st.querySelector(".day.today");
-  if (t) setTimeout(function(){ t.scrollIntoView({inline:"center",block:"nearest"}); },100);
-}
-
-/* ===== くわしく ===== */
-function renderDetail(){
-  var d = new Date(selKey+"T00:00:00");
-  var isToday = selKey===key(today), isPast = d<today;
-  q("dTitle").textContent = (d.getMonth()+1)+"がつ "+d.getDate()+"にち "+WD[d.getDay()]+"ようび"+(isToday?"(きょう)":"");
-  var b=q("dBody"); b.innerHTML="";
-  eventsOf(d).forEach(function(e){
-    b.insertAdjacentHTML("beforeend",'<div class="dRow newpop"><span class="big">'+e.e+'</span><span class="lb">'+e.l+'</span></div>');
-  });
-  var pz = prizesOf(selKey);
-  pz.forEach(function(p){
-    b.insertAdjacentHTML("beforeend",'<div class="dRow newpop">'+(ICONS[p.id]||'<span class="big">🎁</span>')+'<span class="lb">'+p.n+' ゲット!</span></div>');
-  });
-  var note = isToday ? "きょうも いいひに なるよ!"
-    : isPast ? (pz.length? "この日は ガチャで あたりが でたね!" : "この日も がんばったね!")
-    : "たのしみに まっててね!";
-  b.insertAdjacentHTML("beforeend",'<div class="dNote">'+note+'</div>');
-}
-
-/* ===== ずかんバッジ ===== */
-
-/* ===== きょうの表示(園の日めくりと同じ: 月・日・曜日を独立ブロックで) ===== */
 (function(){
-  var w = today.getDay();
-  var wcls = w===0 ? " sun" : (w===6 ? " sat" : "");
-  q("todayBig").innerHTML =
-    '<span class="dchip">'+(today.getMonth()+1)+'がつ</span>'+
-    '<span class="dchip">'+today.getDate()+'にち</span>'+
-    '<span class="dchip'+wcls+'">'+WD[w]+'ようび</span>';
-})();
+  var KEY = "mitooshi_v1";
+  var EMOJIS = ["🏊","🤱","🏥","🚗","🎂","🍰","🎈","🚂","🏠","🐱","🍜","🌊","⚽","🎁","🌟","🍦"];
+  var picked = "🌟";
 
-/* ===== おうちのひと編集(長押し1.5秒) ===== */
-(function(){
-  var t=null,b=q("setBtn"),gz=q("pbGauge");
-  function down(){ gz.style.transition="width 1.5s linear"; gz.style.width="100%";
-    t=setTimeout(function(){ openEditor(); gz.style.transition="none"; gz.style.width="0%"; },1500); }
-  function up(){ clearTimeout(t); gz.style.transition="none"; gz.style.width="0%"; }
-  b.addEventListener("mousedown",down); b.addEventListener("mouseup",up); b.addEventListener("mouseleave",up);
-  b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
-})();
+  // 初期データは空(公開リポジトリに家族の予定を置かないため)。予定は端末側で登録し、localStorageにのみ保存される
+  var SEED = [];
 
-var edSel = { day:key(today), ico:0 };
-function openEditor(){
-  var sel = q("wdName"); if (sel) sel.value = M.wdName || "ほいくえん";
-  q("editor").style.display="block";
-  var dc=q("dayChips"); dc.innerHTML="";
-  for (var i=0;i<=13;i++){
-    var d=addDays(today,i), k=key(d);
-    dc.insertAdjacentHTML("beforeend",'<div class="chip'+(k===edSel.day?" sel":"")+'" data-k="'+k+'">'+
-      (d.getMonth()+1)+'/'+d.getDate()+'('+WD[d.getDay()]+')</div>');
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return SEED.slice();
   }
-  dc.querySelectorAll(".chip").forEach(function(c){ c.onclick=function(){ edSel.day=c.dataset.k; openEditor(); }; });
-  var ig=q("icoGrid"); ig.innerHTML="";
-  EVICONS.forEach(function(ei,i){
-    ig.insertAdjacentHTML("beforeend",'<button class="'+(i===edSel.ico?"sel":"")+'" data-i="'+i+'">'+ei[0]+'</button>');
-  });
-  ig.querySelectorAll("button").forEach(function(bt){
-    bt.onclick=function(){ edSel.ico=parseInt(bt.dataset.i,10); q("evLabel").value=EVICONS[edSel.ico][1]; openEditor(); };
-  });
-  if (!q("evLabel").value) q("evLabel").value = EVICONS[edSel.ico][1];
-  renderEvList();
-  q("editor").scrollIntoView({behavior:"smooth"});
-}
-function renderEvList(){
-  var el=q("evList"); el.innerHTML="";
-  (M.ev[edSel.day]||[]).forEach(function(e,i){
-    el.insertAdjacentHTML("beforeend",'<div class="evItem"><span>'+e.e+'</span><span>'+e.l+'</span>'+
-      '<span class="del" data-i="'+i+'">🗑</span></div>');
-  });
-  el.querySelectorAll(".del").forEach(function(d){
-    d.onclick=function(){ M.ev[edSel.day].splice(parseInt(d.dataset.i,10),1);
-      if(!M.ev[edSel.day].length) delete M.ev[edSel.day];
-      save(); renderEvList(); renderStrip(); renderDetail(); };
-  });
-}
-function addEvent(){
-  var l=q("evLabel").value.trim() || EVICONS[edSel.ico][1];
-  if (!M.ev[edSel.day]) M.ev[edSel.day]=[];
-  M.ev[edSel.day].push({ e:EVICONS[edSel.ico][0], l:l });
-  save(); blip(784,.12);
-  q("evLabel").value="";
-  renderEvList(); renderStrip(); selKey=edSel.day; renderDetail();
-}
-function closeEditor(){ q("editor").style.display="none"; }
-setTimeout(function(){ firstTip("calendar", "みとおしカレンダー",
-  "きょうと あしたの よていが わかります。<br><br>よていを 入れるときは、右上の <b>「おうちのひと(ながおし)」を 1.5秒ながおし</b>してください。<br>へいじつの よびかた(ほいくえん/がっこう など)も そこで かえられます。"); }, 600);
+  function save(list){
+    try{ localStorage.setItem(KEY, JSON.stringify(list)); }catch(e){}
+  }
 
-renderStrip();
-renderDetail();
-document.addEventListener("visibilitychange", function(){ if(!document.hidden){
-  try{ var g2=localStorage.getItem("ofuro_gacha_v1"); if(g2){ var go2=JSON.parse(g2); gacha.owned=go2.owned||{}; gacha.hist=go2.hist||[]; } }catch(e){}
-  renderStrip(); renderDetail();
-}});
-</script>
-<!-- ふぃーどばっく(共通パーツ) -->
-<div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
-  <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
-    <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
-    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
-    <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-      <button onclick="fbLine()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#c8e6c0;color:#4a6b42;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a5cf9b;cursor:pointer">💬 LINEで おくる</button>
-      <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピーだけする</button>
-      <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
-    </div>
-    <div id="fbDone" style="display:none;font-size:12.5px;font-weight:bold;color:#5b7ba0;margin-top:8px"></div>
-  </div>
-</div>
-<script>
-var FB_TAGS = ["子どもが喜んだ","反応がイマイチ","使い方が分かりにくい","バグ・動かない","こんな機能がほしい","声かけがラクになった"];
-function fbOpen(){
-  var p=document.getElementById("fbPanel"); p.style.display="flex";
-  var c=document.getElementById("fbChips");
-  if(!c.dataset.built){ c.dataset.built="1";
-    FB_TAGS.forEach(function(t){
-      var b=document.createElement("button");
-      b.textContent=t; b.dataset.on="";
-      b.style.cssText="font-family:inherit;font-size:12px;font-weight:bold;border:2px solid #c9ae87;background:#fff;color:#7a6146;border-radius:999px;padding:6px 12px;cursor:pointer";
-      b.onclick=function(){ var on=b.dataset.on==="1"; b.dataset.on=on?"":"1";
-        b.style.background=on?"#fff":"#f2d98a"; };
-      c.appendChild(b);
+  var events = load();
+
+  function midnight(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function parse(s){
+    var p = s.split("-");
+    return new Date(+p[0], +p[1]-1, +p[2]);
+  }
+  function nights(dateStr){
+    var today = midnight(new Date());
+    var t = parse(dateStr);
+    return Math.round((t - today) / 86400000);
+  }
+  var WD = ["にち","げつ","か","すい","もく","きん","ど"];
+  function jp(dateStr){
+    var d = parse(dateStr);
+    return (d.getMonth()+1) + "がつ " + d.getDate() + "にち（" + WD[d.getDay()] + "）";
+  }
+
+  function render(){
+    var el = document.getElementById("cards");
+    el.innerHTML = "";
+
+    var now = new Date();
+    document.getElementById("todayLabel").textContent =
+      "きょうは " + (now.getMonth()+1) + "がつ" + now.getDate() + "にち（" + WD[now.getDay()] + "）";
+
+    var list = events.slice().sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+
+    if(!list.length){
+      el.innerHTML = '<div class="empty">たのしみが まだ ありません。<br>したの「＋」から ふやしてね。</div>';
+      return;
+    }
+
+    list.forEach(function(ev){
+      var n = nights(ev.date);
+      var card = document.createElement("div");
+      card.className = "card" + (n < 0 ? " done" : (n === 0 ? " today-ev" : ""));
+
+      var html = '';
+      html += '<button class="del" data-name="'+ev.name+'" data-date="'+ev.date+'">×</button>';
+      html += '<div class="row">';
+      html += '<div class="emoji">' + ev.emoji + '</div>';
+      html += '<div class="info"><div class="name">' + ev.name + '</div>';
+      html += '<div class="date">' + jp(ev.date) + '</div></div>';
+      html += '</div>';
+
+      if(n < 0){
+        html += '<div class="count zero">おわったよ</div>';
+      }else if(n === 0){
+        html += '<div class="count zero">きょう だよ！</div>';
+      }else{
+        html += '<div class="count">あと <b>' + n + '</b> かい ねたら</div>';
+        var beds = '<div class="beds">';
+        var show = Math.min(n, 14);
+        for(var i=0;i<show;i++){ beds += '<div class="bed">🛏</div>'; }
+        if(n > 14){ beds += '<div class="bed past">…</div>'; }
+        beds += '</div>';
+        html += beds;
+      }
+
+      card.innerHTML = html;
+      el.appendChild(card);
+    });
+
+    Array.prototype.forEach.call(el.querySelectorAll(".del"), function(b){
+      b.addEventListener("click", function(){
+        var nm = b.getAttribute("data-name"), dt = b.getAttribute("data-date");
+        events = events.filter(function(e){ return !(e.name === nm && e.date === dt); });
+        save(events); render();
+      });
     });
   }
-}
-function fbClose(){ document.getElementById("fbPanel").style.display="none";
-  document.getElementById("fbDone").style.display="none"; }
-function fbBody(){
-  var tags=[].slice.call(document.querySelectorAll("#fbChips button"))
-    .filter(function(b){return b.dataset.on==="1";}).map(function(b){return b.textContent;});
-  var t=document.getElementById("fbText").value.trim();
-  return (tags.length?"【"+tags.join("・")+"】\n":"")+t+
-    "\n\n---\n画面: "+(document.title||"")+"\n日時: "+new Date().toLocaleString("ja-JP");
-}
-function fbLine(){
-  var v = fbBody();
-  var d = document.getElementById("fbDone");
-  // さきにコピー(LINEが開かなくても貼れるように)
-  try{ navigator.clipboard && navigator.clipboard.writeText(v); }catch(e){}
-  d.textContent = "LINEを ひらきます。ひらかないときは「コピーだけする」で 貼りつけてください";
-  d.style.display = "block";
-  setTimeout(function(){
-    window.open("https://line.me/R/share?text=" + encodeURIComponent(v), "_blank");
-  }, 150);
-}
-function fbCopy(){
-  var v=fbBody();
-  var d=document.getElementById("fbDone");
-  try{ navigator.clipboard.writeText(v).then(function(){ d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }); }
-  catch(e){ var ta=document.getElementById("fbText"); ta.select(); document.execCommand("copy");
-    d.textContent="✅ コピーしました! LINEに貼って送ってください"; d.style.display="block"; }
-}
-</script>
 
-<div id="appFoot">
-  <a class="fbtn " href="kuruma_parking.html"><span class="ic"><svg viewBox="0 0 80 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 44 V38 Q6 32 14 32 L22 32 Q28 18 41 18 L49 18 Q59 18 63 32 Q70 32 70 39 V44 Z" fill="#f4d3da"/><circle cx="20" cy="46" r="7" fill="#ddd7f0"/><circle cx="58" cy="46" r="7" fill="#ddd7f0"/><circle cx="33" cy="37" r="2.5" fill="#8d7b66" stroke="none"/><circle cx="45" cy="37" r="2.5" fill="#8d7b66" stroke="none"/></svg></span>おしたく</a>
-  <a class="fbtn on" href="mitooshi_calendar.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><rect x="7" y="12" width="46" height="42" rx="8" fill="#fff7ec"/><path d="M7 24 H53" stroke-width="3.5"/><rect x="17" y="4" width="5" height="12" rx="2.5" fill="#c9ae87"/><rect x="38" y="4" width="5" height="12" rx="2.5" fill="#c9ae87"/><circle cx="30" cy="39" r="7" fill="#f4b8b8" stroke="none"/></svg></span>カレンダー</a>
-  <a class="fbtn " href="ofuro_gacha.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><path d="M8 30 a22 22 0 0 1 44 0 Z" fill="#f4d3da"/><path d="M8 30 h44" stroke-width="4"/><path d="M52 30 a22 22 0 0 1 -44 0 Z" fill="#fff7ec"/></svg></span>ガチャ</a>
-  <a class="fbtn " href="neko_house.html"><span class="ic"><svg viewBox="0 0 60 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round"><path d="M16 22 L11 6 L27 14 Z" fill="#f0e3c8"/><path d="M44 22 L49 6 L33 14 Z" fill="#f0e3c8"/><circle cx="30" cy="34" r="20" fill="#f0e3c8"/><circle cx="23" cy="31" r="2.6" fill="#5a4a38" stroke="none"/><circle cx="37" cy="31" r="2.6" fill="#5a4a38" stroke="none"/><path d="M27 40 q3 3 6 0" stroke-width="3"/><circle cx="16" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/><circle cx="44" cy="39" r="3.5" fill="#f4b8b8" stroke="none"/></svg></span>ねこ</a>
-</div>
+  // 絵文字ピッカー
+  var pickEl = document.getElementById("pick");
+  EMOJIS.forEach(function(em){
+    var b = document.createElement("button");
+    b.textContent = em;
+    if(em === picked) b.className = "sel";
+    b.addEventListener("click", function(){
+      picked = em;
+      Array.prototype.forEach.call(pickEl.children, function(c){ c.className = ""; });
+      b.className = "sel";
+    });
+    pickEl.appendChild(b);
+  });
 
-<script>
-(function(){
-  try{ var w=JSON.parse(localStorage.getItem("yucoin_wallet_v1")||'{"n":0}').n||0;
-       document.getElementById("footCoinN").textContent=w; }catch(e){}
-  var t=null,b=document.getElementById("footSet"),gz=document.getElementById("footGauge");
-  function down(){ gz.style.transition="width 1.5s linear"; gz.style.width="100%";
-    t=setTimeout(function(){ openEditor(); gz.style.transition="none"; gz.style.width="0%"; },1500); }
-  function up(){ clearTimeout(t); gz.style.transition="none"; gz.style.width="0%"; }
-  b.addEventListener("mousedown",down);b.addEventListener("mouseup",up);b.addEventListener("mouseleave",up);
-  b.addEventListener("touchstart",down,{passive:true});b.addEventListener("touchend",up);
+  document.getElementById("save").addEventListener("click", function(){
+    var name = document.getElementById("fName").value.trim();
+    var date = document.getElementById("fDate").value;
+    if(!name || !date){ alert("なまえ と ひづけ を いれてね"); return; }
+    events.push({name:name, date:date, emoji:picked});
+    save(events);
+    document.getElementById("fName").value = "";
+    document.getElementById("fDate").value = "";
+    document.querySelector(".addbox").open = false;
+    render();
+  });
+
+  render();
+  // 日付が変わったら数え直す
+  setInterval(render, 60000);
 })();
 </script>
 </body>
