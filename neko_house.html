@@ -179,13 +179,12 @@ body{padding-bottom:104px!important}
 
 <div id="parent"><div class="inner">
   <h3 id="pTitle">ねこのなまえ</h3>
-  <p>お子さんと一緒に決めて入力してください(あとから変更OK)。ごはんは「おしたくボードのできた!」で届きます。このねこは、おなかがすいても弱ったり死んだりしません(甘えん坊になるだけ)。</p>
+  <p>お子さんと一緒に決めて入力してください(あとから変更できます)。<br>ごはんは、おしたくボードでためた お湯コイン1枚で あげられます。<br>ごはんをあげなくても、ねこは弱ったり いなくなったりしません。おなかがすくと、ねむそうな顔で「おなか すいたにゃ」と言うだけです。</p>
   <input type="text" id="nameInput" maxlength="8" placeholder="例: ゆず">
-  <button onclick="saveName()">きめた!</button>
+  <button onclick="saveName()">この なまえに する</button>
   <div style="margin-top:10px;border-top:1px dashed #e5d9c2;padding-top:8px">
-    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0;text-align:left"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
+    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0;text-align:left"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 この画面での こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ねこ、おなか すいてるって。ごはん あげる?」<br>・「コインが たりないね。ほかの おしたく やれば もらえるんじゃない?」<br>・「おもちゃ かってあげたら、ねこ よろこぶかな」<br><span style="color:#a5842e;font-weight:bold">コツ: 「やりなさい」を、ねこの話に変える。命令が消えると、子どもは自分で選びます。</span></div></div>
     <button onclick="fbOpen()" style="background:#cfe0ee;color:#5b7ba0;box-shadow:0 3px 0 #a8c4dc">💬 かんそう・ようぼうを おくる</button><br>
-    <button onclick="location.href='index.html'" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">🏠 はぐのまちトップ</button><br>
     <button onclick="q('parent').style.display='none'" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">とじる</button>
   </div>
 </div></div>
@@ -734,7 +733,7 @@ q("coinIco").innerHTML = COIN; if(q("footCoinIco")) q("footCoinIco").innerHTML =
 render();
 if (!neko.name) q("parent").style.display = "flex";
 else setTimeout(sayLine, 800);
-setTimeout(function(){ firstTip("neko", "ねこのおうち", "おしたくで ためた <b>お湯コイン</b>で、ごはんや おもちゃを かってあげられます。<br>なかよしに なると、ねこが いろいろ してくれます。"); }, 600);
+setTimeout(function(){ firstTip("neko", "ねこのおうち", "おしたくで ためた <b>お湯コイン</b>で、ごはん(1まい)や おもちゃを かってあげられます。<br>なかよしに なると、ねこが いろいろ してくれます。<br><br><span style='font-size:12px;color:#8d7b66'>おうちのひとの せっていは、右上の「おうちのひと」を 1.5秒 ながおし。</span>"); }, 600);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden){ render(); } });
 setInterval(render, 60000);
 setInterval(sayLine, 45000);
@@ -743,11 +742,12 @@ setInterval(sayLine, 45000);
 <div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
   <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:78vh;max-height:calc(100dvh - 72px);overflow:auto">
     <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
-    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINE」か「Threads」を押すと、文章をコピーして送り先が開きます(Threadsは はーパパのページが開くので、メッセージに貼ってください)。</p>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
     <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       <button onclick="fbLine()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#c8e6c0;color:#4a6b42;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a5cf9b;cursor:pointer">💬 LINEで おくる</button>
+      <button onclick="fbThreads()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e6dcf2;color:#5b4a7a;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #c9b8e0;cursor:pointer">🧵 Threadsで おくる</button>
       <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピーだけする</button>
       <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
     </div>
@@ -789,6 +789,14 @@ function fbLine(){
   setTimeout(function(){
     window.open("https://line.me/R/share?text=" + encodeURIComponent(v), "_blank");
   }, 150);
+}
+function fbThreads(){
+  var v = fbBody();
+  var d = document.getElementById("fbDone");
+  try{ navigator.clipboard && navigator.clipboard.writeText(v); }catch(e){}
+  d.textContent = "✅ コピーしました。Threadsの はーパパのページを ひらくので、メッセージに 貼りつけて 送ってください";
+  d.style.display = "block";
+  setTimeout(function(){ window.open("https://www.threads.com/@ha_papa_hug", "_blank"); }, 150);
 }
 function fbCopy(){
   var v=fbBody();

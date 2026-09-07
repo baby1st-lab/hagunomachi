@@ -175,6 +175,7 @@ body{padding-bottom:78px!important}
   <div class="chips" id="dayChips"></div>
   <div id="icoGrid"></div>
   <input type="text" id="evLabel" maxlength="10" placeholder="よていのなまえ(ひらがな)">
+  <div class="chips" id="repChips" style="justify-content:center"><div class="chip sel" data-r="0">この日だけ</div><div class="chip" data-r="1" id="repWeekly">まいしゅう</div></div>
   <div style="text-align:center;margin:6px 0 2px">
     <button class="pbtn" onclick="addEvent()">よていを ついか</button>
   </div>
@@ -190,11 +191,10 @@ body{padding-bottom:78px!important}
     </select>
   </div>
   <div style="text-align:center;margin-top:14px">
-    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
+    <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0;text-align:left"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 この画面での こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「あしたは ほいくえん。きょうは はやく ねよっか」<br>・「あと 3かい ねたら プールだね」<br>・「きょうは なにの日? いっしょに 見てみよう」<br><span style="color:#a5842e;font-weight:bold">コツ: 予定は「何をする」より「あと何回 寝たら」で伝わります。</span></div></div>
     <button class="pbtn" style="background:#cfe0ee;color:#5b7ba0" onclick="fbOpen()">💬 かんそう・ようぼう</button>
   </div>
   <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
-    <a class="pbtn" href="index.html" style="background:#e8dcc4;text-decoration:none;display:inline-block">🏠 トップ</a>
     <button class="pbtn" style="background:#e8dcc4" onclick="closeEditor()">とじる</button>
   </div>
 </div>
@@ -207,6 +207,14 @@ function q(id){ return document.getElementById(id); }
 var M = { ev: {} };
 try{ var s = localStorage.getItem("mitooshi_v1"); if (s) M = JSON.parse(s); if(!M.ev) M.ev={}; }catch(e){}
 function save(){ try{ localStorage.setItem("mitooshi_v1", JSON.stringify(M)); }catch(e){} }
+/* 毎週の予定(2026-09-07): M.wk = { "曜日番号": [{e,l}] }。すでに使っている端末だけ、これまで固定だった金曜の「もちかえりの日」を引き継ぐ */
+if (!M.wk || typeof M.wk !== "object"){
+  M.wk = {};
+  if (Object.keys(M.ev||{}).length || M.wdName) M.wk["5"] = [{e:"🧺", l:"もちかえりの日"}];
+  save();
+}
+function weeklyOf(d){ var a = M.wk[String(d.getDay())]; return Array.isArray(a) ? a.map(function(e){ return {e:e.e, l:e.l, wk:1}; }) : []; }
+function realEventsOf(d){ return (M.ev[key(d)] || []).concat(weeklyOf(d)); }
 function setWdName(v){ M.wdName = v; save(); renderStrip(); renderDetail(); }
 /* ===== はじめてだけ出るヒント ===== */
 function firstTip(id, title, body){
@@ -254,13 +262,12 @@ var EVICONS = [["🚲","じてんしゃ"],["🚗","くるま"],["🚌","バス"]
                ["💇","おば(かみきり)"],["🛍","モール"],["🏊","ぷーる"],["🏞","こうえん"],
                ["🏥","びょういん"],["👶","あかちゃん"],["♨","おふろやさん"],["🎂","たんじょうび"]];
 function eventsOf(d){
-  var evs = M.ev[key(d)] || [];
-  if (evs.length) return evs.slice();
+  var evs = realEventsOf(d);
+  if (evs.length) return evs;
   var w = d.getDay();
   var wn = M.wdName || "ほいくえん";
   var base = (w===0||w===6) ? [{e:"🏠",l:"おうち",auto:1}]
            : [{e:(wn==="おうち"?"🏠":"🎒"), l:wn, auto:1}];
-  if (w===5) base.push({e:"🧺",l:"もちかえりの日",auto:1}); // 毎週金曜: ロッカーの荷物持ち帰り
   return base;
 }
 
@@ -288,7 +295,7 @@ function renderStrip(){
     var relMap = { "-2":"おととい", "-1":"きのう", "0":"きょう", "1":"あした", "2":"あさって" };
     var rel = relMap[String(diff)] ? '<div class="rel">'+relMap[String(diff)]+'</div>' : '';
     // 登録された予定(自動の園・おうちは除く)がある未来の日だけ、マスの下に「あと◯かい」
-    var realEvs = (M.ev[k] || []).length;
+    var realEvs = realEventsOf(d).length;
     var cnt = (diff >= 1 && realEvs) ? '<div class="cnt">あと'+diff+'かい</div>' : '<div class="cnt">&nbsp;</div>';
     st.insertAdjacentHTML("beforeend",
       '<div class="'+cls+'" data-k="'+k+'">'+rel+mo+
@@ -319,7 +326,7 @@ function renderMonth(){
   for (var dd=1; dd<=days; dd++){
     var d = new Date(mYear, mMonth, dd); var k = key(d); var w = d.getDay();
     var diff = Math.round((d - today) / 86400000);
-    var realEvs = M.ev[k] || [];
+    var realEvs = realEventsOf(d);
     var icons = realEvs.slice(0,2).map(function(e){ return e.e; }).join("");
     var cnt = (diff >= 1 && realEvs.length) ? '<div class="mc">あと'+diff+'</div>' : '';
     var cls = "mcell" + (w===0?" sun":w===6?" sat":"") + (k===key(today)?" today":(d<today?" past":""));
@@ -358,7 +365,7 @@ function renderMonth(){
   for (var dd=1; dd<=days; dd++){
     var d = new Date(mYear, mMonth, dd); var k = key(d); var w = d.getDay();
     var diff = Math.round((d - today) / 86400000);
-    var realEvs = M.ev[k] || [];
+    var realEvs = realEventsOf(d);
     var icons = realEvs.slice(0,2).map(function(e){ return e.e; }).join("");
     var cnt = (diff >= 1 && realEvs.length) ? '<div class="mc">あと'+diff+'</div>' : '';
     var cls = "mcell" + (w===0?" sun":w===6?" sat":"") + (k===key(today)?" today":(d<today?" past":""));
@@ -395,7 +402,7 @@ function renderDetail(){
   pz.forEach(function(p){
     b.insertAdjacentHTML("beforeend",'<div class="dRow newpop">'+(ICONS[p.id]||'<span class="big">🎁</span>')+'<span class="lb">'+p.n+' ゲット!</span></div>');
   });
-  var realCount = (M.ev[selKey] || []).length;
+  var realCount = realEventsOf(d).length;
   var diffN = Math.round((d - today) / 86400000);
   var note = isToday ? "きょうも いいひに なるよ!"
     : isPast ? (pz.length? "この日は ガチャで あたりが でたね!" : "この日も がんばったね!")
@@ -425,7 +432,7 @@ function renderDetail(){
   b.addEventListener("touchstart",down,{passive:true}); b.addEventListener("touchend",up);
 })();
 
-var edSel = { day:key(today), ico:0 };
+var edSel = { day:key(today), ico:0, rep:0 };
 function openEditor(){
   var sel = q("wdName"); if (sel) sel.value = M.wdName || "ほいくえん";
   q("editor").style.display="block";
@@ -444,32 +451,51 @@ function openEditor(){
     bt.onclick=function(){ edSel.ico=parseInt(bt.dataset.i,10); q("evLabel").value=EVICONS[edSel.ico][1]; openEditor(); };
   });
   if (!q("evLabel").value) q("evLabel").value = EVICONS[edSel.ico][1];
+  var wdSel = new Date(edSel.day+"T00:00:00").getDay();
+  q("repWeekly").textContent = "まいしゅう " + WD[wdSel] + "ようび";
+  q("repChips").querySelectorAll(".chip").forEach(function(c){
+    c.classList.toggle("sel", String(edSel.rep) === c.dataset.r);
+    c.onclick = function(){ edSel.rep = parseInt(c.dataset.r,10); openEditor(); };
+  });
   renderEvList();
   q("editor").scrollIntoView({behavior:"smooth"});
 }
 function renderEvList(){
   var el=q("evList"); el.innerHTML="";
+  var wd = String(new Date(edSel.day+"T00:00:00").getDay());
   (M.ev[edSel.day]||[]).forEach(function(e,i){
     el.insertAdjacentHTML("beforeend",'<div class="evItem"><span>'+e.e+'</span><span>'+e.l+'</span>'+
-      '<span class="del" data-i="'+i+'">🗑</span></div>');
+      '<span class="del" data-t="d" data-i="'+i+'">🗑</span></div>');
+  });
+  (M.wk[wd]||[]).forEach(function(e,i){
+    el.insertAdjacentHTML("beforeend",'<div class="evItem"><span>'+e.e+'</span><span>'+e.l+' <small style="color:#a58868">(まいしゅう '+WD[parseInt(wd,10)]+')</small></span>'+
+      '<span class="del" data-t="w" data-i="'+i+'">🗑</span></div>');
   });
   el.querySelectorAll(".del").forEach(function(d){
-    d.onclick=function(){ M.ev[edSel.day].splice(parseInt(d.dataset.i,10),1);
-      if(!M.ev[edSel.day].length) delete M.ev[edSel.day];
-      save(); renderEvList(); renderStrip(); renderDetail(); };
+    d.onclick=function(){
+      var i = parseInt(d.dataset.i,10);
+      if (d.dataset.t === "w"){ M.wk[wd].splice(i,1); if(!M.wk[wd].length) delete M.wk[wd]; }
+      else { M.ev[edSel.day].splice(i,1); if(!M.ev[edSel.day].length) delete M.ev[edSel.day]; }
+      save(); renderEvList(); renderStrip(); renderDetail(); if (mShown) renderMonth(); };
   });
 }
 function addEvent(){
   var l=q("evLabel").value.trim() || EVICONS[edSel.ico][1];
-  if (!M.ev[edSel.day]) M.ev[edSel.day]=[];
-  M.ev[edSel.day].push({ e:EVICONS[edSel.ico][0], l:l });
+  if (edSel.rep){
+    var wd = String(new Date(edSel.day+"T00:00:00").getDay());
+    if (!M.wk[wd]) M.wk[wd]=[];
+    M.wk[wd].push({ e:EVICONS[edSel.ico][0], l:l });
+  } else {
+    if (!M.ev[edSel.day]) M.ev[edSel.day]=[];
+    M.ev[edSel.day].push({ e:EVICONS[edSel.ico][0], l:l });
+  }
   save(); blip(784,.12);
   q("evLabel").value="";
-  renderEvList(); renderStrip(); selKey=edSel.day; renderDetail();
+  renderEvList(); renderStrip(); selKey=edSel.day; renderDetail(); if (mShown) renderMonth();
 }
 function closeEditor(){ q("editor").style.display="none"; }
 setTimeout(function(){ firstTip("calendar", "みとおしカレンダー",
-  "きょうと あしたの よていが わかります。<br><br>よていを 入れるときは、右上の <b>「おうちのひと(ながおし)」を 1.5秒ながおし</b>してください。<br>へいじつの よびかた(ほいくえん/がっこう など)も そこで かえられます。"); }, 600);
+  "あしたが なにの日か、子どもと いっしょに 見るための カレンダーです。「あと◯かい ねたら」で よていを つたえます。<br>おしたくボードとは べつの画面で、コインは かかわりません。<br><br>よていを 入れるときは、右上の <b>「おうちのひと(ながおし)」を 1.5秒ながおし</b>。プールなど まいしゅうの よていも 入れられます。へいじつの よびかた(ほいくえん/がっこう など)も そこで かえられます。"); }, 600);
 
 renderStrip();
 renderDetail();
@@ -482,11 +508,12 @@ document.addEventListener("visibilitychange", function(){ if(!document.hidden){
 <div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
   <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:88vh;overflow:auto">
     <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
-    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINE」か「Threads」を押すと、文章をコピーして送り先が開きます(Threadsは はーパパのページが開くので、メッセージに貼ってください)。</p>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
     <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       <button onclick="fbLine()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#c8e6c0;color:#4a6b42;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a5cf9b;cursor:pointer">💬 LINEで おくる</button>
+      <button onclick="fbThreads()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e6dcf2;color:#5b4a7a;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #c9b8e0;cursor:pointer">🧵 Threadsで おくる</button>
       <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピーだけする</button>
       <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
     </div>
@@ -528,6 +555,14 @@ function fbLine(){
   setTimeout(function(){
     window.open("https://line.me/R/share?text=" + encodeURIComponent(v), "_blank");
   }, 150);
+}
+function fbThreads(){
+  var v = fbBody();
+  var d = document.getElementById("fbDone");
+  try{ navigator.clipboard && navigator.clipboard.writeText(v); }catch(e){}
+  d.textContent = "✅ コピーしました。Threadsの はーパパのページを ひらくので、メッセージに 貼りつけて 送ってください";
+  d.style.display = "block";
+  setTimeout(function(){ window.open("https://www.threads.com/@ha_papa_hug", "_blank"); }, 150);
 }
 function fbCopy(){
   var v=fbBody();

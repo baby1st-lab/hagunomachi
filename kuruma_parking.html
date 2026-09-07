@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-title" content="おしたく">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>おしたくボード & おでかけタイマー</title>
+<title>おしたくボード</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-height:100vh;min-height:100dvh;color:#5a4a38;
@@ -305,7 +305,7 @@ body{padding-bottom:78px!important}
 <div style="display:none">
   <div id="coinBadge"><span id="coinIco"></span><span id="coinN">0</span></div>
   <div id="maruBadge">🌸× <span id="maruN">0</span></div>
-  <div class="tab" id="tabTask">おしたく</div><div class="tab" id="tabTicket">タイマー</div>
+  <div class="tab" id="tabTask">おしたく</div><div class="tab" id="tabTicket" style="display:none">タイマー</div>
   <div class="tab" id="parentBtn"><span id="pbGauge"></span></div>
 </div>
 
@@ -429,13 +429,15 @@ body{padding-bottom:78px!important}
   <h3>⭐ おかわりの きほんセット(星ボタンで出るタスク)</h3>
   <div id="editStretch"></div>
   <div class="row"><button onclick="addStretchDef()">+ ついか</button></div>
+  <div id="kirariSettings">
   <h3>⭐️ きらりの こうもく(えらぶシートに出ます)</h3>
   <p style="font-size:12px;color:#8d7b66;line-height:1.7">うんちなど「その日かぎりの めずらしい たっせい」を、子ども自身がタップして祝う枠です(承認は不要)。1日3こまで・押さない日は何も残りません。</p>
   <div id="editKirari"></div>
   <div class="row"><button onclick="addKirariDef()">+ ついか</button></div>
   <h3>⭐️ これまでの きらり(あたらしい順に10件)</h3>
   <div id="kirariLog"></div>
-  <h3>⏱ できたきろく(14日分)</h3>
+  </div>
+  <h3>⏱ できたきろく(記録のある日だけ・14日分まで)</h3>
   <p style="font-size:11.5px;color:#8d7b66;line-height:1.7;margin-bottom:6px">ぜんぶできた日は「できた時刻」を、とちゅうで終わった日は定点(あさ9:30/よる22:30)の「できた数」を自動で記録します。だんだん早くなるのが見えます。</p>
   <div id="recList" style="font-size:12px;line-height:2;color:#7a6146"></div>
   <h3 style="cursor:pointer;user-select:none" onclick="var e=document.getElementById('papaSec');e.style.display=e.style.display==='none'?'block':'none'">👔 パパ・ママのおしたく / 🎒バッグ ▼(タップでひらく)</h3>
@@ -450,7 +452,7 @@ body{padding-bottom:78px!important}
   <div id="editBag"></div>
   <div class="row"><button onclick="addBagDef()">+ ついか</button></div>
   </div>
-<div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、おしたくボードで チェックしよっか」<br>・「はみがき したら コインもらえるよ。ねこに ごはん あげられるね」<br>・「"おふろ いきます!" って言って やくそくボタン おしたら、ガチャ まわせるって」<br><span style="color:#a5842e;font-weight:bold">コツ: 終わったあとのごほうびにせず、「やる」と決めた入口に置く。</span></div></div>
+<div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 この画面での こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、ボードで チェックしよっか」<br>・「さきに おしても いいよ。おしたから、やろっか」<br>・「コイン たまったね。ねこに ごはん あげにいく?」<br><span style="color:#a5842e;font-weight:bold">コツ: ごほうびは、やり終わった後ではなく「やる」と決めた入口に。子どもは欲求に素直です。やる前に押しても怒らず、「押したから やろっか」と声をかけてください。「やってないのに」とルールで縛ると、親子ともに疲れます。</span></div></div>
   <details id="bkup" style="margin-top:14px;border-top:2px dashed #dcc06e;padding-top:10px">
     <summary style="font-size:13px;font-weight:bold;color:#a58868;cursor:pointer">🗄 データのバックアップ(ふだんは使いません)</summary>
     <p style="font-size:12px;color:#8d7b66;margin:8px 0">記録はこの端末の中だけに保存されています。機種変更のときや、まんいちデータが消えたときのために書き出しておけます。</p>
@@ -463,7 +465,6 @@ body{padding-bottom:78px!important}
   </details>
   <div class="row" style="margin-top:10px">
     <button onclick="fbOpen()">💬 かんそう・ようぼうを おくる</button>
-    <button onclick="location.href='index.html'">🏠 はぐのまちトップ</button>
   </div>
   <button class="close" onclick="closeParent()">とじる</button>
 </div></div>
@@ -938,6 +939,7 @@ function renderKirari(freshName){
   var card = q("kirariCard"); if (!card) return;
   if (!KIRARI_ENABLED){
     card.style.display = "none";
+    var ksw = q("kirariSettings"); if (ksw) ksw.style.display = "none";
     ["editKirari","kirariLog"].forEach(function(id){
       var el = q(id); if (!el) return;
       if (el.previousElementSibling && el.previousElementSibling.tagName === "H3") el.previousElementSibling.style.display = "none";
@@ -1810,7 +1812,7 @@ function dataImport(input){
 }
 
 /* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */
-setTimeout(function(){ firstTip("oshitaku", "おしたくボード", "できた ことを タップすると、くるまが はしって <b>お湯コイン +1</b>。<br>ためた コインは、おふろガチャや ねこのおうちで つかえます。"); }, 600);
+setTimeout(function(){ firstTip("oshitaku", "おしたくボード", "やることが できたら、じぶんで ボタンを おす。<b>やる まえに おしても だいじょうぶ</b>。おしたら くるまが はしって <b>お湯コイン +1</b>。<br>コインは、ねこのおうちや おふろガチャで つかえます。<br><br><span style='font-size:12px;color:#8d7b66'>おうちのひとの せっていは、右上の「おうちのひと」を 1.5秒 ながおし。</span>"); }, 600);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
 
 q("coinIco").innerHTML=COIN; if(q("footCoinIco")) q("footCoinIco").innerHTML=COIN;
@@ -1846,11 +1848,12 @@ updateTrip();
 <div id="fbPanel" style="display:none;position:fixed;inset:0;background:rgba(90,74,56,.55);z-index:9999;align-items:center;justify-content:center;padding:16px">
   <div style="background:#fffcf4;border:4px solid #a58868;border-radius:22px;max-width:420px;width:100%;padding:18px;max-height:78vh;max-height:calc(100dvh - 72px);overflow:auto">
     <h3 style="color:#7a6146;font-size:16px;margin-bottom:4px">💬 かんそう・ようぼうを おしえてください</h3>
-    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINEでおくる」を押すと、文章が入った状態でLINEが開きます。</p>
+    <p style="font-size:12px;color:#8d7b66;line-height:1.7;margin-bottom:10px">ひとことでも大歓迎です。「うちの子はダメだった」も大事な情報です。「LINE」か「Threads」を押すと、文章をコピーして送り先が開きます(Threadsは はーパパのページが開くので、メッセージに貼ってください)。</p>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px" id="fbChips"></div>
     <textarea id="fbText" rows="5" placeholder="例: 車が走るのが好きみたい。でも文字が読めないので◯◯が分かりにくそうでした" style="width:100%;font-family:inherit;font-size:14px;padding:10px;border:2.5px solid #c9ae87;border-radius:12px"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       <button onclick="fbLine()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#c8e6c0;color:#4a6b42;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a5cf9b;cursor:pointer">💬 LINEで おくる</button>
+      <button onclick="fbThreads()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e6dcf2;color:#5b4a7a;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #c9b8e0;cursor:pointer">🧵 Threadsで おくる</button>
       <button onclick="fbCopy()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#cfe0ee;color:#5b7ba0;border-radius:999px;padding:11px 22px;box-shadow:0 3px 0 #a8c4dc;cursor:pointer">📋 コピーだけする</button>
       <button onclick="fbClose()" style="font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;border-radius:999px;padding:11px 20px;cursor:pointer">とじる</button>
     </div>
@@ -1892,6 +1895,14 @@ function fbLine(){
   setTimeout(function(){
     window.open("https://line.me/R/share?text=" + encodeURIComponent(v), "_blank");
   }, 150);
+}
+function fbThreads(){
+  var v = fbBody();
+  var d = document.getElementById("fbDone");
+  try{ navigator.clipboard && navigator.clipboard.writeText(v); }catch(e){}
+  d.textContent = "✅ コピーしました。Threadsの はーパパのページを ひらくので、メッセージに 貼りつけて 送ってください";
+  d.style.display = "block";
+  setTimeout(function(){ window.open("https://www.threads.com/@ha_papa_hug", "_blank"); }, 150);
 }
 function fbCopy(){
   var v=fbBody();
