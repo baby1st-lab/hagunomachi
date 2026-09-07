@@ -579,7 +579,7 @@ var DEFAULT_TASKS = {
 var store = { date:"", tasks:null, done:{asa:{},yoru:{}}, timerMin:10, saOn:false, notifySec:60,
   vehAsa:"bike", vehYoru:"car" };
 function load(){ try{ var s=localStorage.getItem("oshitaku_v1"); if(s){ var o=JSON.parse(s);
-  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1","cleaned2","kirari","kirariDef","stretchNightPass"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["date","tasks","done","timerMin","notifySec","vehAsa","vehYoru","papa","stretch","stretchDef","stretchSeen","maru","papaDef","bagDef","bag","cleaned1","cleaned2","kirari","kirariDef","stretchNightPass","rec","saOn"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("oshitaku_v1", JSON.stringify(store)); }catch(e){} }
 load();
 if (!store.tasks) store.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));

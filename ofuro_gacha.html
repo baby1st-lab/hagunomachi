@@ -244,9 +244,8 @@ body{padding-bottom:78px!important}
   <h3>おうちのひとメニュー</h3>
   <p>基本の流れ: 子が「きょうの おやくそく」を決めて、水色の「<b>おやくそく まもります!</b>」を押す(<b>1日の回数は下で設定</b>。初期は1回)→コインが出る→ガチャを回す→出てきた なかまは ずかんに たまります。<br>
   <b>「おふろ はいります! って おやくそく いえたら、まわしていいよ」「きょうの おやくそく、なにに する?」</b>のように、本人に約束を言わせてから押させるのがコツです。<br>
-  <b>ガチャは、やり終わった「ごほうび」としてより、これからやるという「おやくそく」として回すと効きます。</b>子どもは欲求に素直なので、やる前に押しても怒らず「押したから やろっか」と声をかけてください。「やってないのに押した」とルールで縛ると、親子ともに疲れます。<br>
-  家に同じものがあれば、出てきた なかまを持ってお風呂に行くと盛り上がります(下の「在庫」で、家にある物だけ出す設定もできます)。<br>
-  </p>
+  子どもは欲求に素直なので、やる前に押しても怒らず「押したから やろっか」と声をかけてください。「やってないのに押した」とルールで縛ると、親子ともに疲れます。<br>
+  家に同じものがあれば、出てきた なかまを持ってお風呂に行くと盛り上がります(下の「在庫」で、家にある物だけ出す設定もできます)。</p>
   <p>いまのコイン: <b id="pCoins">0</b>まい / やくそくボタン: きょうは<b id="pProm">まだ</b></p>
   <h3>コインを ふやす</h3>
   <div class="row">
@@ -254,18 +253,22 @@ body{padding-bottom:78px!important}
     <button onclick="addCoin(3)">コイン +3</button>
     <button class="warn" onclick="resetAll()">ずかんリセット(2回押し)</button>
   </div>
-  <p style="font-size:11.5px;color:#8d7b66;line-height:1.6;margin:2px 0 8px">※ 画面左上の コインの まる(ゆ×0)を 1.5秒ながおししても、+3枚 ふやせます。</p>
+  <p style="font-size:11.5px;color:#8d7b66;line-height:1.6;margin:2px 0 8px">※ 画面左上の コインを 1.5秒ながおししても、+3枚 ふやせます。</p>
   <h3>「おやくそく」1回でもらえるコイン <span style="font-size:11px;color:#8d7b66;font-weight:normal">(黄色が いまの設定)</span></h3>
   <div class="row" id="promMax"></div>
   <h3>1日に「おやくそく」を おせる かいすう</h3>
   <p style="margin:2px 0 6px;font-size:12.5px;color:#8d7b66">約束が複数ある日は増やせます(例:「YouTubeやめる」「帰ったらお風呂」で2回)。<b>回数だけ増やして、その場の交渉には使わないこと。</b></p>
   <div class="row" id="promPer"></div>
   <div class="row" id="promReset"></div>
-  <div class="row"><button id="cfgToggle" onclick="toggleCfg()">▼ 在庫・確定ガチャの設定をひらく</button></div>
+  <div class="row" style="margin-top:22px;padding-top:14px;border-top:2px dashed #e5d9c2"><button id="cfgToggle" onclick="toggleCfg()">▼ 在庫・確定ガチャの設定をひらく</button></div>
   <div id="cfgWrap">
     <p>「在庫」OFF=その景品は出ない(<b>家に現物がある物だけ出す</b>使い方。にんじんが出たら本物を持ってお風呂へ!)。「つぎ確定」=次の1回だけその景品が必ず出る。</p>
     <div id="prizeCfg"></div>
   </div>
+  <h3>🎁 なかまを ふやす(コード)</h3>
+  <p style="font-size:12px;color:#8d7b66;line-height:1.6;margin:2px 0 6px">いまは10種類。コードを入れると なかまが ふえます(いまのところ「そらの なかまパック」6種)。</p>
+  <div class="row" style="align-items:center"><input type="text" id="packCode" placeholder="コード" style="font-family:inherit;font-size:14px;padding:8px 10px;border:2.5px solid #c9ae87;border-radius:12px;width:170px;text-transform:uppercase"><button onclick="applyPackCode()">ふやす</button></div>
+  <div id="packState" style="font-size:12px;color:#8d7b66;margin:2px 0 8px"></div>
   <h3>データのひきつぎ(バックアップ)</h3>
   <p>ブラウザのデータはまれに消えます(特にiPhoneのSafariは長期間開かないと削除されることがある)。ときどき「書き出す」→コードをLINEのKeep等に貼って保管を。機種変更もこれでOK。</p>
   <div class="row"><button onclick="bakOut()">書き出す</button><button onclick="bakIn()">読み込む</button></div>
@@ -301,8 +304,16 @@ var PRIZES = [
  {id:"crown", name:"おうかん", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 58 L10 24 L26 38 L40 16 L54 38 L70 24 L66 58 Z" fill="#f9e3a8"/><circle cx="10" cy="21" r="3.5" fill="#f4d3da"/><circle cx="40" cy="13" r="3.5" fill="#ddd7f0"/><circle cx="70" cy="21" r="3.5" fill="#cfe0ee"/><path d="M20 4 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><path d="M60 4 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><circle cx="33" cy="46" r="2" fill="#8d7b66"/><circle cx="47" cy="46" r="2" fill="#8d7b66"/><ellipse cx="25" cy="51" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="55" cy="51" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 50 q3 3 6 0"/></svg>'}
 ];
 
+/* ===== 景品パック: 最初は10種。「そらの なかまパック」(6種)はコードで追加 ===== */
+var PACK_OF = { boat:"p1", bubble:"p1", starcar:"p1", himitsu_plane:"p1", himitsu_heli:"p1", crown:"p1" };
+PRIZES.forEach(function(p){ if (PACK_OF[p.id]) p.pack = PACK_OF[p.id]; });
+function packOn_(pk){ return !pk || (store.packs && store.packs[pk]); }
+function activePrizes_(){ return PRIZES.filter(function(p){ return packOn_(p.pack); }); }
+
 /* ===== 状態(できれば保存・だめなら今だけ) ===== */
-var store = { coins: 0, owned: {}, resetArm: false,
+var PACK_CODES = { "HAGU-SORA-2026": "p1" };   // コード → パック。p1=そらの なかま(6種)
+var PACK_NAMES = { p1: "そらの なかまパック" };
+var store = { coins: 0, owned: {}, resetArm: false, packs: null,
   stock: {},          // {id:false}=在庫なし(排出停止)
   forced: "",         // 次回確定の景品id
   promCoins: 1,       // やくそくボタン1回でもらえる枚数
@@ -311,11 +322,13 @@ var store = { coins: 0, owned: {}, resetArm: false,
   lastSeen: null,     // 前回ずかんを見た時点の所持数(NEW表示用)
   prom: { date:"", n:0 } };
 function load(){ try{ var s = localStorage.getItem("ofuro_gacha_v1"); if(s){ var o = JSON.parse(s);
-  ["coins","owned","stock","forced","promCoins","promPerDay","lastPrize","lastSeen","prom"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["coins","owned","stock","forced","promCoins","promPerDay","lastPrize","lastSeen","prom","packs"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("ofuro_gacha_v1", JSON.stringify({
   coins:store.coins, owned:store.owned, stock:store.stock, forced:store.forced,
-  promCoins:store.promCoins, promPerDay:store.promPerDay, lastPrize:store.lastPrize, lastSeen:store.lastSeen, prom:store.prom })); }catch(e){} }
+  promCoins:store.promCoins, promPerDay:store.promPerDay, lastPrize:store.lastPrize, lastSeen:store.lastSeen, prom:store.prom, packs:store.packs })); }catch(e){} }
 load();
+// すでに使っている端末(なかまを1つでも持っている)は、これまで通り全部出る
+if (!store.packs || typeof store.packs !== "object"){ store.packs = {}; if (Object.keys(store.owned||{}).length){ store.packs.p1 = true; } save(); }
 if (!store.lastSeen){ store.lastSeen = {}; for (var lk in store.owned) store.lastSeen[lk] = store.owned[lk]; save(); }
 // 見通しカレンダー連携: キャラ絵の共有辞書を書き出す(mitooshi_calendar.htmlが読む)
 try{ var icm={}; PRIZES.forEach(function(p){ icm[p.id]=p.svg; }); localStorage.setItem("prize_icons_v1", JSON.stringify(icm)); }catch(e){}
@@ -469,13 +482,13 @@ q("coinBtn").onclick = function(){
 function pick(){
   // 確定ガチャ(親が指定した次の1回)
   if (store.forced){
-    var f = PRIZES.filter(function(p){ return p.id===store.forced; })[0];
+    var f = activePrizes_().filter(function(p){ return p.id===store.forced; })[0];
     store.forced = ""; save();
     if (f) return f;
   }
   // 在庫ありのものだけから抽選
-  var avail = PRIZES.filter(function(p){ return store.stock[p.id] !== false; });
-  if (avail.length === 0) avail = PRIZES; // 全部OFFなら安全側で全排出
+  var avail = activePrizes_().filter(function(p){ return store.stock[p.id] !== false; });
+  if (avail.length === 0) avail = activePrizes_(); // 全部OFFなら安全側で全排出
   // 同じ景品の2連続を防止(候補が2つ以上ある時だけ)
   if (avail.length > 1){
     var noRepeat = avail.filter(function(p){ return p.id !== store.lastPrize; });
@@ -622,18 +635,26 @@ q("dome").onclick = function(){
 q("zukanBtn").onclick = function(){
   var grid = q("zgrid"); grid.innerHTML = "";
   var got = 0, newCount = 0;
+  var act = activePrizes_(), lockedN = 0;
   PRIZES.forEach(function(p){
+    var cell = document.createElement("div");
+    if (!packOn_(p.pack)){
+      lockedN++;
+      cell.className = "zcell no";
+      cell.style.opacity = ".45";
+      cell.innerHTML = '<div style="font-size:26px;line-height:64px;text-align:center;color:#a58868">?</div>';
+      grid.appendChild(cell); return;
+    }
     var n = store.owned[p.id]||0;
     var seen = (store.lastSeen && store.lastSeen[p.id]) || 0;
     var isNew = n > seen; // 前回ずかんを見たあとに増えた子
     if (n>0) got++;
     if (isNew) newCount++;
-    var cell = document.createElement("div");
     cell.className = "zcell" + (n>0?"":" no") + (p.rare?" rare":"") + (isNew?" newget":"");
     cell.innerHTML = p.svg + (n>0 ? '<span class="cnt">×'+n+'</span>' : '');
     grid.appendChild(cell);
   });
-  q("zprog").textContent = got + "/" + PRIZES.length;
+  q("zprog").textContent = got + "/" + act.length + (lockedN ? "(? は これから ふえる なかま)" : "");
   q("zukan").style.display = "flex";
   if (newCount>0){ blip(659,.1); blip(880,.12,.12,"triangle"); } else blip(660,.08);
   // 今回の状態を「見た」として記録(次に開くとNEWは消える)
@@ -667,6 +688,7 @@ function renderParent(){
     q("pProm").textContent = (promLeft() <= 0) ? " ぜんぶ おした" : ("あと" + promLeft() + "かい おせる");
   }catch(e){ try{ gtoast("⚠ 表示エラー: " + e.message); }catch(e2){} }
   // やくそくボタン1回でもらえるコイン枚数 + 復活ボタン
+  renderPackState_();
   var pm = q("promMax"); if (!pm){ renderCfgRows_(); return; }
   pm.innerHTML = "";
   [1,2,3].forEach(function(n){
@@ -717,12 +739,27 @@ function renderParent(){
 }
 /* 景品ごとの在庫トグル+確定指定(2026-08-21: renderParentから独立。
    他の描画が失敗してもここは生き残り、失敗したらエラーを画面に出す) */
+function applyPackCode(){
+  var v = (q("packCode").value || "").trim().toUpperCase();
+  var pk = PACK_CODES[v];
+  if (!pk){ gtoast("そのコードは ちがうみたい"); return; }
+  if (!store.packs) store.packs = {};
+  if (store.packs[pk]){ gtoast("そのパックは もう ふえてるよ"); return; }
+  store.packs[pk] = true; save(); q("packCode").value = "";
+  gtoast("🎉 " + PACK_NAMES[pk] + " が ふえた! ずかんを みてね");
+  renderPackState_(); renderCfgRows_();
+}
+function renderPackState_(){
+  var el = q("packState"); if (!el) return;
+  var on = Object.keys(store.packs||{}).filter(function(k){ return store.packs[k]; }).map(function(k){ return PACK_NAMES[k]||k; });
+  el.textContent = "いま出る なかま: " + activePrizes_().length + "種" + (on.length ? "(" + on.join("・") + " 追加ずみ)" : "");
+}
 function renderCfgRows_(){
   var cfg = q("prizeCfg"); if (!cfg) return;
   try{
     if (!store.stock || typeof store.stock !== "object") store.stock = {};
     cfg.innerHTML = "";
-    PRIZES.forEach(function(p){
+    activePrizes_().forEach(function(p){
       var row = document.createElement("div");
       row.className = "pz";
       var inStock = store.stock[p.id] !== false;

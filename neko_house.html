@@ -72,7 +72,7 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 .heart{position:absolute;font-size:20px;color:#e8788a;pointer-events:none;animation:hrise 1.2s ease-out forwards;z-index:6}
 @keyframes hrise{to{transform:translateY(-70px) scale(1.4);opacity:0}}
 /* ごはん */
-#bowl{position:absolute;left:30px;bottom:22px;width:74px;cursor:pointer;display:none;z-index:4}
+#bowl{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:74px;cursor:pointer;display:none;z-index:5} /* 2026-09-07: 左端だとおもちゃと重なるので中央に */
 #bowl svg{width:100%;height:auto}
 #bowl .n{position:absolute;top:-10px;right:-6px;background:#e8937c;color:#fff;font-size:12px;font-weight:bold;
   border-radius:999px;padding:1px 8px}
@@ -605,7 +605,7 @@ q("feedBtn").onclick = function(){
   c.classList.add("happy");
   catSay("わーい! ごはんだにゃ!");
   blip(523,.1); blip(659,.1,.12);
-  c.style.left = "22%";
+  c.style.left = "50%";
   setTimeout(function(){
     c.classList.add("munch");
     catSay("もぐもぐ… もぐもぐ…");
