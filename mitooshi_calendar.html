@@ -168,7 +168,7 @@ body{padding-bottom:78px!important}
   <div id="dBody"></div>
 </div>
 
-<div id="monthTgl"><button id="monthBtn">🗓 ひとつき ぜんぶ みる</button></div>
+<div id="monthTgl"><button id="monthBtn">🗓 カレンダーを ひらく</button></div>
 <div id="monthWrap">
   <div id="mHead">
     <button id="mPrev">◀</button>
@@ -183,6 +183,7 @@ body{padding-bottom:78px!important}
   <h3>📅 よていをつくる(おうちのひと)</h3>
   <div class="chips" id="dayChips"></div>
   <div id="icoGrid"></div>
+  <div id="customRow" style="display:none;margin:4px 0 6px;text-align:center"><span style="font-size:12px;color:#a58868">えもじを 1つ 入れてね(キーボードの 🌐/😀 から)</span><br><input type="text" id="icoCustom" maxlength="4" placeholder="😀" oninput="openEditor()" style="width:90px;text-align:center;font-size:24px;padding:6px;border:2.5px solid #c9ae87;border-radius:12px;font-family:inherit"></div>
   <input type="text" id="evLabel" maxlength="10" placeholder="よていのなまえ(ひらがな)">
   <div class="chips" id="repChips" style="justify-content:center"><div class="chip sel" data-r="0">この日だけ</div><div class="chip" data-r="1" id="repWeekly">まいしゅう</div></div>
   <div id="wdRow" style="display:none;margin:2px 0 4px"><div style="font-size:11.5px;color:#a58868;margin-bottom:4px;text-align:center">まいしゅう なんようび?(いくつでも)</div><div class="chips" id="wdChips" style="justify-content:center;flex-wrap:wrap;overflow:visible"></div></div>
@@ -267,10 +268,10 @@ var today = new Date(); today.setHours(0,0,0,0);
 function prizesOf(dateKey){ return gacha.hist.filter(function(h){ return h.d===dateKey; }); }
 /* その日のよてい。なければ平日=ようちえん/土日=おうち */
 /* のりもの優先(どこへ行くかより「なにで行くか」が彼には重要) */
-var EVICONS = [["🚲","じてんしゃ"],["🚗","くるま"],["🚌","バス"],["🚃","でんしゃ"],
-               ["🎒","ほいくえん"],["🏠","おうち"],["✏️","くもん"],["👫","おともだち"],
-               ["💇","おば(かみきり)"],["🛍","モール"],["🏊","ぷーる"],["🏞","こうえん"],
-               ["🏥","びょういん"],["👶","あかちゃん"],["♨","おふろやさん"],["🎂","たんじょうび"]];
+var EVICONS = [["🚗","おでかけ"],["🎒","ほいくえん"],["🏠","おうち"],["👫","おともだち"],
+               ["🎵","ならいごと"],["🏊","ぷーる"],["🏞","こうえん"],["🛍","おかいもの"],
+               ["🏥","びょういん"],["♨","おふろやさん"],["👵","じいじ・ばあば"],["🎂","たんじょうび"],
+               ["🎉","おまつり"],["✈️","りょこう"],["✚","じぶんで えらぶ"]];  // 最後は自由入力(えもじ)
 function eventsOf(d){
   var evs = realEventsOf(d);
   if (evs.length) return evs;
@@ -354,7 +355,7 @@ function renderMonth(){
 q("monthBtn").onclick = function(){
   mShown = !mShown;
   q("monthWrap").style.display = mShown ? "block" : "none";
-  q("monthBtn").textContent = mShown ? "🗓 ひとつきを とじる" : "🗓 ひとつき ぜんぶ みる";
+  q("monthBtn").textContent = mShown ? "🗓 カレンダーを とじる" : "🗓 カレンダーを ひらく";
   if (mShown){ mYear = today.getFullYear(); mMonth = today.getMonth(); renderMonth(); }
 };
 q("mPrev").onclick = function(){ mMonth--; if(mMonth<0){mMonth=11;mYear--;} renderMonth(); };
@@ -393,7 +394,7 @@ function renderMonth(){
 q("monthBtn").onclick = function(){
   mShown = !mShown;
   q("monthWrap").style.display = mShown ? "block" : "none";
-  q("monthBtn").textContent = mShown ? "🗓 ひとつきを とじる" : "🗓 ひとつき ぜんぶ みる";
+  q("monthBtn").textContent = mShown ? "🗓 カレンダーを とじる" : "🗓 カレンダーを ひらく";
   if (mShown){ mYear = today.getFullYear(); mMonth = today.getMonth(); renderMonth(); }
 };
 q("mPrev").onclick = function(){ mMonth--; if(mMonth<0){mMonth=11;mYear--;} renderMonth(); };
@@ -447,7 +448,7 @@ function openEditor(){
   // 2026-09-07: 設定は帯・くわしくの直下に出す(ひとつき表示が間に挟まって確認しづらかった)。開くときは ひとつき表示をたたむ
   var edEl = q("editor"), tg = q("monthTgl");
   if (edEl && tg && edEl.nextElementSibling !== tg) tg.parentNode.insertBefore(edEl, tg);
-  if (mShown){ mShown = false; q("monthWrap").style.display = "none"; q("monthBtn").textContent = "🗓 ひとつき ぜんぶ みる"; }
+  if (mShown){ mShown = false; q("monthWrap").style.display = "none"; q("monthBtn").textContent = "🗓 カレンダーを ひらく"; }
   var sel = q("wdName"); if (sel) sel.value = M.wdName || "ほいくえん";
   q("editor").style.display="block";
   var dc=q("dayChips"); dc.innerHTML="";
@@ -458,13 +459,16 @@ function openEditor(){
   }
   dc.querySelectorAll(".chip").forEach(function(c){ c.onclick=function(){ edSel.day=c.dataset.k; openEditor(); }; });
   var ig=q("icoGrid"); ig.innerHTML="";
+  var CUSTOM = EVICONS.length - 1;
   EVICONS.forEach(function(ei,i){
-    ig.insertAdjacentHTML("beforeend",'<button class="'+(i===edSel.ico?"sel":"")+'" data-i="'+i+'">'+ei[0]+'</button>');
+    var face = (i===CUSTOM) ? ((q("icoCustom") && q("icoCustom").value.trim()) || ei[0]) : ei[0];
+    ig.insertAdjacentHTML("beforeend",'<button class="'+(i===edSel.ico?"sel":"")+'" data-i="'+i+'" title="'+ei[1]+'">'+face+'</button>');
   });
   ig.querySelectorAll("button").forEach(function(bt){
-    bt.onclick=function(){ edSel.ico=parseInt(bt.dataset.i,10); q("evLabel").value=EVICONS[edSel.ico][1]; openEditor(); };
+    bt.onclick=function(){ edSel.ico=parseInt(bt.dataset.i,10); if (edSel.ico!==CUSTOM) q("evLabel").value=EVICONS[edSel.ico][1]; openEditor(); if (edSel.ico===CUSTOM) q("icoCustom").focus(); };
   });
-  if (!q("evLabel").value) q("evLabel").value = EVICONS[edSel.ico][1];
+  q("customRow").style.display = (edSel.ico===CUSTOM) ? "block" : "none";
+  if (!q("evLabel").value && edSel.ico!==CUSTOM) q("evLabel").value = EVICONS[edSel.ico][1];
   var wdSel = new Date(edSel.day+"T00:00:00").getDay();
   q("repChips").querySelectorAll(".chip").forEach(function(c){
     c.classList.toggle("sel", String(edSel.rep) === c.dataset.r);
@@ -524,14 +528,17 @@ function renderEvList(){
   }
 }
 function addEvent(){
-  var l=q("evLabel").value.trim() || EVICONS[edSel.ico][1];
+  var CUSTOM = EVICONS.length - 1;
+  var ico = EVICONS[edSel.ico][0];
+  if (edSel.ico===CUSTOM){ ico = q("icoCustom").value.trim(); if (!ico){ q("icoCustom").focus(); return; } }
+  var l=q("evLabel").value.trim() || (edSel.ico===CUSTOM ? "よてい" : EVICONS[edSel.ico][1]);
   if (edSel.rep){
     var wds = Object.keys(edSel.wds);
     if (!wds.length) wds = [String(new Date(edSel.day+"T00:00:00").getDay())];
-    wds.forEach(function(wd){ if (!M.wk[wd]) M.wk[wd]=[]; M.wk[wd].push({ e:EVICONS[edSel.ico][0], l:l }); });
+    wds.forEach(function(wd){ if (!M.wk[wd]) M.wk[wd]=[]; M.wk[wd].push({ e:ico, l:l }); });
   } else {
     if (!M.ev[edSel.day]) M.ev[edSel.day]=[];
-    M.ev[edSel.day].push({ e:EVICONS[edSel.ico][0], l:l });
+    M.ev[edSel.day].push({ e:ico, l:l });
   }
   save(); blip(784,.12);
   q("evLabel").value="";

@@ -222,9 +222,10 @@ function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||wi
 /* うれしい声(低音のゴロゴロは不評だったので、明るいチャープに変更) */
 function purr(){ blip(784,.1,0,"triangle"); blip(988,.1,.13,"triangle"); blip(1175,.16,.26,"triangle"); }
 /* ねむり時間(ボードのねこと同期: 20:30〜翌7:00) */
+function nekoBed_(){ try{ var v = JSON.parse(localStorage.getItem("neko_sleep_v1")||"{}").bed; return (typeof v === "number" && v >= 1080 && v <= 1380) ? v : 1230; }catch(e){ return 1230; } }
 function isSleepTime_(){
   var d = new Date(), t = d.getHours()*60 + d.getMinutes();
-  return (t >= 1230 || t < 420);
+  return (t >= nekoBed_() || t < 420); // ねる時間はおしたくボードの設定と共有(既定20:30)
 }
 function sleepSay_(){
   catSay("すやすや… ねてるよ zzz また あした あそぼうにゃ");
