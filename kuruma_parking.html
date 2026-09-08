@@ -272,6 +272,11 @@ body.night #kirariCard{background:rgba(255,253,246,.94)}
   border-radius:999px;padding:8px 13px;box-shadow:0 3px 0 #aec4d6;cursor:pointer}
 #parent button.on{background:#f2b28c;color:#fff;box-shadow:0 3px 0 #d99a75}
 #parent button.close{background:#f2d98a;color:#7a6146;box-shadow:0 3px 0 #dcc06e;margin-top:12px}
+/* 設定の区切り(2026-09-08): 各セクションを▼で開く */
+#parent .psec{margin-top:14px;border-top:2px dashed #e5d9c2;padding-top:10px}
+#parent .psecBtn{width:100%;text-align:left;background:#fff6dc;color:#7a6146;font-size:14px;padding:10px 14px;border-radius:14px;box-shadow:0 3px 0 #e8d9b5}
+#parent .psecBody{margin-top:8px}
+#parent .psecBody h3{margin-top:10px}
 .tedit{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px dashed #e5d9c2}
 .tedit .ico{width:38px;flex:none;background:#fff;border:2px solid #e5d3b2;border-radius:8px;padding:2px;cursor:pointer}
 .tedit .ico svg{width:100%;height:auto;display:block}
@@ -431,15 +436,23 @@ body{padding-bottom:78px!important}
     <button onclick="resetDone('asa')">☀あさの「できた」をリセット</button>
     <button onclick="resetDone('yoru')">🌙よるの「できた」をリセット</button>
   </div>
-  <h3>☀ あさのタスク(タップで絵を変更/↑↓で並べ替え)</h3>
-  <div id="editAsa"></div>
-  <div class="row"><button onclick="addTask('asa')">+ タスク追加</button></div>
-  <h3>🌙 よるのタスク</h3>
-  <div id="editYoru"></div>
-  <div class="row"><button onclick="addTask('yoru')">+ タスク追加</button></div>
-  <h3>⭐ おかわりの きほんセット(星ボタンで出るタスク)</h3>
-  <div id="editStretch"></div>
-  <div class="row"><button onclick="addStretchDef()">+ ついか</button></div>
+  <div class="psec"><button type="button" class="psecBtn" id="secAsaBtn" onclick="toggleSec_('secAsa','secAsaBtn','☀ あさのタスク')">▼ ☀ あさのタスク</button>
+  <div id="secAsa" class="psecBody" style="display:none">
+    <p style="font-size:11.5px;color:#8d7b66;margin:0 0 4px">絵をタップで変更 / ↑↓で並べ替え</p>
+    <div id="editAsa"></div>
+    <div class="row"><button onclick="addTask('asa')">+ タスク追加</button></div>
+  </div></div>
+  <div class="psec"><button type="button" class="psecBtn" id="secYoruBtn" onclick="toggleSec_('secYoru','secYoruBtn','🌙 よるのタスク')">▼ 🌙 よるのタスク</button>
+  <div id="secYoru" class="psecBody" style="display:none">
+    <div id="editYoru"></div>
+    <div class="row"><button onclick="addTask('yoru')">+ タスク追加</button></div>
+  </div></div>
+  <div class="psec"><button type="button" class="psecBtn" id="secStretchBtn" onclick="toggleSec_('secStretch','secStretchBtn','⭐ おかわりの きほんセット')">▼ ⭐ おかわりの きほんセット</button>
+  <div id="secStretch" class="psecBody" style="display:none">
+    <p style="font-size:11.5px;color:#8d7b66;margin:0 0 4px">星ボタンを押すと出るタスク。よゆうがある日の追加分なので、かんたんなものを</p>
+    <div id="editStretch"></div>
+    <div class="row"><button onclick="addStretchDef()">+ ついか</button></div>
+  </div></div>
   <div id="kirariSettings">
   <h3>⭐️ きらりの こうもく(えらぶシートに出ます)</h3>
   <p style="font-size:12px;color:#8d7b66;line-height:1.7">うんちなど「その日かぎりの めずらしい たっせい」を、子ども自身がタップして祝う枠です(承認は不要)。1日3こまで・押さない日は何も残りません。</p>
@@ -448,11 +461,13 @@ body{padding-bottom:78px!important}
   <h3>⭐️ これまでの きらり(あたらしい順に10件)</h3>
   <div id="kirariLog"></div>
   </div>
-  <h3>⏱ できたきろく(記録のある日だけ・14日分まで)</h3>
-  <p style="font-size:11.5px;color:#8d7b66;line-height:1.7;margin-bottom:6px">ぜんぶできた日は「できた時刻」を、とちゅうで終わった日は定点(あさ9:30/よる22:30)の「できた数」を自動で記録します。だんだん早くなるのが見えます。</p>
-  <div id="recList" style="font-size:12px;line-height:2;color:#7a6146"></div>
-  <h3 style="cursor:pointer;user-select:none" onclick="var e=document.getElementById('papaSec');e.style.display=e.style.display==='none'?'block':'none'">👔 パパ・ママのおしたく / 🎒バッグ ▼(タップでひらく)</h3>
-  <div id="papaSec" style="display:none">
+  <div class="psec"><button type="button" class="psecBtn" id="secRecBtn" onclick="toggleSec_('secRec','secRecBtn','⏱ できたきろく')">▼ ⏱ できたきろく</button>
+  <div id="secRec" class="psecBody" style="display:none">
+    <p style="font-size:11.5px;color:#8d7b66;line-height:1.7;margin-bottom:6px">記録のある日だけ・14日分まで。ぜんぶできた日は「できた時刻」を、とちゅうで終わった日は定点(あさ9:30/よる22:30)の「できた数」を自動で記録します。だんだん早くなるのが見えます。</p>
+    <div id="recList" style="font-size:12px;line-height:2;color:#7a6146"></div>
+  </div></div>
+  <div class="psec"><button type="button" class="psecBtn" id="secPapaBtn" onclick="toggleSec_('papaSec','secPapaBtn','👔 パパ・ママのおしたく / 🎒 バッグ')">▼ 👔 パパ・ママのおしたく / 🎒 バッグ</button>
+  <div id="papaSec" class="psecBody" style="display:none">
   <h3>👔 パパ・ママのおしたく(あさ)</h3>
   <div id="editPapaAsa"></div>
   <div class="row"><button onclick="addPapaDef('asa')">+ ついか</button></div>
@@ -462,7 +477,7 @@ body{padding-bottom:78px!important}
   <h3>🎒 バッグのなかみリスト</h3>
   <div id="editBag"></div>
   <div class="row"><button onclick="addBagDef()">+ ついか</button></div>
-  </div>
+  </div></div>
 <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 この画面での こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「ごはん たべたら、ボードで チェックしよっか」<br>・「さきに おしても いいよ。おしたから、やろっか」<br>・「コイン たまったね。ねこに ごはん あげにいく?」<br><span style="color:#a5842e;font-weight:bold">コツ: ごほうびは、やり終わった後ではなく「やる」と決めた入口に。子どもは欲求に素直です。やる前に押しても怒らず、「押したから やろっか」と声をかけてください。「やってないのに」とルールで縛ると、親子ともに疲れます。</span></div></div>
   <details id="bkup" style="margin-top:14px;border-top:2px dashed #dcc06e;padding-top:10px">
     <summary style="font-size:13px;font-weight:bold;color:#a58868;cursor:pointer">🗄 データのバックアップ(ふだんは使いません)</summary>
@@ -556,7 +571,7 @@ function openIconPicker_(cur, onPick){
 }
 
 /* ===== ねこが ねる じかん(2026-09-07: 家ごとに違うので設定に。ねこのおうちと共有) ===== */
-function nekoBed_(){ try{ var v = JSON.parse(localStorage.getItem("neko_sleep_v1")||"{}").bed; return (typeof v === "number" && v >= 1080 && v <= 1380) ? v : 1230; }catch(e){ return 1230; } }
+function nekoBed_(){ try{ var v = JSON.parse(localStorage.getItem("neko_sleep_v1")||"{}").bed; return (typeof v === "number" && v >= 1080 && v <= 1439) ? v : 1230; }catch(e){ return 1230; } }
 function nekoBedSet_(m){ try{ localStorage.setItem("neko_sleep_v1", JSON.stringify({bed:m})); }catch(e){} }
 function nekoBedLabel_(){ var m = nekoBed_(); return Math.floor(m/60) + ":" + ("0"+(m%60)).slice(-2); }
 
@@ -704,8 +719,11 @@ renderPapa();
    レール(車が走る)としてボードに追加される。翌日は自動で消える */
 if (!store.stretch) store.stretch = { d:"", on:false, extra:[] };
 if (!store.stretch.extra) store.stretch.extra = [];
-if (!store.stretchDef) store.stretchDef = [ {n:"べんきょう",ic:"kumon"},
-  {n:"おえかき",ic:"oekaki"}, {n:"えほん",ic:"ehon"} ];
+if (!store.stretchDef) store.stretchDef = [ {n:"おえかき",ic:"oekaki"}, {n:"えほん",ic:"ehon"}, {n:"おかたづけ",ic:"katazuke"} ];
+// 2026-09-08(K): 「べんきょう」は追加分には重い。旧既定のまま触っていない端末だけ新既定に
+else if (store.stretchDef.length === 3 && store.stretchDef[0].n === "べんきょう" && store.stretchDef[1].n === "おえかき" && store.stretchDef[2].n === "えほん"){
+  store.stretchDef = [ {n:"おえかき",ic:"oekaki"}, {n:"えほん",ic:"ehon"}, {n:"おかたづけ",ic:"katazuke"} ]; save();
+}
 /* 設定画面から編集できる「きほんセット」 */
 function renderStretchDef(){
   var w = document.getElementById("editStretch"); if (!w) return;
@@ -781,6 +799,10 @@ function nekoAsleep_(){
 function nightBlocked_(){
   return nekoAsleep_() && store.stretchNightPass !== papaToday_();
 }
+/* 子どもの追加は1日3こまで(妻仕様 2026-07-27)。残りを子ども画面に出す(2026-09-08 K要望) */
+var STRETCH_MAX = 3;
+function stretchLeft_(){ if (!store.stretch || store.stretch.d !== papaToday_()) return STRETCH_MAX; return Math.max(0, STRETCH_MAX - (store.stretch.extra||[]).length); }
+function stretchStars_(){ var l = stretchLeft_(), s = ""; for (var i=0; i<STRETCH_MAX; i++) s += (i < l ? "⭐" : "☆"); return s; }
 function addStretchExtra_(nm){
   if (nightBlocked_()){
     toast("ねこが ねたよ🌙(よる" + nekoBedLabel_() + "〜あさ4じは おやすみ) あたらしい おしごとは あしたの おたのしみ!");
@@ -790,8 +812,8 @@ function addStretchExtra_(nm){
   }
   if (!nm || !nm.trim()) return;
   // 妻仕様(2026-07-27): 子どもの追加は1日3個まで(無限増殖→就寝遅延の防止)
-  if ((store.stretch.extra || []).length >= 3){
-    toast("きょうの ついかは 3こまで! つづきは あしたの おたのしみ⭐");
+  if ((store.stretch.extra || []).length >= STRETCH_MAX){
+    toast("きょうの ついかは " + STRETCH_MAX + "こまで! つづきは あしたの おたのしみ⭐");
     blip(392,.15);
     return;
   }
@@ -816,7 +838,9 @@ function addStretchTask(){
     var nm = (typeof e === "string") ? e : e.n;
     return '<span class="sgmine">'+nm+' <b class="sgdel" data-i="'+i+'">🗑</b></span>';
   }).join("");
-  p.innerHTML = '<div class="sgttl">① えをえらぶ</div>'+
+  var sl = stretchLeft_();
+  p.innerHTML = '<div class="sgttl" style="font-size:14px;margin-bottom:8px">' + (sl > 0 ? 'きょう ふやせるのは あと ' + sl + 'こ <span style="letter-spacing:2px">' + stretchStars_() + '</span>' : 'きょうは もう ふやせないよ(' + STRETCH_MAX + 'こ) <span style="letter-spacing:2px">' + stretchStars_() + '</span><br><span style="font-size:12px;font-weight:normal">つづきは あした⭐</span>') + '</div>'+
+    '<div class="sgttl">① えをえらぶ</div>'+
     '<div class="sgicos">'+icons+'</div>'+
     '<div class="sgttl">② なまえをえらぶ か かく(きょうだけ)</div>'+
     '<div class="sgchips">'+chips+'</div>'+
@@ -1161,7 +1185,10 @@ function renderBoard(newId){
   if (store.stretch.on){
     var ar=document.createElement("div");
     ar.className="rrow stretchrow"; ar.style.cssText="justify-content:center;border-style:dashed;cursor:pointer";
-    ar.innerHTML='<span style="font-weight:bold;color:#a5842e;font-size:15px;padding:6px 0">＋ じぶんで ふやす(きょうだけ)</span>';
+    var sl2 = stretchLeft_();
+    ar.innerHTML = sl2 > 0
+      ? '<span style="font-weight:bold;color:#a5842e;font-size:15px;padding:6px 0;text-align:center">＋ じぶんで ふやす(きょうだけ)<br><span style="font-size:12px;letter-spacing:2px">あと'+sl2+'こ '+stretchStars_()+'</span></span>'
+      : '<span style="font-weight:bold;color:#a58868;font-size:14px;padding:6px 0;text-align:center">きょうの ついかは おしまい <span style="letter-spacing:2px">'+stretchStars_()+'</span><br><span style="font-size:12px;font-weight:normal">つづきは あした</span></span>';
     ar.onclick=addStretchTask;
     wrap.appendChild(ar);
   }
@@ -1457,15 +1484,26 @@ function shareRecordCard_(){
   }).catch(function(){ toast("がぞうを つくれなかった…もういちど おしてね"); });
 }
 /* ===== できたきろくの一覧(おうちのひとパネル) ===== */
+function toggleSec_(id, btnId, label){
+  var w = q(id), b = q(btnId); if (!w || !b) return;
+  var open = w.style.display !== "none";
+  w.style.display = open ? "none" : "block";
+  b.textContent = (open ? "▼ " : "▲ ") + label;
+  if (!open) setTimeout(function(){ try{ b.scrollIntoView({block:"start", behavior:"smooth"}); }catch(e){} }, 60);
+}
 function renderBed_(){
   var el = q("bedRow"); if (!el) return; el.innerHTML = "";
-  [1170,1200,1230,1260,1290,1320].forEach(function(m){
-    var b = document.createElement("button"); b.type = "button";
-    b.textContent = Math.floor(m/60) + ":" + ("0"+(m%60)).slice(-2);
-    if (m === nekoBed_()) b.style.cssText = "background:#f2d98a;color:#7a6146;box-shadow:0 3px 0 #dcc06e;outline:3px solid #e8b96e;outline-offset:1px";
-    b.onclick = function(){ nekoBedSet_(m); renderBed_(); try{ renderBoardNeko(); }catch(e){} };
-    el.appendChild(b);
-  });
+  var m = nekoBed_(), h = Math.floor(m/60), mm = Math.round((m % 60) / 10) * 10 % 60;
+  var css = "font-family:inherit;font-size:17px;font-weight:bold;padding:8px 8px;border:2.5px solid #c9ae87;border-radius:12px;background:#fffaf0;color:#7a6146";
+  var sh = document.createElement("select"), sm = document.createElement("select");
+  sh.style.cssText = css; sm.style.cssText = css;
+  for (var i=18; i<=23; i++){ var o = document.createElement("option"); o.value = i; o.textContent = i + " じ"; if (i === h) o.selected = true; sh.appendChild(o); }
+  for (var j=0; j<60; j+=10){ var o2 = document.createElement("option"); o2.value = j; o2.textContent = ("0"+j).slice(-2) + " ふん"; if (j === mm) o2.selected = true; sm.appendChild(o2); }
+  var lbl = document.createElement("span"); lbl.style.cssText = "font-size:12px;color:#8d7b66";
+  function show(){ lbl.textContent = "→ " + nekoBedLabel_() + " に ねます"; }
+  function apply(){ nekoBedSet_(parseInt(sh.value,10)*60 + parseInt(sm.value,10)); show(); try{ renderBoardNeko(); }catch(e){} }
+  sh.onchange = apply; sm.onchange = apply; show();
+  el.appendChild(sh); el.appendChild(sm); el.appendChild(lbl);
 }
 function renderRec_(){
   var el = q("recList"); if (!el) return;
@@ -1862,7 +1900,7 @@ function dataImport(input){
 }
 
 /* 財布はガチャ側の操作でも変わるので、画面に戻ってきたら再読込 */
-setTimeout(function(){ firstTip("oshitaku", "おしたくボード", "やることが できたら、じぶんで ボタンを おす。<b>やる まえに おしても だいじょうぶ</b>。おしたら くるまが はしって <b>お湯コイン +1</b>。<br>コインは、ねこのおうちや おふろガチャで つかえます。<br><br><span style='font-size:12px;color:#8d7b66'>おうちのひとの せっていは、右上の「おうちのひと」を 1.5秒 ながおし。</span>"); }, 600);
+setTimeout(function(){ firstTip("oshitaku", "おしたくボード", "やることが終わったら、子ども自身がボタンを押します。<b>やる前に押しても大丈夫</b>(「押したから、やろっか」でOK)。押すと車が走って<b>お湯コイン+1</b>。<br>コインは「ねこのおうち」と「おふろガチャ」で使えます。<br><br><span style='font-size:12px;color:#8d7b66'>タスクの編集などの設定は、右上の「おうちのひと」を1.5秒長押し。</span>"); }, 600);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) refreshCoin(); });
 
 q("coinIco").innerHTML=COIN; if(q("footCoinIco")) q("footCoinIco").innerHTML=COIN;

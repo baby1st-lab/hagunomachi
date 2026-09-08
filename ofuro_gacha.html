@@ -216,7 +216,7 @@ body{padding-bottom:78px!important}
   </div>
   <div id="msg" style="display:none"></div>
   <div id="coinBtn" class="off"><span class="icon"></span><div class="lbl">コインをタップ!</div></div>
-  <button id="promiseBtn">✋ おやくそく まもります!</button>
+  <button id="promiseBtn">✋ おやくそく いえたよ!</button>
 </div>
 
 <div id="gtoast"></div>
@@ -240,12 +240,13 @@ body{padding-bottom:78px!important}
   <button onclick="closeZukan()">とじる</button>
 </div></div>
 
-<div id="parent"><div class="inner">
+<div id="parent"><div class="inner" style="position:relative"><button onclick="closeParent()" style="position:absolute;top:10px;right:12px;background:#e8dcc4;border:none;border-radius:50%;width:34px;height:34px;font-size:16px;font-weight:bold;color:#7a6146;cursor:pointer;box-shadow:none;margin:0;padding:0;line-height:34px;text-align:center">✕</button>
   <h3>おうちのひとメニュー</h3>
-  <p>基本の流れ: 子が「きょうの おやくそく」を決めて、水色の「<b>おやくそく まもります!</b>」を押す(<b>1日の回数は下で設定</b>。初期は1回)→コインが出る→ガチャを回す→出てきた なかまは ずかんに たまります。<br>
+  <p>基本の流れ: 子が「きょうの おやくそく」を決めて 口に出す→水色の「<b>おやくそく いえたよ!</b>」を押す(<b>1日の回数は下で設定</b>。初期は1回)→コインが出る→ガチャを回す→出てきた なかまは ずかんに たまります。<br>
   <b>「おふろ はいります! って おやくそく いえたら、まわしていいよ」「きょうの おやくそく、なにに する?」</b>のように、本人に約束を言わせてから押させるのがコツです。<br>
+  <span id="moreLink" onclick="showMore()" style="color:#5b7ba0;font-weight:bold;cursor:pointer;text-decoration:underline">続きを読む…</span><span id="moreTxt" style="display:none">コインは「言えたこと」へのごほうびです。守れなかった日も取り立てず、「言えたね」で終わりに。<br>
   子どもは欲求に素直なので、やる前に押しても怒らず「押したから やろっか」と声をかけてください。「やってないのに押した」とルールで縛ると、親子ともに疲れます。<br>
-  家に同じものがあれば、出てきた なかまを持ってお風呂に行くと盛り上がります(下の「在庫」で、家にある物だけ出す設定もできます)。</p>
+  家に同じものがあれば、出てきた なかまを持ってお風呂に行くと盛り上がります(下の「在庫」で、家にある物だけ出す設定もできます)。</span></p>
   <p>いまのコイン: <b id="pCoins">0</b>まい / やくそくボタン: きょうは<b id="pProm">まだ</b></p>
   <h3>コインを ふやす</h3>
   <div class="row">
@@ -254,10 +255,10 @@ body{padding-bottom:78px!important}
     <button class="warn" onclick="resetAll()">ずかんリセット(2回押し)</button>
   </div>
   <p style="font-size:11.5px;color:#8d7b66;line-height:1.6;margin:2px 0 8px">※ 画面左上の コインを 1.5秒ながおししても、+3枚 ふやせます。</p>
-  <h3>「おやくそく」1回でもらえるコイン <span style="font-size:11px;color:#8d7b66;font-weight:normal">(黄色が いまの設定)</span></h3>
+  <h3>「おやくそく」1回でもらえるコイン</h3>
   <div class="row" id="promMax"></div>
   <h3>1日に「おやくそく」を おせる かいすう</h3>
-  <p style="margin:2px 0 6px;font-size:12.5px;color:#8d7b66">約束が複数ある日は増やせます(例:「YouTubeやめる」「帰ったらお風呂」で2回)。<b>回数だけ増やして、その場の交渉には使わないこと。</b></p>
+  <p style="margin:2px 0 6px;font-size:12.5px;color:#8d7b66">約束が複数ある日は増やせます(例:「YouTubeやめる」「帰ったらお風呂」で2回)。</p>
   <div class="row" id="promPer"></div>
   <div class="row" id="promReset"></div>
   <div class="row" style="margin-top:22px;padding-top:14px;border-top:2px dashed #e5d9c2"><button id="cfgToggle" onclick="toggleCfg()">▼ 在庫・確定ガチャの設定をひらく</button></div>
@@ -265,14 +266,18 @@ body{padding-bottom:78px!important}
     <p>「在庫」OFF=その景品は出ない(<b>家に現物がある物だけ出す</b>使い方。にんじんが出たら本物を持ってお風呂へ!)。「つぎ確定」=次の1回だけその景品が必ず出る。</p>
     <div id="prizeCfg"></div>
   </div>
-  <h3>🎁 なかまを ふやす(コード)</h3>
-  <p style="font-size:12px;color:#8d7b66;line-height:1.6;margin:2px 0 6px">いまは10種類。コードを入れると なかまが ふえます(いまのところ「そらの なかまパック」6種)。</p>
-  <div class="row" style="align-items:center"><input type="text" id="packCode" placeholder="コード" style="font-family:inherit;font-size:14px;padding:8px 10px;border:2.5px solid #c9ae87;border-radius:12px;width:170px;text-transform:uppercase"><button onclick="applyPackCode()">ふやす</button></div>
-  <div id="packState" style="font-size:12px;color:#8d7b66;margin:2px 0 8px"></div>
-  <h3>データのひきつぎ(バックアップ)</h3>
-  <p>ブラウザのデータはまれに消えます(特にiPhoneのSafariは長期間開かないと削除されることがある)。ときどき「書き出す」→コードをLINEのKeep等に貼って保管を。機種変更もこれでOK。</p>
-  <div class="row"><button onclick="bakOut()">書き出す</button><button onclick="bakIn()">読み込む</button></div>
-  <textarea id="bakArea" style="width:100%;height:64px;font-size:11px;border:2px solid #c9ae87;border-radius:10px;font-family:monospace" placeholder="ここにコードが出ます / 貼り付けて読み込み"></textarea>
+  <div class="row" style="margin-top:14px"><button id="packToggle" onclick="toggleSec('packWrap','packToggle','🎁 なかまを ふやす(コード)')">▼ 🎁 なかまを ふやす(コード)</button></div>
+  <div id="packWrap" style="display:none">
+    <p style="font-size:12px;color:#8d7b66;line-height:1.6;margin:2px 0 6px">コードを入れると なかまが ふえます。</p>
+    <div class="row" style="align-items:center"><input type="text" id="packCode" placeholder="コード" style="font-family:inherit;font-size:14px;padding:8px 10px;border:2.5px solid #c9ae87;border-radius:12px;width:170px;text-transform:uppercase"><button onclick="applyPackCode()">ふやす</button></div>
+    <div id="packState" style="font-size:12px;color:#8d7b66;margin:2px 0 8px"></div>
+  </div>
+  <div class="row" style="margin-top:14px"><button id="bakToggle" onclick="toggleSec('bakWrap','bakToggle','データのひきつぎ(バックアップ)')">▼ データのひきつぎ(バックアップ)</button></div>
+  <div id="bakWrap" style="display:none">
+    <p>ブラウザのデータはまれに消えます(特にiPhoneのSafariは長期間開かないと削除されることがある)。ときどき「書き出す」→コードをLINEのKeep等に貼って保管を。機種変更もこれでOK。</p>
+    <div class="row"><button onclick="bakOut()">書き出す</button><button onclick="bakIn()">読み込む</button></div>
+    <textarea id="bakArea" style="width:100%;height:64px;font-size:11px;border:2px solid #c9ae87;border-radius:10px;font-family:monospace" placeholder="ここにコードが出ます / 貼り付けて読み込み"></textarea>
+  </div>
   <div style="background:#fdf6dd;border:2.5px dashed #e8cf7a;border-radius:14px;padding:10px 12px;margin:12px 0;text-align:left"><div style="font-size:12.5px;font-weight:bold;color:#a5842e;margin-bottom:5px">💬 この画面での こえかけの れい</div><div style="font-size:12px;line-height:1.8;color:#8d7b66">・「おふろ はいります! って おやくそく いえたら、まわしていいよ」<br>・「きょうの おやくそく、なにに する?」<br>・「だれが でてくるかな?」<br><span style="color:#a5842e;font-weight:bold">コツ: ガチャは、やり終わった「ごほうび」より、これからやるという「おやくそく」として回す。</span></div></div>
   <button onclick="fbOpen()" style="font-family:inherit;font-size:13px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:9px 18px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin:6px 4px 0 0">💬 かんそう・ようぼう</button>
   <button class="close" onclick="closeParent()">とじる</button>
@@ -301,18 +306,22 @@ var PRIZES = [
  {id:"starcar", name:"スターカー", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M26 40 Q30 26 43 26 H51 Q61 26 65 40 Z" fill="#f4d3da"/><path d="M8 47 Q8 40 16 40 H64 Q72 40 72 47 Z" fill="#f9e3a8"/><path d="M8 47 H72 V50 Q72 53 68 53 H12 Q8 53 8 50 Z" fill="#cfe0ee"/><path d="M32 38 Q35 30 43 30 H49 Q55 30 58 38 Z" fill="#fff7ec"/><circle cx="20" cy="55" r="7" fill="#ddd7f0"/><circle cx="60" cy="55" r="7" fill="#ddd7f0"/><path d="M66 8 l2.5 5 5 2.5 -5 2.5 -2.5 5 -2.5 -5 -5 -2.5 5 -2.5 Z" fill="#f9e3a8"/><path d="M12 14 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><circle cx="34" cy="44" r="2" fill="#8d7b66"/><circle cx="46" cy="44" r="2" fill="#8d7b66"/><ellipse cx="27" cy="47" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="53" cy="47" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 45 q3 3 6 0"/></svg>'},
  {id:"himitsu_plane", name:"ひみつの ひこうき", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M10 44 Q10 34 22 34 L54 34 Q68 34 70 40 Q68 48 54 48 L22 48 Q10 48 10 44 Z" fill="#cfe0ee"/><path d="M34 36 L26 20 L34 22 L44 34 Z" fill="#fff7ec"/><path d="M34 46 L28 60 L36 58 L44 48 Z" fill="#fff7ec"/><path d="M14 38 L8 28 L16 30 L20 36 Z" fill="#f4d3da"/><circle cx="56" cy="40" r="2.5" fill="#fff7ec"/><circle cx="63" cy="41" r="2" fill="#fff7ec"/><circle cx="26" cy="40" r="2" fill="#8d7b66"/><circle cx="38" cy="40" r="2" fill="#8d7b66"/><ellipse cx="21" cy="44" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="43" cy="44" rx="3" ry="2" fill="#f4b8b8"/><path d="M29 43 q3 3 6 0"/><path d="M66 12 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/><path d="M12 14 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/></svg>'},
  {id:"himitsu_heli", name:"ひみつの ヘリコプター", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M12 14 H62"/><path d="M37 14 V22"/><rect x="33" y="8" width="8" height="6" rx="3" fill="#ddd7f0"/><path d="M18 36 Q18 22 37 22 Q56 22 56 36 Q56 48 40 48 L30 48 Q18 48 18 36 Z" fill="#f9e3a8"/><path d="M54 30 L70 26 Q74 28 70 32 L54 38 Z" fill="#f4d3da"/><path d="M66 20 V32"/><path d="M24 48 V54 M44 48 V54 M18 54 H50"/><path d="M38 26 Q50 26 52 34 Q44 38 38 36 Z" fill="#fff7ec"/><circle cx="27" cy="34" r="2" fill="#8d7b66"/><circle cx="37" cy="34" r="2" fill="#8d7b66"/><ellipse cx="23" cy="40" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="41" cy="40" rx="3" ry="2" fill="#f4b8b8"/><path d="M29 39 q3 3 6 0"/><path d="M10 62 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><path d="M64 58 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#f9e3a8"/></svg>'},
- {id:"crown", name:"おうかん", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 58 L10 24 L26 38 L40 16 L54 38 L70 24 L66 58 Z" fill="#f9e3a8"/><circle cx="10" cy="21" r="3.5" fill="#f4d3da"/><circle cx="40" cy="13" r="3.5" fill="#ddd7f0"/><circle cx="70" cy="21" r="3.5" fill="#cfe0ee"/><path d="M20 4 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><path d="M60 4 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><circle cx="33" cy="46" r="2" fill="#8d7b66"/><circle cx="47" cy="46" r="2" fill="#8d7b66"/><ellipse cx="25" cy="51" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="55" cy="51" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 50 q3 3 6 0"/></svg>'}
+ {id:"crown", name:"おうかん", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M14 58 L10 24 L26 38 L40 16 L54 38 L70 24 L66 58 Z" fill="#f9e3a8"/><circle cx="10" cy="21" r="3.5" fill="#f4d3da"/><circle cx="40" cy="13" r="3.5" fill="#ddd7f0"/><circle cx="70" cy="21" r="3.5" fill="#cfe0ee"/><path d="M20 4 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><path d="M60 4 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#fff7ec"/><circle cx="33" cy="46" r="2" fill="#8d7b66"/><circle cx="47" cy="46" r="2" fill="#8d7b66"/><ellipse cx="25" cy="51" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="55" cy="51" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 50 q3 3 6 0"/></svg>'},
+ {id:"himitsu_train", name:"ひみつの でんしゃ", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="16" y="18" width="10" height="8" rx="3" fill="#f4d3da"/><rect x="6" y="26" width="30" height="26" rx="6" fill="#ddd7f0"/><rect x="44" y="26" width="30" height="26" rx="6" fill="#ddd7f0"/><path d="M36 44 H44"/><rect x="49" y="32" width="8" height="8" rx="2" fill="#f9e3a8"/><rect x="61" y="32" width="8" height="8" rx="2" fill="#f9e3a8"/><circle cx="14" cy="56" r="5" fill="#cfe0ee"/><circle cx="28" cy="56" r="5" fill="#cfe0ee"/><circle cx="52" cy="56" r="5" fill="#cfe0ee"/><circle cx="66" cy="56" r="5" fill="#cfe0ee"/><circle cx="16" cy="36" r="2" fill="#8d7b66"/><circle cx="26" cy="36" r="2" fill="#8d7b66"/><ellipse cx="12" cy="42" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="30" cy="42" rx="3" ry="2" fill="#f4b8b8"/><path d="M18 41 q3 3 6 0"/><path d="M66 8 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/><path d="M8 12 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/><path d="M40 62 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#f9e3a8"/></svg>'},
+ {id:"himitsu_carrot", name:"ひみつの にんじん", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M34 22 Q26 12 18 10 Q24 22 34 24 Z" fill="#f9e3a8"/><path d="M40 22 Q40 8 44 4 Q50 14 42 23 Z" fill="#f9e3a8"/><path d="M46 23 Q54 14 62 12 Q56 24 46 25 Z" fill="#f9e3a8"/><path d="M28 26 Q40 18 52 26 Q54 44 42 66 Q40 70 38 66 Q26 44 28 26 Z" fill="#ddd7f0"/><path d="M32 46 h6 M42 54 h5"/><circle cx="34" cy="33" r="2" fill="#8d7b66"/><circle cx="46" cy="33" r="2" fill="#8d7b66"/><ellipse cx="31" cy="40" rx="3" ry="2" fill="#f4b8b8"/><ellipse cx="49" cy="40" rx="3" ry="2" fill="#f4b8b8"/><path d="M37 38 q3 3 6 0"/><path d="M66 40 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/><path d="M10 44 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/><path d="M62 62 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#f9e3a8"/></svg>'},
+ {id:"himitsu_tomato", name:"ひみつの トマト", rare:1, svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M40 12 q1 -5 4 -7"/><circle cx="40" cy="46" r="25" fill="#cfe0ee"/><path d="M28 16 L37 21 L40 12 L43 21 L52 16 L45 24 L40 27 L35 24 Z" fill="#f9e3a8"/><circle cx="32" cy="42" r="2" fill="#8d7b66"/><circle cx="48" cy="42" r="2" fill="#8d7b66"/><ellipse cx="23" cy="50" rx="3.5" ry="2.5" fill="#f4b8b8"/><ellipse cx="57" cy="50" rx="3.5" ry="2.5" fill="#f4b8b8"/><path d="M37 47 q3 3 6 0"/><path d="M66 18 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/><path d="M10 26 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/><path d="M70 60 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/></svg>'}
 ];
 
-/* ===== 景品パック: 最初は10種。「そらの なかまパック」(6種)はコードで追加 ===== */
-var PACK_OF = { boat:"p1", bubble:"p1", starcar:"p1", himitsu_plane:"p1", himitsu_heli:"p1", crown:"p1" };
+/* ===== 景品パック: 最初は10種。p1「そらの なかまパック」(6種)・p2「ひみつの なかまパック」(3種・息子案 2026-09-07)はコードで追加 ===== */
+var PACK_OF = { boat:"p1", bubble:"p1", starcar:"p1", himitsu_plane:"p1", himitsu_heli:"p1", crown:"p1",
+                himitsu_train:"p2", himitsu_carrot:"p2", himitsu_tomato:"p2" };
 PRIZES.forEach(function(p){ if (PACK_OF[p.id]) p.pack = PACK_OF[p.id]; });
 function packOn_(pk){ return !pk || (store.packs && store.packs[pk]); }
 function activePrizes_(){ return PRIZES.filter(function(p){ return packOn_(p.pack); }); }
 
 /* ===== 状態(できれば保存・だめなら今だけ) ===== */
-var PACK_CODES = { "HAGU-SORA-2026": "p1" };   // コード → パック。p1=そらの なかま(6種)
-var PACK_NAMES = { p1: "そらの なかまパック" };
+var PACK_CODES = { "HAGU-SORA-2026": "p1", "HAGU-HIMITSU-2026": "p2" };   // コード → パック
+var PACK_NAMES = { p1: "そらの なかまパック", p2: "ひみつの なかまパック" };
 var store = { coins: 0, owned: {}, resetArm: false, packs: null,
   stock: {},          // {id:false}=在庫なし(排出停止)
   forced: "",         // 次回確定の景品id
@@ -322,10 +331,10 @@ var store = { coins: 0, owned: {}, resetArm: false, packs: null,
   lastSeen: null,     // 前回ずかんを見た時点の所持数(NEW表示用)
   prom: { date:"", n:0 } };
 function load(){ try{ var s = localStorage.getItem("ofuro_gacha_v1"); if(s){ var o = JSON.parse(s);
-  ["coins","owned","stock","forced","promCoins","promPerDay","lastPrize","lastSeen","prom","packs"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
+  ["coins","owned","stock","forced","promCoins","promPerDay","lastPrize","lastSeen","prom","packs","hist","comp"].forEach(function(k){ if(o[k]!==undefined) store[k]=o[k]; }); } }catch(e){} }
 function save(){ try{ localStorage.setItem("ofuro_gacha_v1", JSON.stringify({
   coins:store.coins, owned:store.owned, stock:store.stock, forced:store.forced,
-  promCoins:store.promCoins, promPerDay:store.promPerDay, lastPrize:store.lastPrize, lastSeen:store.lastSeen, prom:store.prom, packs:store.packs })); }catch(e){} }
+  promCoins:store.promCoins, promPerDay:store.promPerDay, lastPrize:store.lastPrize, lastSeen:store.lastSeen, prom:store.prom, packs:store.packs, hist:store.hist, comp:store.comp })); }catch(e){} }
 load();
 // すでに使っている端末(なかまを1つでも持っている)は、これまで通り全部出る
 if (!store.packs || typeof store.packs !== "object"){ store.packs = {}; if (Object.keys(store.owned||{}).length){ store.packs.p1 = true; } save(); }
@@ -420,7 +429,7 @@ function firstTip(id, title, body){
   document.body.appendChild(w);
 }
 
-setTimeout(function(){ firstTip("ofuro", "おふろガチャ", "「おふろ はいります!」って おやくそく いえたら、水色の <b>「✋ おやくそく まもります!」</b> を おしてね。お湯コインが もらえます。<br>コインを ガチャに いれると、おふろの なかまが 出てきます。<br><br><span style='font-size:12px;color:#8d7b66'>おうちのひとの せっていは、右上の「おうちのひと」を 1.5秒 ながおし。</span>"); }, 600);
+setTimeout(function(){ firstTip("ofuro", "おふろガチャ", "子どもが「おふろ入ります!」のように約束を口に出せたら、水色の<b>「✋ おやくそく いえたよ!」</b>を押します。お湯コインがもらえます。<br>コインをガチャに入れると、おふろの仲間が出てきて図鑑に貯まります。<br>コインは「言えたこと」へのごほうびなので、守れなかった日も取り立てなくて大丈夫です。<br><br><span style='font-size:12px;color:#8d7b66'>コインの枚数・出る仲間の設定は、右上の「おうちのひと」を1.5秒長押し。</span>"); }, 600);
 /* 状況にあった案内(やくそく済みなら次を促さない) */
 function idleMsg(){
   return ""; // 説明吹き出しは廃止(2026-08-11 K指示)。操作の誘導はコインとハンドルの見た目に任せる
@@ -508,12 +517,12 @@ function refreshPromise(){
   var per  = Number(store.promPerDay)||1;
   if (left <= 0){
     b.classList.add("used");
-    b.textContent = "✅ きょうの おやくそくは おしたよ";
+    b.textContent = "✅ きょうの おやくそくは いえたよ";
   } else {
     b.classList.remove("used");
     b.textContent = (per > 1)
-      ? "✋ おやくそく まもります! (あと" + left + "かい)"
-      : "✋ おやくそく まもります!";
+      ? "✋ おやくそく いえたよ! (あと" + left + "かい)"
+      : "✋ おやくそく いえたよ!";
   }
 }
 q("promiseBtn").onclick = function(){
@@ -522,7 +531,7 @@ q("promiseBtn").onclick = function(){
   var n = Number(store.promCoins) || 1;
   wSet(wGet() + n); save();
   refreshHud(); refreshPromise();
-  gtoast("やくそくできたね! コイン +" + n + " (いま" + wGet() + "まい)");
+  gtoast("いえたね! コイン +" + n + " (いま" + wGet() + "まい)");
   blip(659,.1); blip(880,.12,.1); blip(1047,.16,.22,"triangle"); buzz([40,30,60]);
   if (state === "idle") setMsg("");
 };
@@ -614,6 +623,7 @@ q("okBtn").onclick = function(){
     zb.classList.add("pulse");
     setTimeout(function(){ zb.classList.remove("pulse"); }, 1300);
     buzz(30);
+    setTimeout(checkComplete_, 700);
   }, 820);
   window._resetKnob();
   state = "idle";
@@ -630,6 +640,44 @@ q("dome").onclick = function(){
   buzz(30);
   setTimeout(function(){ if(state!=="rolling") d.classList.remove("jiggle"); }, 650);
 };
+
+/* ===== コンプリート演出(2026-09-08): いま出る なかまが ぜんいん そろったとき、その種類数につき1回だけ ===== */
+function checkComplete_(){
+  var act = activePrizes_();
+  if (!act.length) return false;
+  for (var i=0; i<act.length; i++){ if (!((store.owned||{})[act[i].id] > 0)) return false; }
+  if (!store.comp || typeof store.comp !== "object") store.comp = {};
+  var n = act.length;
+  if (store.comp[n]) return false;
+  store.comp[n] = gToday; save();
+  showComplete_(act);
+  return true;
+}
+function showComplete_(act){
+  var w = document.createElement("div");
+  w.id = "compWrap";
+  w.style.cssText = "position:fixed;inset:0;background:rgba(90,74,56,.6);z-index:96;display:flex;align-items:center;justify-content:center;padding:18px";
+  var cells = act.map(function(p, i){ return '<div class="zcell" style="animation:zpopg .7s ease ' + (i*0.09).toFixed(2) + 's 4">' + p.svg + '</div>'; }).join("");
+  w.innerHTML = '<div style="background:#fffcf4;border:4px solid #dcc06e;border-radius:24px;max-width:400px;width:100%;padding:18px;text-align:center;max-height:calc(100dvh - 60px);overflow-y:auto">'
+    + '<div style="font-size:36px;line-height:1.1">🏆</div>'
+    + '<div style="font-size:19px;font-weight:bold;color:#7a6146;margin:6px 0 2px">ずかん コンプリート!</div>'
+    + '<div style="font-size:13px;color:#8d7b66;line-height:1.7;margin-bottom:10px">' + act.length + 'にんの なかまが ぜんいん あつまったよ!<br>みんなで おいわいの ダンス!</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">' + cells + '</div>'
+    + '<div style="font-size:12px;color:#8d7b66;line-height:1.7;margin-top:10px">これからも ガチャは まわせるよ。おなじ なかまを なんこも あつめるのも たのしいよ。</div>'
+    + '<button style="font-family:inherit;font-size:15px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;border-radius:999px;padding:12px 30px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin-top:12px">やったー!</button></div>';
+  w.querySelector("button").onclick = function(){ w.remove(); };
+  document.body.appendChild(w);
+  fanfare(); setTimeout(fanfare, 650); setTimeout(fanfare, 1300);
+  var cols = ["#f4d3da","#cfe0ee","#d3e7cb","#f9e3a8","#ddd7f0","#f5c9a8"];
+  for (var i=0; i<60; i++){
+    var cf = document.createElement("div");
+    cf.className = "confetti";
+    cf.style.cssText += "left:" + (Math.random()*100) + "vw;top:-20px;background:" + cols[i%cols.length] +
+      ";animation-duration:" + (1.6+Math.random()*1.8) + "s;animation-delay:" + (Math.random()*1.2) + "s;z-index:97";
+    document.body.appendChild(cf);
+    setTimeout(function(el){ return function(){ el.remove(); }; }(cf), 4400);
+  }
+}
 
 /* ===== ずかん ===== */
 q("zukanBtn").onclick = function(){
@@ -654,7 +702,7 @@ q("zukanBtn").onclick = function(){
     cell.innerHTML = p.svg + (n>0 ? '<span class="cnt">×'+n+'</span>' : '');
     grid.appendChild(cell);
   });
-  q("zprog").textContent = got + "/" + act.length + (lockedN ? "(? は これから ふえる なかま)" : "");
+  q("zprog").textContent = ((act.length && got === act.length) ? "🏆 " : "") + got + "/" + act.length + (lockedN ? "(? は これから ふえる なかま)" : "");
   q("zukan").style.display = "flex";
   if (newCount>0){ blip(659,.1); blip(880,.12,.12,"triangle"); } else blip(660,.08);
   // 今回の状態を「見た」として記録(次に開くとNEWは消える)
@@ -793,6 +841,15 @@ function resetAll(){
   gtoast("✅ ずかんをリセットしました(コインは残ります)");
   setMsg("");
 }
+function toggleSec(wrapId, btnId, label){
+  var w = q(wrapId), b = q(btnId); if (!w || !b) return;
+  var open = w.style.display === "block";
+  w.style.display = open ? "none" : "block";
+  b.textContent = (open ? "▼ " : "▲ ") + label;
+  if (!open && wrapId === "packWrap") renderPackState_();
+  if (!open){ setTimeout(function(){ try{ b.scrollIntoView({block:"start", behavior:"smooth"}); }catch(e){} }, 60); }
+}
+function showMore(){ var l = q("moreLink"), t = q("moreTxt"); if (l) l.style.display = "none"; if (t) t.style.display = "inline"; }
 function toggleCfg(){
   var w = q("cfgWrap"), b = q("cfgToggle");
   var open = w.style.display === "block";

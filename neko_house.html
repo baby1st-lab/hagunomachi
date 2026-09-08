@@ -74,6 +74,14 @@ body{font-family:"Hiragino Maru Gothic ProN","BIZ UDGothic",sans-serif;min-heigh
 /* ごはん */
 #bowl{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;width:74px;cursor:pointer;display:none;z-index:5} /* 2026-09-07: 左端だとおもちゃと重なるので中央に */
 #bowl svg{width:100%;height:auto}
+/* どうぐばこ(こうぼうの入口・2026-09-08 「奥のドア」演出の置き換え) */
+#toolbox{position:absolute;left:82px;bottom:118px;width:54px;cursor:pointer;display:none;z-index:1}
+#toolbox svg{width:100%;height:auto;display:block}
+#toolbox.drop{animation:pdrop 1.1s cubic-bezier(.3,.9,.4,1.1) both}
+@keyframes pdrop{0%{transform:translateY(-330px) rotate(-8deg)}60%{transform:translateY(0) rotate(0)}76%{transform:translateY(-16px) rotate(3deg)}100%{transform:translateY(0) rotate(0)}}
+#toolbox.pop{animation:tpop .6s ease 3}
+@keyframes tpop{50%{transform:scale(1.22) rotate(-6deg)}}
+.spark{position:absolute;font-size:18px;pointer-events:none;animation:hrise 1.3s ease-out forwards;z-index:6}
 #bowl .n{position:absolute;top:-10px;right:-6px;background:#e8937c;color:#fff;font-size:12px;font-weight:bold;
   border-radius:999px;padding:1px 8px}
 #bowl.wiggle{animation:bwig 1s ease-in-out infinite}
@@ -159,6 +167,7 @@ body{padding-bottom:104px!important}
   <div id="toyBox" style="position:absolute;left:16px;bottom:118px;width:58px;cursor:pointer;display:none;z-index:1">
     <span class="n" style="position:absolute;top:-8px;right:-6px;background:#e8937c;color:#fff;font-size:11px;font-weight:bold;border-radius:999px;padding:1px 7px"></span>
   </div>
+  <div id="toolbox" title="こうぼうへ"></div>
 </div>
 
 <div id="stats">
@@ -185,7 +194,7 @@ body{padding-bottom:104px!important}
     🔧 おもちゃこうぼうで つくってあげる</a>
 </div>
 
-<div id="parent"><div class="inner">
+<div id="parent"><div class="inner" style="position:relative"><button onclick="q('parent').style.display='none'" style="position:absolute;top:10px;right:12px;background:#e8dcc4;border:none;border-radius:50%;width:34px;height:34px;font-size:16px;font-weight:bold;color:#7a6146;cursor:pointer;box-shadow:none;margin:0;padding:0;line-height:34px;text-align:center">✕</button>
   <h3 id="pTitle">ねこのなまえ</h3>
   <p>お子さんと一緒に決めて入力してください(あとから変更できます)。<br>ごはんは、おしたくボードでためた お湯コイン1枚で あげられます。<br>ごはんをあげなくても、ねこは弱ったり いなくなったりしません。おなかがすくと、ねむそうな顔で「おなか すいたにゃ」と教えてくれます。</p>
   <input type="text" id="nameInput" maxlength="8" placeholder="例: ゆず">
@@ -222,7 +231,7 @@ function blip(f,d,w,t){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||wi
 /* うれしい声(低音のゴロゴロは不評だったので、明るいチャープに変更) */
 function purr(){ blip(784,.1,0,"triangle"); blip(988,.1,.13,"triangle"); blip(1175,.16,.26,"triangle"); }
 /* ねむり時間(ボードのねこと同期: 20:30〜翌7:00) */
-function nekoBed_(){ try{ var v = JSON.parse(localStorage.getItem("neko_sleep_v1")||"{}").bed; return (typeof v === "number" && v >= 1080 && v <= 1380) ? v : 1230; }catch(e){ return 1230; } }
+function nekoBed_(){ try{ var v = JSON.parse(localStorage.getItem("neko_sleep_v1")||"{}").bed; return (typeof v === "number" && v >= 1080 && v <= 1439) ? v : 1230; }catch(e){ return 1230; } }
 function isSleepTime_(){
   var d = new Date(), t = d.getHours()*60 + d.getMinutes();
   return (t >= nekoBed_() || t < 420); // ねる時間はおしたくボードの設定と共有(既定20:30)
@@ -436,17 +445,48 @@ function renderKoubou(){
   var st = q("shopTitle"), sr = q("shopRow");
   if (st) st.style.display = all ? "none" : "";
   if (sr) sr.style.display = all ? "none" : "";
+  if (all && !neko.koubouSeen) row.style.display = "none";   // 演出の最後に出す
+  var tb = q("toolbox");
+  if (tb){
+    if (all && neko.koubouSeen){ tb.style.display = "block"; if (!tb.innerHTML) tb.innerHTML = TOOLBOX_SVG; tb.onclick = goKoubou_; }
+    else if (!all) tb.style.display = "none";
+  }
   if (all && !neko.koubouSeen){
     neko.koubouSeen = 1; save();
-    setTimeout(function(){
-      catSay("おもちゃ ぜんぶ そろったにゃ!! …あ! おくの ドアが あいたにゃ🔧 こうぼうが つかえるにゃ!");
-      var c = q("cat"); c.classList.add("happy","bounce");
-      setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
-      setTimeout(function(){ c.classList.remove("happy"); }, 3200);
-      purr();
-      [523,659,784,1047].forEach(function(f,i){ blip(f,.2,i*.14); });
-    }, 700);
+    setTimeout(koubouUnlock_, 700);
   }
+}
+/* こうぼう開放の演出(2026-09-08): 「奥のドア」は部屋に無いので廃止。
+   ねこが喜ぶ → ピンポーン → おれいの荷物が上から降ってくる → 開くと どうぐばこ(タップで こうぼうへ) */
+var PARCEL_SVG = '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="12" y="32" width="56" height="40" rx="6" fill="#f0e3c8"/><path d="M12 46 H68"/><path d="M40 32 V72" stroke="#e8788a" stroke-width="5"/><path d="M12 52 H68" stroke="#e8788a" stroke-width="5"/><path d="M40 32 Q28 14 20 22 Q28 30 40 32 Z" fill="#f4d3da"/><path d="M40 32 Q52 14 60 22 Q52 30 40 32 Z" fill="#f4d3da"/><circle cx="40" cy="32" r="4" fill="#f4b8b8"/></svg>';
+var TOOLBOX_SVG = '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="36" width="60" height="34" rx="7" fill="#a5c9e8"/><path d="M10 52 H70"/><path d="M30 36 V26 Q30 22 34 22 H46 Q50 22 50 26 V36" fill="#cfe0ee"/><rect x="33" y="47" width="14" height="10" rx="3" fill="#f9e3a8"/><path d="M18 44 h6 M56 44 h6" stroke="#fff7ec"/><path d="M66 10 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2 Z" fill="#f9e3a8"/><path d="M10 18 l1.5 3 3 1.5 -3 1.5 -1.5 3 -1.5 -3 -3 -1.5 3 -1.5 Z" fill="#fff7ec"/></svg>';
+function goKoubou_(){ blip(784,.08); location.href = "koubou.html"; }
+function koubouUnlock_(){
+  var c = q("cat"), tb = q("toolbox"), room = q("room");
+  catSay("おもちゃ ぜんぶ そろったにゃ!! ありがとにゃ〜💗", 2600);
+  c.classList.add("happy","bounce"); setTimeout(function(){ c.classList.remove("bounce"); }, 1100);
+  purr();
+  setTimeout(function(){
+    if (!tb) return;
+    blip(988,.22,0,"triangle"); blip(784,.3,.25,"triangle");       // ピンポーン
+    tb.innerHTML = PARCEL_SVG; tb.style.display = "block"; tb.classList.remove("pop"); tb.classList.add("drop");
+    catSay("あれ? なにか とどいたにゃ!", 2200);
+    c.classList.add("jump"); setTimeout(function(){ c.classList.remove("jump"); }, 1400);
+  }, 1500);
+  setTimeout(function(){
+    if (!tb) return;
+    tb.classList.remove("drop"); tb.innerHTML = TOOLBOX_SVG; tb.classList.add("pop"); tb.onclick = goKoubou_;
+    for (var i=0; i<6; i++){
+      var sp = document.createElement("div"); sp.className = "spark"; sp.textContent = "✨";
+      sp.style.left = (66 + Math.random()*90) + "px"; sp.style.bottom = (130 + Math.random()*50) + "px"; sp.style.animationDelay = (i*0.12) + "s";
+      if (room) room.appendChild(sp);
+      setTimeout(function(el){ return function(){ el.remove(); }; }(sp), 1900);
+    }
+    [523,659,784,1047].forEach(function(f,i){ blip(f,.2,i*.14); });
+    catSay("どうぐばこ だにゃ! これで おもちゃを つくって あげられるにゃ🔧(どうぐばこを タップ)", 4500);
+    var row = q("koubouRow"); if (row){ row.style.display = "block"; row.style.animation = "tpop .6s ease 3"; }
+    setTimeout(function(){ c.classList.remove("happy"); }, 2200);
+  }, 3600);
 }
 function renderToyBox(){
   var b = q("toyBox"); if (!b) return;
@@ -742,7 +782,7 @@ q("coinIco").innerHTML = COIN; if(q("footCoinIco")) q("footCoinIco").innerHTML =
 render();
 if (!neko.name) q("parent").style.display = "flex";
 else setTimeout(sayLine, 800);
-setTimeout(function(){ firstTip("neko", "ねこのおうち", "おしたくで ためた <b>お湯コイン</b>で、ごはんや おもちゃを かってあげられます。<br>おもちゃを ぜんぶ かうと、おたのしみが まってるよ。<br><br><span style='font-size:12px;color:#8d7b66'>おうちのひとの せっていは、右上の「おうちのひと」を 1.5秒 ながおし。</span>"); }, 600);
+setTimeout(function(){ firstTip("neko", "ねこのおうち", "おしたくボードで貯めた<b>お湯コイン</b>で、ねこにごはんやおもちゃを買ってあげられます。ごはんをあげなくても、ねこは弱ったり いなくなったりしません。<br>おもちゃを全部買うと、お楽しみが待っています。<br><br><span style='font-size:12px;color:#8d7b66'>ねこの名前の設定は、右上の「おうちのひと」を1.5秒長押し。</span>"); }, 600);
 document.addEventListener("visibilitychange", function(){ if(!document.hidden){ render(); } });
 setInterval(render, 60000);
 setInterval(sayLine, 45000);
