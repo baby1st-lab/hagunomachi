@@ -61,6 +61,71 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
 #cel button{font-family:inherit;font-size:14px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;
   border-radius:999px;padding:11px 26px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin:8px 4px 0}
 
+/* もくひょう(第8ラウンド) */
+#goal{display:none;margin-top:8px;font-size:12.5px;font-weight:bold;color:#5a6b86;cursor:pointer}
+#goal .bar{height:10px;border-radius:99px;background:#e8e2d4;border:2px solid #c9ae87;margin:5px auto 0;max-width:300px;overflow:hidden}
+#goal .bar i{display:block;height:100%;width:0;background:#a5c9e8;border-radius:99px;transition:width .6s}
+#garageTtl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#madeN{font-size:11.5px;color:#8b9ab3;font-weight:normal}
+#depotBtn{margin-left:auto;font-family:inherit;font-size:12.5px;font-weight:bold;border:none;background:#a5c9e8;color:#2f4b6b;
+  border-radius:999px;padding:7px 14px;box-shadow:0 3px 0 #7fa9cd;cursor:pointer}
+#depotBtn:active{transform:translateY(2px);box-shadow:0 1px 0 #7fa9cd}
+/* ながい でんしゃ(共通) */
+.fm{position:absolute;left:0;bottom:8px;will-change:transform;cursor:pointer}
+.fm .cars{display:flex;align-items:flex-end}
+.fm.flip .cars{transform:scaleX(-1)}
+.cr{display:block;flex:none}
+.cr svg{width:100%;height:100%;display:block}
+/* おいわい(100りょう)+もくひょう */
+#mile{position:fixed;inset:0;background:rgba(90,74,56,.6);z-index:95;display:none;align-items:center;justify-content:center;
+  padding:16px 12px calc(16px + env(safe-area-inset-bottom))}
+#mile .in{background:#fffcf4;border:4px solid #a58868;border-radius:24px;max-width:400px;width:100%;padding:16px 12px 14px;text-align:center;
+  max-height:78vh;max-height:calc(100dvh - 60px);overflow-y:auto}
+#mileTtl{font-size:24px;line-height:1.25;font-weight:bold;color:#7a6146}
+#mile .strip{position:relative;height:60px;overflow:hidden;background:#eef4fb;border:2.5px solid #c9ae87;border-radius:14px;margin:10px 0 8px}
+#mile .strip .sline{position:absolute;left:0;right:0;bottom:8px;height:6px;background:#d8c9ab}
+#mile .strip .sline::after{content:"";position:absolute;inset:1px 0;background:repeating-linear-gradient(90deg,#c9ae87 0 6px,transparent 6px 18px)}
+#mile .strip .fm{bottom:12px}
+#mileMsg{font-size:13px;color:#8d7b66;margin:0 0 8px}
+#mileAsk .q{font-size:15px;font-weight:bold;color:#5a6b86;margin:4px 0 8px}
+#mileBtns{display:flex;gap:8px;justify-content:center}
+#mileBtns .gbtn{flex:1;max-width:110px;font-family:inherit;font-size:20px;font-weight:bold;border:none;background:#f2d98a;color:#7a6146;
+  border-radius:16px;padding:14px 0;box-shadow:0 4px 0 #dcc06e;cursor:pointer}
+#mileBtns .gbtn:active{transform:translateY(2px);box-shadow:0 2px 0 #dcc06e}
+#mile .other{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px}
+#mileNum{font-family:inherit;font-size:18px;font-weight:bold;width:130px;padding:9px 6px;border:2.5px solid #c9ae87;border-radius:14px;
+  text-align:center;color:#7a6146;background:#fff;-webkit-user-select:text;user-select:text}
+#mile .other button,#mile .later{font-family:inherit;font-size:13.5px;font-weight:bold;border:none;background:#e8dcc4;color:#7a6146;
+  border-radius:999px;padding:10px 18px;box-shadow:0 3px 0 #cbb99b;cursor:pointer}
+#mile .later{display:block;margin:12px auto 0;background:#f2ede2;box-shadow:0 3px 0 #d9d0bf;font-size:12.5px;padding:8px 16px}
+.cf{position:fixed;top:-14px;width:10px;height:14px;border-radius:3px;z-index:96;pointer-events:none;animation:cfall 2.8s linear forwards}
+@keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:.85}}
+/* しゃりょうきち(まち) */
+#depot{position:fixed;inset:0;z-index:90;display:none;flex-direction:column;background:#c9ddb9}
+#depot .hd{display:flex;align-items:center;gap:6px;padding:10px 8px 8px;font-size:14px;font-weight:bold;color:#5a6b86;white-space:nowrap;
+  background:rgba(255,250,240,.94);border-bottom:3px solid #c9ae87;padding-top:calc(10px + env(safe-area-inset-top))}
+#depotN{font-size:12px;color:#8b9ab3;font-weight:normal;white-space:nowrap}
+#depot .hd button{font-family:inherit;font-size:12.5px;font-weight:bold;border:none;border-radius:999px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+#depotAll{background:#f2d98a;color:#7a6146;box-shadow:0 3px 0 #dcc06e}
+#depotX{background:#e8dcc4;color:#7a6146;box-shadow:0 3px 0 #cbb99b;font-size:15px;padding:6px 13px}
+#scene{flex:1;position:relative;overflow:hidden;min-height:260px;background:linear-gradient(#cfe0ee 0%,#eaf2fb 46%,#d3e7cb 46%,#c9ddb9 100%)}
+#scene .sky{position:absolute;left:0;right:0;top:0;height:46%}
+#scene .sky svg{width:100%;height:100%;display:block}
+#scene .lane{position:absolute;left:0;right:0;height:34px}
+#scene .lane .track{position:absolute;left:0;right:0;bottom:3px;height:7px;background:#d8c9ab;border-radius:99px}
+#scene .lane.rail .track::after{content:"";position:absolute;inset:2px 0;background:repeating-linear-gradient(90deg,#c9ae87 0 6px,transparent 6px 18px)}
+#scene .lane.road .track{height:13px;background:#cfc7ba;bottom:1px;border-radius:4px}
+#scene .lane.road .track::after{content:"";position:absolute;left:0;right:0;top:5px;height:2px;background:repeating-linear-gradient(90deg,#fff7ec 0 10px,transparent 10px 22px)}
+#scene .sempty{position:absolute;left:0;right:0;top:55%;text-align:center;font-size:13px;color:#7a6146;font-weight:bold}
+#deco{position:absolute;right:6px;top:6px;display:flex;gap:2px;align-items:flex-end;background:rgba(255,250,240,.85);
+  border:2px solid #c9ae87;border-radius:12px;padding:3px 6px}
+#deco span{display:block;width:34px;height:14px}
+#deco span svg{width:100%;height:100%;display:block}
+#deco b{font-size:11px;color:#7a6146;margin:0 2px 0 0}
+#depotToast{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(90,74,56,.85);color:#fff;
+  font-size:13px;font-weight:bold;padding:8px 14px;border-radius:999px;display:none;white-space:nowrap;pointer-events:none}
+@media (max-height:610px){ #mileTtl{font-size:20px} #mile .strip{height:52px} #mileBtns .gbtn{padding:11px 0;font-size:18px} }
+
 *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* ===== 共通ヘッダー ===== */
 #topBar{display:flex;gap:8px;align-items:center;width:min(500px,96vw);margin:0 auto 8px}
@@ -96,12 +161,13 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
   <div id="rail"><div id="railLine"></div><div id="trainSvg"></div></div>
   <div id="progress"></div>
   <div id="hint"></div>
+  <div id="goal" onclick="openMile(prevMile_(), true)"><span id="goalTxt"></span><div class="bar"><i id="goalFill"></i></div></div>
 </div>
 
 <div id="shopTtl"><span style="display:inline-block;width:28px;height:28px;vertical-align:-8px;margin-right:4px"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 22 L13 9 H47 L52 22 Z" fill="#f4d3da"/><path d="M21 9 L19 22 M30 9 V22 M39 9 L41 22"/><path d="M8 22 q5.5 7 11 0 q5.5 7 11 0 q5.5 7 11 0 q5.5 7 11 0" fill="#fff7ec"/><circle cx="30" cy="37" r="9" fill="#f0e3c8"/><circle cx="27" cy="36" r="1.6" fill="#5a4a38" stroke="none"/><circle cx="33" cy="36" r="1.6" fill="#5a4a38" stroke="none"/><path d="M28 40 q2 2 4 0" stroke-width="2"/><circle cx="23.5" cy="39.5" r="2" fill="#f4b8b8" stroke="none"/><circle cx="36.5" cy="39.5" r="2" fill="#f4b8b8" stroke="none"/><rect x="9" y="46" width="42" height="9" rx="3" fill="#f9e3a8"/></svg></span>ぶひんやさん(タップで かう)</div>
 <div id="parts"></div>
 
-<div id="garageTtl">🎁 できた おもちゃ</div>
+<div id="garageTtl"><span>🎁 できた おもちゃ</span><span id="madeN"></span><button id="depotBtn" onclick="openDepot()">🚉 しゃりょうきち</button></div>
 <div id="garage"></div>
 
 <div id="cel"><div class="in">
@@ -111,6 +177,24 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
   <button onclick="location.href='neko_house.html'">🐱 ねこに みせにいく</button>
   <button onclick="closeCel()" style="background:#e8dcc4;box-shadow:0 3px 0 #cbb99b">つぎを つくる</button>
 </div></div>
+
+<div id="mile"><div class="in">
+  <div id="mileTtl"></div>
+  <div class="strip"><div class="sline"></div><div class="fm" id="mileFm"><div class="cars"></div></div></div>
+  <p id="mileMsg"></p>
+  <div id="mileAsk">
+    <div class="q">つぎは なんりょう まで?</div>
+    <div id="mileBtns"></div>
+    <div class="other"><input id="mileNum" type="number" inputmode="numeric" min="1" max="9999" placeholder="ほかの かず"><button onclick="mileDecide(0)">きめる</button></div>
+    <button class="later" onclick="mileLater()">あとで きめる</button>
+  </div>
+</div></div>
+
+<div id="depot">
+  <div class="hd"><span>🚉 しゃりょうきち</span><span id="depotN"></span><span style="flex:1"></span><button id="depotAll" onclick="depotToggleAll()">ぜんぶ つなぐ!</button><button id="depotX" onclick="closeDepot()">✕</button></div>
+  <div id="scene"></div>
+  <div id="depotToast"></div>
+</div>
 
 <div id="appFoot">
   <a class="fbtn" href="kuruma_parking.html"><span class="ic"><svg viewBox="0 0 80 60" fill="none" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 44 V38 Q6 32 14 32 L22 32 Q28 18 41 18 L49 18 Q59 18 63 32 Q70 32 70 39 V44 Z" fill="#f4d3da"/><circle cx="20" cy="46" r="7" fill="#ddd7f0"/><circle cx="58" cy="46" r="7" fill="#ddd7f0"/><circle cx="33" cy="37" r="2.5" fill="#8d7b66" stroke="none"/><circle cx="45" cy="37" r="2.5" fill="#8d7b66" stroke="none"/></svg></span>おしたく</a>
@@ -223,9 +307,11 @@ function cakeSVG(t, step){
 }
 
 /* ===== データ ===== */
-var K = { made:[], cur:null, bought:{} };
+var K = { made:[], cur:null, bought:{}, goal:0, cel:{} };   // goal=つぎの もくひょう(0=なし) / cel=おいわい済みの りょうすう
 try{ var raw = localStorage.getItem("koubou_v1"); if (raw){ var o = JSON.parse(raw);
-  ["made","cur","bought"].forEach(function(k){ if(o[k]!==undefined) K[k]=o[k]; }); } }catch(e){}
+  ["made","cur","bought","goal","cel"].forEach(function(k){ if(o[k]!==undefined) K[k]=o[k]; }); } }catch(e){}
+if (!K.cel || typeof K.cel !== "object") K.cel = {};
+if (!(K.goal > 0)) K.goal = 0;
 function save(){ try{ localStorage.setItem("koubou_v1", JSON.stringify(K)); }catch(e){} }
 if (!K.cur) startNext_();
 
@@ -264,6 +350,8 @@ function render(){
   q("hint").textContent = st >= 4 ? "ぜんぶ そろった!"
     : (next ? "つぎは「" + next.name + "」を かおう(" + next.price + "まい)" : "");
   renderGarage();
+  renderGoal();
+  var mn = q("madeN"); if (mn) mn.textContent = K.made.length ? "(" + K.made.length + "りょう)" : "";
   refreshCoin();
 }
 function renderGarage(){
@@ -308,7 +396,8 @@ function finishToy_(){
   q("celSvg").innerHTML = trainSVG(t, 4);
   q("celTtl").textContent = "🎉 「" + t.name + "」 かんせい!";
   q("celMsg").textContent = "じぶんで つくったね! ねこに みせに いこう";
-  q("cel").style.display = "flex";
+  if (pendingMile_()) { setTimeout(function(){ openMile(pendingMile_(), false); }, 500); }   // 100りょう等の節目は 大きいお祝いだけ出す
+  else q("cel").style.display = "flex";
   // ねこの部屋に「もらったでんしゃ」として渡す
   try{
     var gift = JSON.parse(localStorage.getItem("neko_gift_v1") || "[]");
@@ -318,7 +407,195 @@ function finishToy_(){
   startNext_();
   render();
 }
-function closeCel(){ q("cel").style.display = "none"; }
+function closeCel(){ q("cel").style.display = "none"; checkMile(); }
+
+/* ===== もくひょう と 節目の おいわい(第8ラウンド 2026-09-18) =====
+   100りょうで1回だけ大きいお祝い → 「つぎは なんりょう まで?」を子が口に出し、おうちのひとが押す。
+   目標に届いたらまた同じ流れ。データ: K.goal(つぎの目標) / K.cel({"100":1,...} お祝い済み) */
+var FIRST_MILE = 100;
+function madeN_(){ return K.made.length; }
+function celDone_(m){ return !!K.cel[m]; }
+function prevMile_(){ var b = 0; Object.keys(K.cel).forEach(function(k){ var n = +k; if (n <= madeN_() && n > b) b = n; }); return b; }
+function pendingMile_(){
+  var n = madeN_();
+  if (n >= FIRST_MILE && !celDone_(FIRST_MILE)) return FIRST_MILE;
+  if (K.goal && n >= K.goal && !celDone_(K.goal)) return K.goal;
+  return 0;
+}
+function checkMile(){ var m = pendingMile_(); if (m) openMile(m, false); }
+function renderGoal(){
+  var g = q("goal"); if (!g) return;
+  if (!K.goal){
+    if (celDone_(FIRST_MILE)){ q("goalTxt").textContent = "🎯 つぎの もくひょうを きめる(ここを おす)"; q("goalFill").style.width = "0%"; g.style.display = "block"; }
+    else g.style.display = "none";
+    return;
+  }
+  var n = madeN_(), base = prevMile_(), left = Math.max(0, K.goal - n);
+  q("goalTxt").textContent = "🎯 もくひょう " + K.goal + "りょう ・ あと " + left + "りょう";
+  var pct = K.goal > base ? Math.min(100, Math.max(0, (n - base) / (K.goal - base) * 100)) : 100;
+  q("goalFill").style.width = pct + "%";
+  g.style.display = "block";
+}
+var mileCur = 0, mileAsk = false;
+function openMile(m, ask){
+  mileCur = m; mileAsk = !!ask;
+  q("mileTtl").innerHTML = ask ? "🎯 つぎの もくひょう" : ("🎉 " + m + "りょう<br>たっせい!");
+  q("mileMsg").textContent = ask ? ("いま " + madeN_() + "りょう。つぎは どこまで?") : "じぶんで ここまで つくったね!";
+  var bt = q("mileBtns"); bt.innerHTML = "";
+  [m + 50, m + 100, m + 200].forEach(function(v){
+    var b = document.createElement("button"); b.className = "gbtn"; b.type = "button"; b.textContent = v;
+    b.onclick = function(){ mileDecide(v); }; bt.appendChild(b);
+  });
+  q("mileNum").value = "";
+  q("mile").style.display = "flex";
+  var fm = q("mileFm"); fm.querySelector(".cars").innerHTML = trainRow_(K.made.slice().reverse(), 44);   // 左むき(鏡うつし)なので逆順
+  fm.classList.add("flip");
+  mvClear("mile"); mvAdd({ el:fm, lane:fm.parentNode, dir:-1, v:70, tag:"mile", x:fm.parentNode.clientWidth + 10 }); mvStart();
+  if (!ask){ fanfare(); setTimeout(fanfare, 650); try{navigator.vibrate&&navigator.vibrate([80,60,80,60,220]);}catch(e){} confettiMile_(); }
+}
+function mileDecide(v){
+  if (!v){ v = parseInt(q("mileNum").value, 10); }
+  if (!(v > madeN_())){ q("mileNum").focus(); blip(300,.15); q("mileMsg").textContent = "いま " + madeN_() + "りょう より おおきい かずに してね"; return; }
+  if (mileCur > 0) K.cel[mileCur] = 1;
+  K.goal = v; save();
+  closeMile(); renderGoal();
+  blip(784,.12); blip(1047,.15,.12);
+}
+function mileLater(){
+  if (!mileAsk){ if (mileCur > 0) K.cel[mileCur] = 1; if (K.goal && K.goal <= mileCur) K.goal = 0; save(); }
+  closeMile(); renderGoal();
+}
+function closeMile(){ q("mile").style.display = "none"; mvClear("mile"); }
+function confettiMile_(){
+  var cols = ["#f4d3da","#cfe0ee","#d3e7cb","#f9e3a8","#ddd7f0","#f5c9a8"];
+  for (var i = 0; i < 44; i++){
+    var d = document.createElement("div"); d.className = "cf";
+    d.style.left = (Math.random()*100) + "vw"; d.style.background = cols[i % cols.length];
+    d.style.animationDelay = (Math.random()*1.2) + "s"; d.style.animationDuration = (2.2 + Math.random()*1.4) + "s";
+    document.body.appendChild(d);
+    (function(el){ setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 4200); })(d);
+  }
+}
+
+/* ===== ながい でんしゃ(共通の部品) ===== */
+function trainById_(id){ return TRAINS.filter(function(x){ return x.id === id; })[0]; }
+function flatSVG_(t){   // でんしゃ以外は「かしゃ」に のせて つなぐ
+  var inner = trainSVG(t, 4).replace("<svg ", '<svg x="66" y="8" width="168" height="67" ');
+  return '<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' +
+    '<rect x="40" y="74" width="220" height="14" rx="6" fill="#c9ae87"/>' +
+    '<circle cx="80" cy="96" r="12" fill="#ddd7f0"/><circle cx="220" cy="96" r="12" fill="#ddd7f0"/>' + inner + '</svg>';
+}
+function carSmall_(t){ return t.type === "train" ? trainSVG(t, 4) : flatSVG_(t); }
+function trainRow_(ids, w){
+  var h = Math.round(w * 0.4);
+  return ids.map(function(id){ var t = trainById_(id); if (!t) return "";
+    return '<span class="cr" style="width:' + w + 'px;height:' + h + 'px">' + carSmall_(t) + '</span>'; }).join("");
+}
+/* うごかす(1つの requestAnimationFrame で 全部)。m = {el, lane, dir(+1/-1), v(px/秒), tag, x, gap, L(1周の長さ)} */
+var MV = { items:[], raf:0, last:0 };
+function mvAdd(m){ m.w = m.el.offsetWidth; if (m.x === undefined) m.x = 0; if (m.gap === undefined) m.gap = 24;
+  m.el.style.transform = "translateX(" + m.x + "px)"; MV.items.push(m); return m; }
+function mvClear(tag){ MV.items = MV.items.filter(function(m){ return m.tag !== tag; }); if (!MV.items.length) mvStop(); }
+function mvStart(){ if (MV.raf || !MV.items.length) return; MV.last = performance.now(); MV.raf = requestAnimationFrame(mvTick); }
+function mvStop(){ if (MV.raf) cancelAnimationFrame(MV.raf); MV.raf = 0; }
+function mvTick(t){
+  var dt = Math.min(.1, (t - MV.last) / 1000); MV.last = t;
+  MV.items.forEach(function(m){
+    var L = m.L || (m.lane.clientWidth + m.w + m.gap * 2);   // 1周 = 画面幅 + 自分の長さ + すきま
+    m.x += m.dir * m.v * dt;
+    if (m.dir < 0 && m.x < -(m.w + m.gap)) m.x += L;
+    if (m.dir > 0 && m.x >= L - (m.w + m.gap)) m.x -= L;
+    m.el.style.transform = "translateX(" + m.x + "px)";
+  });
+  MV.raf = MV.items.length ? requestAnimationFrame(mvTick) : 0;
+}
+
+/* ===== しゃりょうきち(まちを はしる) ===== */
+var DEPOT = { all:false };
+var SKY_SVG = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="2.5" stroke-linejoin="round">' +
+  '<circle cx="52" cy="170" r="18" fill="#f9e3a8" stroke="#eccf92"/>' +
+  '<g fill="#fff" stroke="#dfe6ef"><ellipse cx="150" cy="150" rx="26" ry="10"/><ellipse cx="166" cy="144" rx="16" ry="9"/><ellipse cx="320" cy="176" rx="30" ry="11"/><ellipse cx="338" cy="169" rx="18" ry="10"/><ellipse cx="236" cy="112" rx="20" ry="8"/></g>' +
+  '<path d="M0 262 Q60 206 120 246 Q170 200 230 240 Q290 196 340 238 Q370 226 400 246 V300 H0 Z" fill="#dde8d6" stroke="none"/>' +
+  '<path d="M0 300 Q90 246 190 278 T400 268 V300 Z" fill="#d3e7cb" stroke="none"/><path d="M0 300 Q70 268 160 292 T400 286 V300 Z" fill="#c9ddb9" stroke="none"/>' +
+  house_(18, "#f4d3da", "#e8788a") + house_(96, "#cfe0ee", "#7fa9cd") + catHouse_(178) + house_(262, "#f9e3a8", "#d9a3b2") + house_(334, "#ddd7f0", "#a58868") +
+  tree_(80) + tree_(246) + tree_(320) + tree_(392) +
+  '</svg>';
+function house_(x, body, roof){   // 地面 y=300 に立つ
+  return '<g><rect x="' + x + '" y="252" width="56" height="48" rx="6" fill="' + body + '"/>' +
+    '<path d="M' + (x - 6) + ' 254 L' + (x + 28) + ' 226 L' + (x + 62) + ' 254 Z" fill="' + roof + '"/>' +
+    '<rect x="' + (x + 22) + '" y="274" width="12" height="26" rx="3" fill="#fff7ec"/>' +
+    '<rect x="' + (x + 6) + '" y="262" width="11" height="10" rx="2" fill="#fff7ec"/><rect x="' + (x + 39) + '" y="262" width="11" height="10" rx="2" fill="#fff7ec"/></g>';
+}
+function catHouse_(x){
+  return '<g><rect x="' + x + '" y="250" width="60" height="50" rx="8" fill="#f0e3c8"/>' +
+    '<path d="M' + (x - 6) + ' 252 L' + (x + 30) + ' 222 L' + (x + 66) + ' 252 Z" fill="#c9ae87"/>' +
+    '<circle cx="' + (x + 30) + '" cy="274" r="13" fill="#fff7ec"/>' +
+    '<path d="M' + (x + 20) + ' 266 L' + (x + 17) + ' 256 L' + (x + 26) + ' 262 Z M' + (x + 40) + ' 266 L' + (x + 43) + ' 256 L' + (x + 34) + ' 262 Z" fill="#fff7ec"/>' +
+    '<circle cx="' + (x + 25) + '" cy="272" r="1.8" fill="#5a4a38" stroke="none"/><circle cx="' + (x + 35) + '" cy="272" r="1.8" fill="#5a4a38" stroke="none"/>' +
+    '<path d="M' + (x + 27) + ' 278 q3 3 6 0" stroke-width="2"/>' +
+    '<circle cx="' + (x + 20) + '" cy="277" r="2.4" fill="#f4b8b8" stroke="none"/><circle cx="' + (x + 40) + '" cy="277" r="2.4" fill="#f4b8b8" stroke="none"/></g>';
+}
+function tree_(x){
+  return '<g><rect x="' + (x - 3) + '" y="278" width="6" height="22" rx="2" fill="#a58868"/><circle cx="' + x + '" cy="268" r="16" fill="#a8cf9e"/><circle cx="' + (x - 9) + '" cy="276" r="10" fill="#b9d9ae" stroke="none"/></g>';
+}
+function openDepot(){ DEPOT.all = false; q("depot").style.display = "flex"; buildScene_(); }
+function closeDepot(){ q("depot").style.display = "none"; mvClear("depot"); q("scene").innerHTML = ""; }
+function depotToggleAll(){ DEPOT.all = !DEPOT.all; buildScene_(); blip(659,.1); }
+function depotToast_(txt){ var t = q("depotToast"); t.textContent = txt; t.style.display = "block"; clearTimeout(t._tm); t._tm = setTimeout(function(){ t.style.display = "none"; }, 1800); }
+function addFm_(lane, ids, w, label, x0, gap){
+  var d = document.createElement("div"); d.className = "fm" + (lane.dir < 0 ? " flip" : "");
+  if (lane.dir < 0) ids = ids.slice().reverse();   // 左むきは鏡うつしになるので、1りょうめが先頭に来るよう逆順に
+  d.innerHTML = '<div class="cars">' + trainRow_(ids, w) + '</div>';
+  d.onclick = function(){ depotToast_(label); blip(523,.08); };
+  lane.el.appendChild(d);
+  return mvAdd({ el:d, lane:lane.el, dir:lane.dir, v:lane.v, tag:"depot", x:x0, gap:gap });
+}
+function buildScene_(){
+  var sc = q("scene"); sc.innerHTML = ""; mvClear("depot");
+  var n = madeN_();
+  q("depotN").textContent = n + "りょう";
+  q("depotAll").textContent = DEPOT.all ? "🏘 まちを はしる" : "🚂 ぜんぶ つなぐ";
+  q("depotAll").style.display = n ? "" : "none";
+  sc.insertAdjacentHTML("beforeend", '<div class="sky">' + SKY_SVG + '</div>');
+  var defs = [ {top:50, kind:"rail", dir:-1, v:46}, {top:63, kind:"rail", dir:1, v:34}, {top:76, kind:"rail", dir:-1, v:56}, {top:89, kind:"road", dir:1, v:40} ];
+  var lanes = defs.map(function(d){ var l = document.createElement("div"); l.className = "lane " + d.kind; l.style.top = d.top + "%";
+    l.innerHTML = '<div class="track"></div>'; sc.appendChild(l); return { el:l, dir:d.dir, v:d.v, kind:d.kind }; });
+  if (!n){ sc.insertAdjacentHTML("beforeend", '<div class="sempty">まだ でんしゃが ないよ。<br>こうぼうで つくろう!</div>'); return; }
+  var W = sc.clientWidth || 390;
+  if (DEPOT.all){
+    addFm_({ el:lanes[1].el, dir:-1, v:64 }, K.made.slice(), 56, "ぜんぶ つないだ " + n + "りょう!", W + 20, 40);   // 右から入って左へ
+    mvStart(); depotToast_(n + "りょう へんせい しゅっぱつ!"); return;
+  }
+  // 種類ごとに 8りょうまでの へんせいに 分ける。でんしゃ=せんろ(3本) / くるま=どうろ(1だいずつ) / リボン・ケーキ=まちの かざり
+  var by = {}, order = [];
+  K.made.forEach(function(id){ if (!by[id]){ by[id] = []; order.push(id); } by[id].push(id); });
+  var fms = [], deco = {};
+  order.forEach(function(id){ var t = trainById_(id); if (!t) return;
+    if (t.type === "train" || t.type === "car"){ var arr = by[id], step = (t.type === "car") ? 1 : 8;
+      for (var i = 0; i < arr.length; i += step) fms.push({ t:t, ids:arr.slice(i, i + step) }); }
+    else deco[id] = by[id].length; });
+  var perLane = [[], [], [], []];
+  fms.forEach(function(f){ if (f.t.type === "car") perLane[3].push(f); else { var k = [0,1,2].sort(function(a,b){ return perLane[a].length - perLane[b].length; })[0]; perLane[k].push(f); } });
+  perLane.forEach(function(list, li){
+    var lane = lanes[li], gap = (li === 3) ? 30 : 60, off = 0, movers = [], maxw = 0;
+    list.forEach(function(f){
+      var w = f.t.type === "car" ? 46 : 56;
+      var label = f.t.name + " " + f.ids.length + (f.t.type === "car" ? "だい" : "りょう");
+      var m = addFm_(lane, f.ids, w, label, off, gap);
+      off += m.w + gap; maxw = Math.max(maxw, m.w); movers.push(m);
+    });
+    var L = Math.max(W + maxw + gap * 2, off);   // 1周の長さ = 全部を並べた長さ(重ならない)か 画面幅+最長
+    movers.forEach(function(m){ m.L = L; });
+  });
+  var dk = Object.keys(deco);
+  if (dk.length){
+    var h = '<div id="deco">';
+    dk.forEach(function(id){ var t = trainById_(id); h += '<b>' + deco[id] + '</b><span>' + trainSVG(t, 4) + '</span>'; });
+    sc.insertAdjacentHTML("beforeend", h + '</div>');
+  }
+  mvStart();
+}
+document.addEventListener("visibilitychange", function(){ if (document.hidden) mvStop(); else if (MV.items.length) mvStart(); });
 
 /* ===== コイン長押しで+3(おうちのひと) ===== */
 (function(){
@@ -333,6 +610,7 @@ q("footCoinIco").innerHTML = COIN;
 render();
 // 旧バージョンで「4つそろったのに かんせいボタンを押していない」状態の救済(自動完成)
 if (step_() >= 4) setTimeout(finishToy_, 800);
+else setTimeout(checkMile, 500);   // 100りょう等の節目が未お祝いなら(すでに超えていても)1回だけ出す
 document.addEventListener("visibilitychange", function(){ if(!document.hidden) render(); });
 </script>
 </body>
