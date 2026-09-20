@@ -1,0 +1,42 @@
+/* Standalone prototype: no account, backend, analytics or existing-app data access. */
+(()=>{'use strict';
+const M=window.HaguModel,$=id=>document.getElementById(id),KEY='hagu_railway_portable_v1';
+let state;try{state=M.normalize(JSON.parse(localStorage.getItem(KEY)));}catch{state=M.initial();}
+let frame=0,moving=false,draft=null;const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{$('notice').textContent='このブラウザでは記録を保存できません。画面を閉じると最初に戻る場合があります。';}}
+function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+/* 2両を弧長で別々に置く。1枚の絵を半分ずつ使うので、曲がっても車体が線路からはみ出さない(連結部で折れる) */
+const RX=38,RY=23.5,CY=45.5,SEG=720,ARC=[0];
+for(let i=1;i<=SEG;i++){const a0=2*Math.PI*(i-1)/SEG,a1=2*Math.PI*i/SEG,am=(a0+a1)/2;ARC.push(ARC[i-1]+Math.hypot(RX*Math.sin(am),RY*Math.cos(am))*(a1-a0));}
+const TOTAL=ARC[SEG];
+function lenAt(a){const f=(((a%(2*Math.PI))+2*Math.PI)%(2*Math.PI))/(2*Math.PI)*SEG,i=Math.floor(f);return ARC[i]+(ARC[i+1]-ARC[i])*(f-i);}
+function angAt(L){L=((L%TOTAL)+TOTAL)%TOTAL;let lo=0,hi=SEG;while(hi-lo>1){const m=(lo+hi)>>1;if(ARC[m]<=L)lo=m;else hi=m;}const f=(L-ARC[lo])/(ARC[lo+1]-ARC[lo]||1);return 2*Math.PI*(lo+f)/SEG;}
+function carHalf(){return $('car-a').getBoundingClientRect().width/$('car-a').parentElement.getBoundingClientRect().width*100/2;}
+function position(index){const n=state.schedule.length,base=lenAt(-Math.PI/2+2*Math.PI*index/n),h=carHalf();
+  [['car-b',h],['car-a',-h]].forEach(([id,off])=>{const a=angAt(base+off);
+    let rot=Math.atan2(RY*Math.cos(a),-RX*Math.sin(a))*180/Math.PI,flip=false;
+    if(rot>90){rot-=180;flip=true;}else if(rot<-90){rot+=180;flip=true;}
+    const el=$(id);el.style.left=(50+RX*Math.cos(a))+'%';el.style.top=(CY+RY*Math.sin(a))+'%';
+    el.style.transform='translate(-50%,-50%) rotate('+rot.toFixed(2)+'deg)'+(flip?' scaleX(-1)':'');});}
+for(let i=0;i<12;i++){const a=i*Math.PI/6,n=document.createElementNS('http://www.w3.org/2000/svg','line');n.setAttribute('x1',60+Math.sin(a)*48);n.setAttribute('y1',60-Math.cos(a)*48);n.setAttribute('x2',60+Math.sin(a)*51);n.setAttribute('y2',60-Math.cos(a)*51);$('ticks').append(n);}
+function clock(){const s=state.schedule[Math.min(state.done,state.schedule.length-1)],n=M.mins(s.time);$('hour').setAttribute('transform','rotate('+(n%720/2)+' 60 60)');$('minute').setAttribute('transform','rotate('+(n%60*6)+' 60 60)');$('target-time').textContent=s.time;$('clock-face').setAttribute('aria-label',M.tasks[s.id].name+'の目標時刻 '+s.time);const now=new Date();$('now-time').textContent='いま '+M.time(now.getHours()*60+now.getMinutes());}
+function route(){const list=$('route-list');list.replaceChildren();state.schedule.forEach((s,i)=>{const li=el('li',undefined,i===state.done?'active':'');li.append(el('span',i<state.done?'✓':String(i+1).padStart(2,'0'),'num'),el('b',M.tasks[s.id].name),el('time',s.time));list.append(li);});$('route-summary').textContent=M.courses[state.course].name+' · '+state.schedule.length+'駅 · おふとん '+state.bed;}
+function render(keepTrain=false){const N=state.schedule.length,finished=state.done===N,idx=Math.min(state.done,N-1),s=state.schedule[idx],task=M.tasks[s.id];$('service').textContent=M.courses[state.course].service+' '+N+'駅';$('course-name').textContent=M.courses[state.course].name;$('progress').textContent='できた '+state.done+' / '+N;$('stations').replaceChildren();$('stations').className=N>4?'dense':'';
+state.schedule.forEach((s,i)=>{const p=M.point(i,N),n=el('div',undefined,'station'+(i<state.done?' done':'')+(i===state.done?' current':'')+(i===N-1?' terminal':''));n.style.left=p.x+'%';n.style.top=p.y+'%';n.append(el('span',i<state.done?'✓':String(i+1).padStart(2,'0'),'dot'),el('span',M.tasks[s.id].name,'label'));$('stations').append(n);});
+if(!keepTrain)position(idx);$('task-title').textContent=finished?'おやすみなさい':task.name;$('current-label').textContent=finished?'終点に とうちゃく':'ただいま';$('code').textContent='H '+String(idx+1).padStart(2,'0');$('next-title').textContent=finished?'きょうは おしまい':(state.schedule[idx+1]?M.tasks[state.schedule[idx+1].id].name:'きょうは おしまい');$('action').textContent=finished?'ゆっくり やすもうね':task.action;$('task-icon').textContent=finished?'🌙':task.icon;$('first-label').textContent=finished?'おつかれさま':'まずは';$('bed-time').textContent=state.bed;$('complete').textContent=finished?'きょうの おしたく おしまい':moving?'つぎのえきへ…':idx===N-1?'できた！ おやすみなさい':'できた！ つぎのえきへ →';$('complete').disabled=finished||moving;$('undo').disabled=state.done===0||moving;$('note').textContent=finished?'がめんを とじて やすもう':'できたら おしてね';$('clock-label').textContent=finished?'おふとんの めやす':'このえきの めやす';clock();route();}
+function settle(){cancelAnimationFrame(frame);moving=false;render();}
+function freshDay(){if(state.date!==M.day()){state.date=M.day();state.done=0;save();settle();}}
+$('complete').addEventListener('click',()=>{freshDay();if(moving||state.done>=state.schedule.length)return;const from=state.done;state.done++;save();const end=Math.min(state.done,state.schedule.length-1);moving=end>from&&!reduced.matches&&!document.hidden;render(moving);$('announcement').textContent=state.done===state.schedule.length?'きょうの おしたく おしまい':'つぎは '+M.tasks[state.schedule[state.done].id].name;if(!moving)return;const start=performance.now();function tick(now){const t=Math.min(1,(now-start)/700),ease=t*t*(3-2*t);position(from+(end-from)*ease);if(t<1)frame=requestAnimationFrame(tick);else settle();}frame=requestAnimationFrame(tick);});
+$('undo').addEventListener('click',()=>{freshDay();if(!moving&&state.done){state.done--;save();render();}});
+$('route-open').addEventListener('click',()=>{freshDay();route();$('route-dialog').showModal();});
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$(b.dataset.close).close()));
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{const r=d.getBoundingClientRect();if(e.target===d&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom))d.close();}));
+function editFields(){const list=$('time-fields');list.replaceChildren();draft.schedule.forEach((s,i)=>{const row=el('div',undefined,'edit-row'),label=el('label',M.tasks[s.id].name),input=el('input');input.type='time';input.value=s.time;input.required=true;input.id='time-'+i;label.htmlFor=input.id;input.disabled=i===draft.schedule.length-1;input.addEventListener('input',()=>{s.time=input.value;});row.append(label,input);[-1,1].forEach(delta=>{const b=el('button',delta<0?'↑':'↓');b.type='button';b.setAttribute('aria-label',M.tasks[s.id].name+(delta<0?'を前へ':'を後へ'));b.disabled=i===draft.schedule.length-1||i+delta<0||i+delta>=draft.schedule.length-1;b.addEventListener('click',()=>{const j=i+delta,a=draft.schedule[i].id;draft.schedule[i].id=draft.schedule[j].id;draft.schedule[j].id=a;editFields();});row.append(b);});list.append(row);});}
+$('parents').addEventListener('click',()=>{freshDay();settle();draft=JSON.parse(JSON.stringify(state));$('course-select').value=state.course;$('bed-input').value=state.bed;$('settings-error').textContent='';editFields();$('parent-dialog').showModal();});
+$('course-select').addEventListener('change',()=>{draft.course=$('course-select').value;draft.schedule=M.make(draft.course,draft.bed);editFields();});
+$('bed-input').addEventListener('change',()=>{try{const next=$('bed-input').value,delta=M.mins(next)-M.mins(draft.bed);draft.schedule=draft.schedule.map(s=>({id:s.id,time:M.time(M.mins(s.time)+delta)}));draft.bed=next;editFields();}catch{$('settings-error').textContent='目標時刻を入力してください。';}});
+$('settings').addEventListener('submit',e=>{e.preventDefault();try{M.validate(draft.schedule,draft.course,draft.bed);const same=draft.course===state.course&&draft.schedule.every((s,i)=>s.id===state.schedule[i]?.id);state={version:1,date:M.day(),course:draft.course,bed:draft.bed,schedule:draft.schedule.map(s=>({...s})),done:same?state.done:0};save();settle();$('parent-dialog').close();}catch(err){$('settings-error').textContent=err.message;}});
+$('reset').addEventListener('click',()=>{if(confirm('この試作の今日の進み具合を、最初に戻しますか？')){state.done=0;state.date=M.day();save();settle();$('parent-dialog').close();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)settle();else{freshDay();clock();}});window.addEventListener('pageshow',()=>{freshDay();clock();});setInterval(()=>{if(!document.hidden){freshDay();clock();}},30000);
+render();save();
+})();
