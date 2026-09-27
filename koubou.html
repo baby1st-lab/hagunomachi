@@ -129,7 +129,7 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
 #deco span{display:block;width:34px;height:14px}
 #deco span svg{width:100%;height:100%;display:block}
 #deco b{font-size:11px;color:#7a6146;margin:0 2px 0 0}
-#depotToast{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(90,74,56,.85);color:#fff;
+#depotToast{position:absolute;z-index:10;left:50%;bottom:calc(64px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(90,74,56,.85);color:#fff;
   font-size:13px;font-weight:bold;padding:8px 14px;border-radius:999px;display:none;white-space:nowrap;pointer-events:none}
 @media (max-height:610px){ #mileTtl{font-size:20px} #mile .strip{height:52px} #mileBtns .gbtn{padding:11px 0;font-size:18px} }
 
@@ -625,7 +625,7 @@ function depotRail_(sc, W, H, skyH, lay, s, lanes, perLane, tops){
   var doors = [];
   lay.houses.forEach(function(hs){
     if (hs.cat) return;
-    var dx = (hs.x + 28) * s, left = hs.x * s, right = (hs.x + HOUSE_W) * s, land = dx - run0;
+    var dx = (hs.x + 28) * s + h / (4 * Math.sin(DEP_ANGLE)), left = hs.x * s, right = (hs.x + HOUSE_W) * s, land = dx - run0;
     if (left < 0 || right > W || land < W * 0.04 || dx > xs - 18 * k) return;
     doors.push({ x:dx, land:land, len:drop0 / Math.sin(DEP_ANGLE) });
   });
@@ -640,12 +640,14 @@ function depotRail_(sc, W, H, skyH, lay, s, lanes, perLane, tops){
   ladder.forEach(function(l){ svg += line(l.x0, trackY[l.from], l.x1, trackY[l.to]); });
   sc.insertAdjacentHTML("beforeend", svg + '</svg>');
   var layer = document.createElement("div"); layer.className = "dcars"; sc.appendChild(layer);
+  layer.style.clipPath = "inset(" + groundY.toFixed(1) + "px 0 0 0)";   // 地面より上(家の中)は見せない: 戸口の足もとから出てくる
 
   // 1りょうずつの みち(path)を つくる
   var loopW = W + w;   // とちゅうの だんは 画面はばで まわりこむ
   function laneSeg(li, xa, xb){ var d = xa >= xb ? xa - xb : xa - xb + loopW; return { t:"lane", li:li, x:xa, len:d }; }
   function pathFor(li, d){
-    var p = [{ t:"line", x0:d.x, y0:groundY + h * 0, x1:d.land, y1:restY[0], len:d.len }];
+    var e = w / 2 + 2 * k;   // 先頭(左はし)が戸口に来るよう、車体ぶん家の中から走り出す
+    var p = [{ t:"line", x0:d.x + e * cosA, y0:groundY - e * Math.sin(DEP_ANGLE), x1:d.land, y1:restY[0], len:d.len + e }];
     if (li === 0) return { segs:p, land:d.land };
     p.push(laneSeg(0, d.land, ladder[0].x0));
     p.push({ t:"line", x0:ladder[0].x0, y0:restY[0], x1:ladder[0].x1, y1:restY[1], len:ladder[0].len });
