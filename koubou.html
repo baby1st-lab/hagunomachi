@@ -62,7 +62,7 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
   border-radius:999px;padding:11px 26px;box-shadow:0 3px 0 #dcc06e;cursor:pointer;margin:8px 4px 0}
 
 /* もくひょう(第8ラウンド) */
-#goal{display:none;margin-top:8px;font-size:12.5px;font-weight:bold;color:#5a6b86;cursor:pointer}
+#goal{display:none;margin-top:8px;font-size:12.5px;font-weight:bold;color:#5a6b86;cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #goal .bar{height:10px;border-radius:99px;background:#e8e2d4;border:2px solid #c9ae87;margin:5px auto 0;max-width:300px;overflow:hidden}
 #goal .bar i{display:block;height:100%;width:0;background:#a5c9e8;border-radius:99px;transition:width .6s}
 #garageTtl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -108,16 +108,23 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
 #depot .hd button{font-family:inherit;font-size:12.5px;font-weight:bold;border:none;border-radius:999px;padding:7px 12px;cursor:pointer;white-space:nowrap}
 #depotAll{background:#f2d98a;color:#7a6146;box-shadow:0 3px 0 #dcc06e}
 #depotX{background:#e8dcc4;color:#7a6146;box-shadow:0 3px 0 #cbb99b;font-size:15px;padding:6px 13px}
-#scene{flex:1;position:relative;overflow:hidden;min-height:260px;background:linear-gradient(#cfe0ee 0%,#eaf2fb 46%,#d3e7cb 46%,#c9ddb9 100%)}
-#scene .sky{position:absolute;left:0;right:0;top:0;height:46%}
+#scene{flex:1;position:relative;overflow:hidden;min-height:260px;background:linear-gradient(#d3e7cb,#c9ddb9)}
+#scene .sky{position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(#cfe0ee,#eaf2fb)}
 #scene .sky svg{width:100%;height:100%;display:block}
-#scene .lane{position:absolute;left:0;right:0;height:34px}
-#scene .lane .track{position:absolute;left:0;right:0;bottom:3px;height:7px;background:#d8c9ab;border-radius:99px}
-#scene .lane.rail .track::after{content:"";position:absolute;inset:2px 0;background:repeating-linear-gradient(90deg,#c9ae87 0 6px,transparent 6px 18px)}
-#scene .lane.road .track{height:13px;background:#cfc7ba;bottom:1px;border-radius:4px}
-#scene .lane.road .track::after{content:"";position:absolute;left:0;right:0;top:5px;height:2px;background:repeating-linear-gradient(90deg,#fff7ec 0 10px,transparent 10px 22px)}
+#scene .lane{position:absolute;left:0;right:0;height:calc(34px * var(--k,1));z-index:1}
+#scene .lane .track{position:absolute;left:0;right:0;bottom:calc(3px * var(--k,1));height:calc(7px * var(--k,1));background:#d8c9ab;border-radius:99px}
+#scene .lane.rail .track::after{content:"";position:absolute;inset:calc(2px * var(--k,1)) 0;background:repeating-linear-gradient(90deg,#c9ae87 0 calc(6px * var(--k,1)),transparent calc(6px * var(--k,1)) calc(18px * var(--k,1)))}
+#scene .lane.road .track{height:calc(13px * var(--k,1));background:#cfc7ba;bottom:calc(1px * var(--k,1));border-radius:4px}
+#scene .lane.road .track::after{content:"";position:absolute;left:0;right:0;top:calc(5px * var(--k,1));height:calc(2px * var(--k,1));background:repeating-linear-gradient(90deg,#fff7ec 0 calc(10px * var(--k,1)),transparent calc(10px * var(--k,1)) calc(22px * var(--k,1)))}
+#scene .fm{bottom:calc(8px * var(--k,1))}
+#scene .spur{position:absolute;left:0;top:0;z-index:1;pointer-events:none}
+#scene .dcars{position:absolute;inset:0;z-index:2;pointer-events:none}
+#scene .dc{position:absolute;left:0;top:0;transform-origin:50% 100%;will-change:transform;cursor:pointer;pointer-events:auto}
+#scene .dc .cars{display:flex;align-items:flex-end}
+#scene .dc.flip .cars{transform:scaleX(-1)}
+#scene .sky{z-index:3}
 #scene .sempty{position:absolute;left:0;right:0;top:55%;text-align:center;font-size:13px;color:#7a6146;font-weight:bold}
-#deco{position:absolute;right:6px;top:6px;display:flex;gap:2px;align-items:flex-end;background:rgba(255,250,240,.85);
+#deco{position:absolute;z-index:4;right:6px;top:6px;display:flex;gap:2px;align-items:flex-end;background:rgba(255,250,240,.85);
   border:2px solid #c9ae87;border-radius:12px;padding:3px 6px}
 #deco span{display:block;width:34px;height:14px}
 #deco span svg{width:100%;height:100%;display:block}
@@ -161,7 +168,7 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
   <div id="rail"><div id="railLine"></div><div id="trainSvg"></div></div>
   <div id="progress"></div>
   <div id="hint"></div>
-  <div id="goal" onclick="openMile(prevMile_(), true)"><span id="goalTxt"></span><div class="bar"><i id="goalFill"></i></div></div>
+  <div id="goal" onclick="goalTap()"><span id="goalTxt"></span><div class="bar"><i id="goalFill"></i></div></div>
 </div>
 
 <div id="shopTtl"><span style="display:inline-block;width:28px;height:28px;vertical-align:-8px;margin-right:4px"><svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8d7b66" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M8 22 L13 9 H47 L52 22 Z" fill="#f4d3da"/><path d="M21 9 L19 22 M30 9 V22 M39 9 L41 22"/><path d="M8 22 q5.5 7 11 0 q5.5 7 11 0 q5.5 7 11 0 q5.5 7 11 0" fill="#fff7ec"/><circle cx="30" cy="37" r="9" fill="#f0e3c8"/><circle cx="27" cy="36" r="1.6" fill="#5a4a38" stroke="none"/><circle cx="33" cy="36" r="1.6" fill="#5a4a38" stroke="none"/><path d="M28 40 q2 2 4 0" stroke-width="2"/><circle cx="23.5" cy="39.5" r="2" fill="#f4b8b8" stroke="none"/><circle cx="36.5" cy="39.5" r="2" fill="#f4b8b8" stroke="none"/><rect x="9" y="46" width="42" height="9" rx="3" fill="#f9e3a8"/></svg></span>ぶひんやさん(タップで かう)</div>
@@ -183,11 +190,12 @@ h1 small{display:block;font-size:11px;color:#8b9ab3;font-weight:normal}
   <div class="strip"><div class="sline"></div><div class="fm" id="mileFm"><div class="cars"></div></div></div>
   <p id="mileMsg"></p>
   <div id="mileAsk">
-    <div class="q">つぎは なんりょう まで?</div>
+    <div class="q">もくひょうを なんりょうに する?</div>
     <div id="mileBtns"></div>
-    <div class="other"><input id="mileNum" type="number" inputmode="numeric" min="1" max="9999" placeholder="ほかの かず"><button onclick="mileDecide(0)">きめる</button></div>
-    <button class="later" onclick="mileLater()">あとで きめる</button>
+    <div class="other" id="mileOther"><input id="mileNum" type="number" inputmode="numeric" min="1" max="9999" placeholder="ほかの かず"><button onclick="mileDecide(0)">きめる</button></div>
+    <button class="later" onclick="mileLater()">やめる</button>
   </div>
+  <button class="later" id="mileOk" onclick="mileOk()" style="font-size:15px;padding:11px 26px;background:#f2d98a;box-shadow:0 3px 0 #dcc06e">やった! つぎへ</button>
 </div></div>
 
 <div id="depot">
@@ -307,11 +315,14 @@ function cakeSVG(t, step){
 }
 
 /* ===== データ ===== */
+var GOAL_MAX_STEP = 1000;   // 目標は いまの りょうすう +1000 まで
 var K = { made:[], cur:null, bought:{}, goal:0, cel:{} };   // goal=つぎの もくひょう(0=なし) / cel=おいわい済みの りょうすう
 try{ var raw = localStorage.getItem("koubou_v1"); if (raw){ var o = JSON.parse(raw);
   ["made","cur","bought","goal","cel"].forEach(function(k){ if(o[k]!==undefined) K[k]=o[k]; }); } }catch(e){}
 if (!K.cel || typeof K.cel !== "object") K.cel = {};
 if (!(K.goal > 0)) K.goal = 0;
+/* 2026-09-25: 子が自由入力で 157858808 などを入れていた → 桁外れの目標は消して選び直し */
+/* 桁外れ・未設定の目標は ensureGoal_() が つぎの10に なおす(もくひょうの節) */
 function save(){ try{ localStorage.setItem("koubou_v1", JSON.stringify(K)); }catch(e){} }
 if (!K.cur) startNext_();
 
@@ -409,40 +420,61 @@ function finishToy_(){
 }
 function closeCel(){ q("cel").style.display = "none"; checkMile(); }
 
-/* ===== もくひょう と 節目の おいわい(第8ラウンド 2026-09-18) =====
-   100りょうで1回だけ大きいお祝い → 「つぎは なんりょう まで?」を子が口に出し、おうちのひとが押す。
-   目標に届いたらまた同じ流れ。データ: K.goal(つぎの目標) / K.cel({"100":1,...} お祝い済み) */
-var FIRST_MILE = 100;
+/* ===== もくひょう と 節目の おいわい(第8ラウンド 2026-09-18 → 2026-09-25 自動の10りょうごと) =====
+   目標は自動で「つぎの 10の まとまり」(105なら110)。子は選ばない(K 9/25: 300は遠い・何度も入れて遊んでしまう)。
+   届いたら おいわい → 「やった!」で つぎの10へ。100ごとは 大きい おいわい。
+   おうちのひとは 目標の帯を 1.5秒ながおしで 好きな かずに できる(いま+1000まで)。
+   データ: K.goal(つぎの目標) / K.cel({"110":1,...} お祝い済み) */
 function madeN_(){ return K.made.length; }
 function celDone_(m){ return !!K.cel[m]; }
+function nextTen_(n){ return Math.floor(n / 10) * 10 + 10; }
 function prevMile_(){ var b = 0; Object.keys(K.cel).forEach(function(k){ var n = +k; if (n <= madeN_() && n > b) b = n; }); return b; }
+function ensureGoal_(){
+  var n = madeN_();
+  if (!(K.goal > 0) || K.goal > n + GOAL_MAX_STEP || (K.goal <= n && celDone_(K.goal))){ K.goal = nextTen_(n); save(); }
+}
+ensureGoal_();
 function pendingMile_(){
   var n = madeN_();
-  if (n >= FIRST_MILE && !celDone_(FIRST_MILE)) return FIRST_MILE;
   if (K.goal && n >= K.goal && !celDone_(K.goal)) return K.goal;
   return 0;
 }
 function checkMile(){ var m = pendingMile_(); if (m) openMile(m, false); }
 function renderGoal(){
   var g = q("goal"); if (!g) return;
-  if (!K.goal){
-    if (celDone_(FIRST_MILE)){ q("goalTxt").textContent = "🎯 つぎの もくひょうを きめる(ここを おす)"; q("goalFill").style.width = "0%"; g.style.display = "block"; }
-    else g.style.display = "none";
-    return;
-  }
-  var n = madeN_(), base = prevMile_(), left = Math.max(0, K.goal - n);
+  ensureGoal_();
+  var n = madeN_(), left = Math.max(0, K.goal - n);
+  var base = (K.goal - n <= 10) ? Math.max(0, K.goal - 10) : prevMile_();   // ふだんは10りょうで1本のバー
   q("goalTxt").textContent = "🎯 もくひょう " + K.goal + "りょう ・ あと " + left + "りょう";
   var pct = K.goal > base ? Math.min(100, Math.max(0, (n - base) / (K.goal - base) * 100)) : 100;
   q("goalFill").style.width = pct + "%";
   g.style.display = "block";
 }
-var mileCur = 0, mileAsk = false;
-function openMile(m, ask){
-  mileCur = m; mileAsk = !!ask;
-  q("mileTtl").innerHTML = ask ? "🎯 つぎの もくひょう" : ("🎉 " + m + "りょう<br>たっせい!");
-  q("mileMsg").textContent = ask ? ("いま " + madeN_() + "りょう。つぎは どこまで?") : "じぶんで ここまで つくったね!";
+var mileCur = 0, mileAsk = false, mileParent = false;
+var goalPressed = false;
+function goalTap(){
+  if (goalPressed){ goalPressed = false; return; }
+  q("hint").textContent = "もくひょうまで あと " + Math.max(0, K.goal - madeN_()) + "りょう! つくって ちかづこう";
+  blip(523,.08);
+}
+(function(){
+  var g = q("goal"), t = null;
+  if (!g) return;
+  function down(){ goalPressed = false; t = setTimeout(function(){ goalPressed = true; openMile(prevMile_(), true, true); }, 1500); }
+  function up(){ clearTimeout(t); }
+  g.addEventListener("mousedown",down); g.addEventListener("mouseup",up); g.addEventListener("mouseleave",up);
+  g.addEventListener("touchstart",down,{passive:true}); g.addEventListener("touchend",up); g.addEventListener("touchmove",up,{passive:true});
+})();
+function openMile(m, ask, parent){
+  mileCur = m; mileAsk = !!ask; mileParent = !!parent;
+  q("mileAsk").style.display = mileAsk ? "" : "none";
+  q("mileOk").style.display = mileAsk ? "none" : "";
+  var nx = nextTen_(Math.max(m, madeN_()));
+  q("mileTtl").innerHTML = ask ? "🎯 もくひょうを かえる" : ("🎉 " + m + "りょう<br>たっせい!");
+  q("mileMsg").textContent = ask ? ("いま " + madeN_() + "りょう。(おうちのひと よう)") : ("じぶんで ここまで つくったね! つぎは " + nx + "りょう");
   var bt = q("mileBtns"); bt.innerHTML = "";
-  [m + 50, m + 100, m + 200].forEach(function(v){
+  var n0 = nextTen_(madeN_());
+  [n0, n0 + 10, n0 + 40].forEach(function(v){
     var b = document.createElement("button"); b.className = "gbtn"; b.type = "button"; b.textContent = v;
     b.onclick = function(){ mileDecide(v); }; bt.appendChild(b);
   });
@@ -451,20 +483,27 @@ function openMile(m, ask){
   var fm = q("mileFm"); fm.querySelector(".cars").innerHTML = trainRow_(K.made.slice().reverse(), 44);   // 左むき(鏡うつし)なので逆順
   fm.classList.add("flip");
   mvClear("mile"); mvAdd({ el:fm, lane:fm.parentNode, dir:-1, v:70, tag:"mile", x:fm.parentNode.clientWidth + 10 }); mvStart();
-  if (!ask){ fanfare(); setTimeout(fanfare, 650); try{navigator.vibrate&&navigator.vibrate([80,60,80,60,220]);}catch(e){} confettiMile_(); }
+  if (!ask){
+    fanfare(); confettiMile_();
+    if (m % 100 === 0){ setTimeout(fanfare, 650); try{navigator.vibrate&&navigator.vibrate([80,60,80,60,220]);}catch(e){} }
+    else { try{navigator.vibrate&&navigator.vibrate([60,50,120]);}catch(e){} }
+  }
+}
+function mileOk(){
+  if (mileCur > 0) K.cel[mileCur] = 1;
+  K.goal = nextTen_(madeN_()); save();
+  closeMile(); renderGoal();
+  var more = pendingMile_(); if (more) setTimeout(function(){ openMile(more, false); }, 400);
 }
 function mileDecide(v){
   if (!v){ v = parseInt(q("mileNum").value, 10); }
   if (!(v > madeN_())){ q("mileNum").focus(); blip(300,.15); q("mileMsg").textContent = "いま " + madeN_() + "りょう より おおきい かずに してね"; return; }
-  if (mileCur > 0) K.cel[mileCur] = 1;
+  if (v > madeN_() + GOAL_MAX_STEP){ q("mileNum").focus(); blip(300,.15); q("mileMsg").textContent = "いまより " + GOAL_MAX_STEP + "りょう までの かずに してね"; return; }
   K.goal = v; save();
   closeMile(); renderGoal();
   blip(784,.12); blip(1047,.15,.12);
 }
-function mileLater(){
-  if (!mileAsk){ if (mileCur > 0) K.cel[mileCur] = 1; if (K.goal && K.goal <= mileCur) K.goal = 0; save(); }
-  closeMile(); renderGoal();
-}
+function mileLater(){ closeMile(); renderGoal(); }
 function closeMile(){ q("mile").style.display = "none"; mvClear("mile"); }
 function confettiMile_(){
   var cols = ["#f4d3da","#cfe0ee","#d3e7cb","#f9e3a8","#ddd7f0","#f5c9a8"];
@@ -512,14 +551,39 @@ function mvTick(t){
 
 /* ===== しゃりょうきち(まちを はしる) ===== */
 var DEPOT = { all:false };
-var SKY_SVG = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="2.5" stroke-linejoin="round">' +
-  '<circle cx="52" cy="170" r="18" fill="#f9e3a8" stroke="#eccf92"/>' +
-  '<g fill="#fff" stroke="#dfe6ef"><ellipse cx="150" cy="150" rx="26" ry="10"/><ellipse cx="166" cy="144" rx="16" ry="9"/><ellipse cx="320" cy="176" rx="30" ry="11"/><ellipse cx="338" cy="169" rx="18" ry="10"/><ellipse cx="236" cy="112" rx="20" ry="8"/></g>' +
-  '<path d="M0 262 Q60 206 120 246 Q170 200 230 240 Q290 196 340 238 Q370 226 400 246 V300 H0 Z" fill="#dde8d6" stroke="none"/>' +
-  '<path d="M0 300 Q90 246 190 278 T400 268 V300 Z" fill="#d3e7cb" stroke="none"/><path d="M0 300 Q70 268 160 292 T400 286 V300 Z" fill="#c9ddb9" stroke="none"/>' +
-  house_(18, "#f4d3da", "#e8788a") + house_(96, "#cfe0ee", "#7fa9cd") + catHouse_(178) + house_(262, "#f9e3a8", "#d9a3b2") + house_(334, "#ddd7f0", "#a58868") +
-  tree_(80) + tree_(246) + tree_(320) + tree_(392) +
-  '</svg>';
+/* 空・丘・家の絵。家は でんしゃと同じ ものさし(DK)で かく: タブレットでも 家だけ大きく ならない。
+   はばが ひろい 画面では 家の かずを ふやす(ねこの家は まんなかに 1けん)。 */
+var HOUSE_COLORS = [["#f4d3da","#e8788a"], ["#cfe0ee","#7fa9cd"], ["#f9e3a8","#d9a3b2"], ["#ddd7f0","#a58868"]];
+var HOUSE_STEP = 82, HOUSE_W = 56;
+function skyLayout_(W, skyH, s){
+  var Wv = W / s, Hv = skyH / s;
+  var n = Math.ceil(Wv / HOUSE_STEP) + 1, x0 = (Wv - (n * HOUSE_STEP - (HOUSE_STEP - HOUSE_W))) / 2, cat = Math.floor(n / 2);
+  var houses = [], ci = 0;
+  for (var i = 0; i < n; i++){
+    if (i === cat) houses.push({ x:x0 + i * HOUSE_STEP, cat:true });
+    else { houses.push({ x:x0 + i * HOUSE_STEP, cat:false, c:HOUSE_COLORS[ci % HOUSE_COLORS.length] }); ci++; }
+  }
+  return { Wv:Wv, Hv:Hv, houses:houses };
+}
+function skySvg_(lay){
+  var Wv = lay.Wv, Hv = lay.Hv, sx = Wv / 400;
+  var s = '<svg viewBox="0 0 ' + Wv.toFixed(2) + ' ' + Hv.toFixed(2) + '" xmlns="http://www.w3.org/2000/svg" stroke="#8d7b66" stroke-width="2.5" stroke-linejoin="round">';
+  // たかい 空(スマホの たて)でも 太陽と雲は 空ぜんたいに ちらす(家の すぐ上に かたまらない)
+  var tall = Hv > 300, u = Hv - 110;
+  s += '<circle cx="' + (52 * sx).toFixed(1) + '" cy="' + (tall ? u * 0.36 : Math.min(170, (Hv - 90) * 0.55)).toFixed(1) + '" r="18" fill="#f9e3a8" stroke="#eccf92"/>';
+  var cy = function(y){ return (tall ? u * 0.8 * y / 176 : Math.min(y, u * y / 176)).toFixed(1); };
+  s += '<g fill="#fff" stroke="#dfe6ef"><ellipse cx="' + (150 * sx) + '" cy="' + cy(150) + '" rx="26" ry="10"/><ellipse cx="' + (166 * sx) + '" cy="' + cy(144) + '" rx="16" ry="9"/>' +
+       '<ellipse cx="' + (320 * sx) + '" cy="' + cy(176) + '" rx="30" ry="11"/><ellipse cx="' + (338 * sx) + '" cy="' + cy(169) + '" rx="18" ry="10"/><ellipse cx="' + (236 * sx) + '" cy="' + cy(112) + '" rx="20" ry="8"/></g>';
+  s += '<g transform="translate(0 ' + (Hv - 300).toFixed(2) + ') scale(' + sx.toFixed(4) + ' 1)">' +
+       '<path d="M0 262 Q60 206 120 246 Q170 200 230 240 Q290 196 340 238 Q370 226 400 246 V300 H0 Z" fill="#dde8d6" stroke="none"/>' +
+       '<path d="M0 300 Q90 246 190 278 T400 268 V300 Z" fill="#d3e7cb" stroke="none"/><path d="M0 300 Q70 268 160 292 T400 286 V300 Z" fill="#c9ddb9" stroke="none"/></g>';
+  s += '<g transform="translate(0 ' + (Hv - 300).toFixed(2) + ')">';
+  lay.houses.forEach(function(h, i){
+    s += h.cat ? catHouse_(h.x) : house_(h.x, h.c[0], h.c[1]);
+    if (!h.cat && i % 2 === 0) s += tree_(h.x + 62);
+  });
+  return s + '</g></svg>';
+}
 function house_(x, body, roof){   // 地面 y=300 に立つ
   return '<g><rect x="' + x + '" y="252" width="56" height="48" rx="6" fill="' + body + '"/>' +
     '<path d="M' + (x - 6) + ' 254 L' + (x + 28) + ' 226 L' + (x + 62) + ' 254 Z" fill="' + roof + '"/>' +
@@ -538,8 +602,143 @@ function catHouse_(x){
 function tree_(x){
   return '<g><rect x="' + (x - 3) + '" y="278" width="6" height="22" rx="2" fill="#a58868"/><circle cx="' + x + '" cy="268" r="16" fill="#a8cf9e"/><circle cx="' + (x - 9) + '" cy="276" r="10" fill="#b9d9ae" stroke="none"/></g>';
 }
+
+/* ===== しゃりょうきち: 家(かくのうこ)から でんしゃが でてくる(2026-09-26 K の案・作り直し) =====
+   - せんろ3本は ぜんぶ ひだりへ ながれる。ななめの せんろは ぜんぶ おなじ かたむき(平行)なので、ななめ どうしは 交わらない
+   - 家の とびら → 上の せんろ(みじかい ななめ)。上→中、中→下 は 右はしに たてに ならんだ ななめ(はしご)で おりる
+   - ななめは となりの だん の あいだだけ。せんろを またいで のびる ななめは ない
+   - 1りょうずつ 家の下から でてきて(家の うしろから あらわれる)、下の だん から じゅんに うまっていく
+   - ぜんぶ のった だん から、いつもの はやさで まわる */
+var DK = 1;                         // ものさし(スマホ=1・タブレットは 1.9 まで)
+var DEP = { raf:0, lanes:[], cars:[], D:0, last:0, V:0, done:true };
+var DEP_ANGLE = 38 * Math.PI / 180;
+function depStop_(){ if (DEP.raf) cancelAnimationFrame(DEP.raf); DEP.raf = 0; DEP.cars = []; DEP.lanes = []; DEP.done = true; }
+function depotRail_(sc, W, H, skyH, lay, s, lanes, perLane, tops){
+  var k = DK, w = Math.round(56 * k), h = Math.round(w * 0.4), g = Math.round(14 * k), fgap = Math.round(60 * k);
+  var cot = 1 / Math.tan(DEP_ANGLE), cosA = Math.cos(DEP_ANGLE);
+  var restY = tops.slice(0, 3).map(function(t){ return t + 26 * k; }), trackY = tops.slice(0, 3).map(function(t){ return t + 27.5 * k; });
+  // はしご(上→中・中→下): 右はしに たてに そろえる
+  var xs = W - Math.max(24, W * 0.05);
+  var ladder = [1, 2].map(function(to){ var drop = restY[to] - restY[to - 1]; return { from:to - 1, to:to, x0:xs, x1:xs - drop * cot, len:drop / Math.sin(DEP_ANGLE) }; });
+  // とびら: ねこの家いがいで、ななめの おわりが 画面に おさまり、はしごと かさならない 家
+  var groundY = skyH - 2 * k, drop0 = restY[0] - groundY, run0 = drop0 * cot;
+  var doors = [];
+  lay.houses.forEach(function(hs){
+    if (hs.cat) return;
+    var dx = (hs.x + 28) * s, left = hs.x * s, right = (hs.x + HOUSE_W) * s, land = dx - run0;
+    if (left < 0 || right > W || land < W * 0.04 || dx > xs - 18 * k) return;
+    doors.push({ x:dx, land:land, len:drop0 / Math.sin(DEP_ANGLE) });
+  });
+  if (doors.length > 4){ var step = (doors.length - 1) / 3; doors = [0,1,2,3].map(function(i){ return doors[Math.round(i * step)]; }); }
+  // せんろの え(ななめ)
+  var line = function(x0, y0, x1, y1){
+    return '<path d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' L' + x1.toFixed(1) + ' ' + y1.toFixed(1) + '" stroke="#d8c9ab" stroke-width="' + (7 * k).toFixed(1) + '"/>' +
+           '<path d="M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' L' + x1.toFixed(1) + ' ' + y1.toFixed(1) + '" stroke="#c9ae87" stroke-width="' + (3 * k).toFixed(1) + '" stroke-dasharray="' + (6 * k).toFixed(1) + ' ' + (12 * k).toFixed(1) + '" stroke-linecap="butt"/>';
+  };
+  var svg = '<svg class="spur" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" fill="none" stroke-linecap="round">';
+  doors.forEach(function(d){ svg += line(d.x, groundY, d.land + 2 * k * cot, trackY[0] - 2 * k); });
+  ladder.forEach(function(l){ svg += line(l.x0, trackY[l.from], l.x1, trackY[l.to]); });
+  sc.insertAdjacentHTML("beforeend", svg + '</svg>');
+  var layer = document.createElement("div"); layer.className = "dcars"; sc.appendChild(layer);
+
+  // 1りょうずつの みち(path)を つくる
+  var loopW = W + w;   // とちゅうの だんは 画面はばで まわりこむ
+  function laneSeg(li, xa, xb){ var d = xa >= xb ? xa - xb : xa - xb + loopW; return { t:"lane", li:li, x:xa, len:d }; }
+  function pathFor(li, d){
+    var p = [{ t:"line", x0:d.x, y0:groundY + h * 0, x1:d.land, y1:restY[0], len:d.len }];
+    if (li === 0) return { segs:p, land:d.land };
+    p.push(laneSeg(0, d.land, ladder[0].x0));
+    p.push({ t:"line", x0:ladder[0].x0, y0:restY[0], x1:ladder[0].x1, y1:restY[1], len:ladder[0].len });
+    if (li === 1) return { segs:p, land:ladder[0].x1 };
+    p.push(laneSeg(1, ladder[0].x1, ladder[1].x0));
+    p.push({ t:"line", x0:ladder[1].x0, y0:restY[1], x1:ladder[1].x1, y1:restY[2], len:ladder[1].len });
+    return { segs:p, land:ladder[1].x1 };
+  }
+  var V = 180 * k, di = 0, S = 0, prevEnd = 0;
+  DEP.lanes = []; DEP.cars = [];
+  [2, 1, 0].forEach(function(li){          // 下の だん から じゅんに うめる
+    var lane = lanes[li], cars = [], off = 0, maxw = 0;
+    perLane[li].forEach(function(f){
+      var d = doors.length ? doors[di++ % doors.length] : null;
+      f.ids.forEach(function(id, j){
+        cars.push({ id:id, t:f.t, off:off, door:d, label:f.t.name + " " + f.ids.length + "りょう" });
+        off += w + (j < f.ids.length - 1 ? g : fgap);
+      });
+      maxw = Math.max(maxw, f.ids.length * (w + g));
+    });
+    if (!cars.length) return;
+    var L = Math.max(W + maxw + fgap * 2, off);
+    var ln = { li:li, lane:lane, v:lane.v * k, L:L, cars:cars, ring:false, y:restY[li] };
+    if (!doors.length){   // とびらが つかえない 小さい画面: さいしょから まわす
+      cars.forEach(function(c){ c.x = W * 0.3 + c.off; c.mode = "ring"; });
+      ln.ring = true;
+    } else {
+      cars.forEach(function(c){ var pf = pathFor(li, c.door); c.segs = pf.segs; c.land = pf.land; c.plen = pf.segs.reduce(function(a, sg){ return a + sg.len; }, 0); });
+      var A = cars[0].land, need = 0;
+      cars.forEach(function(c){ c.base = ((A - c.land) % L + L) % L; need = Math.max(need, c.plen - c.off - c.base); });
+      var st = Math.max(need, prevEnd);
+      cars.forEach(function(c){ c.arr = st + c.off + c.base; c.dep = c.arr - c.plen; c.mode = "wait"; });
+      var lastArr = 0; cars.forEach(function(c){ lastArr = Math.max(lastArr, c.arr); });
+      ln.lastArr = lastArr;
+      // つぎの だんは、この だんの さいごの 1りょうが とちゅうの だん を ぬけてから
+      var tail = 0; cars.forEach(function(c){ var x = c.segs[c.segs.length - 1]; tail = Math.max(tail, c.arr - (li > 0 ? x.len : 0)); });
+      prevEnd = tail + w + g;
+    }
+    cars.forEach(function(c){
+      var el = document.createElement("div"); el.className = "dc flip";
+      el.style.width = w + "px"; el.style.height = h + "px";
+      el.innerHTML = '<div class="cars">' + trainRow_([c.id], w) + '</div>';
+      el.onclick = (function(lb){ return function(){ depotToast_(lb); blip(523,.08); }; })(c.label);
+      el.style.visibility = "hidden";
+      layer.appendChild(el); c.el = el; c.w = w; c.h = h;
+    });
+    DEP.lanes.push(ln);
+  });
+  DEP.V = V; DEP.D = 0; DEP.done = false; DEP.W = W; DEP.loopW = loopW; DEP.restY = restY; DEP.last = performance.now();
+  if (!DEP.raf) DEP.raf = requestAnimationFrame(depTick_);
+}
+function depPos_(c, u){   // みちの u の ところの ばしょ(車の まんなか・した)と かたむき
+  for (var i = 0; i < c.segs.length; i++){
+    var sg = c.segs[i];
+    if (u <= sg.len || i === c.segs.length - 1){
+      if (sg.t === "line"){ var r = Math.min(1, u / sg.len); return { x:sg.x0 + (sg.x1 - sg.x0) * r, y:sg.y0 + (sg.y1 - sg.y0) * r, a:-DEP_ANGLE * 180 / Math.PI }; }
+      var x = sg.x - u; if (x < -c.w / 2) x += DEP.loopW; return { x:x, y:DEP.restY[sg.li], a:0 };
+    }
+    u -= sg.len;
+  }
+}
+function depWrapC_(x, L, w){ var lo = -w; return ((x - lo) % L + L) % L + lo; }
+function depPlace_(c, x, y, a){
+  c.el.style.transform = "translate(" + (x - c.w / 2).toFixed(1) + "px," + (y - c.h).toFixed(1) + "px)" + (a ? " rotate(" + a.toFixed(1) + "deg)" : "");
+}
+function depTick_(now){
+  var dt = Math.min(0.1, (now - DEP.last) / 1000); DEP.last = now;
+  if (!DEP.done) DEP.D += DEP.V * dt;
+  var allRing = true;
+  DEP.lanes.forEach(function(ln){
+    if (!ln.ring && DEP.D >= ln.lastArr){   // この だんは ぜんぶ のった → いつもの はやさへ
+      ln.cars.forEach(function(c){ c.x = depWrapC_(c.land - (DEP.D - c.arr), ln.L, c.w); c.mode = "ring"; c.el.style.visibility = "visible"; });
+      ln.ring = true;
+    }
+    if (ln.ring){
+      ln.cars.forEach(function(c){ c.x = depWrapC_(c.x - ln.v * dt, ln.L, c.w); depPlace_(c, c.x, ln.y, 0); c.el.style.visibility = (c.x > -c.w && c.x < DEP.W + c.w) ? "visible" : "hidden"; });
+      return;
+    }
+    allRing = false;
+    ln.cars.forEach(function(c){
+      var u = DEP.D - c.dep;
+      if (u < 0){ c.el.style.visibility = "hidden"; return; }
+      c.el.style.visibility = "visible";
+      if (u >= c.plen){ var x = depWrapC_(c.land - (u - c.plen), ln.L, c.w); depPlace_(c, x, ln.y, 0); return; }
+      var p = depPos_(c, u); depPlace_(c, p.x, p.y, p.a);
+    });
+  });
+  if (allRing) DEP.done = true;
+  DEP.raf = (DEP.lanes.length && !document.hidden) ? requestAnimationFrame(depTick_) : 0;
+}
+document.addEventListener("visibilitychange", function(){ if (!document.hidden && DEP.lanes.length && !DEP.raf){ DEP.last = performance.now(); DEP.raf = requestAnimationFrame(depTick_); } });
 function openDepot(){ DEPOT.all = false; q("depot").style.display = "flex"; buildScene_(); }
-function closeDepot(){ q("depot").style.display = "none"; mvClear("depot"); q("scene").innerHTML = ""; }
+function closeDepot(){ q("depot").style.display = "none"; mvClear("depot"); depStop_(); q("scene").innerHTML = ""; }
 function depotToggleAll(){ DEPOT.all = !DEPOT.all; buildScene_(); blip(659,.1); }
 function depotToast_(txt){ var t = q("depotToast"); t.textContent = txt; t.style.display = "block"; clearTimeout(t._tm); t._tm = setTimeout(function(){ t.style.display = "none"; }, 1800); }
 function addFm_(lane, ids, w, label, x0, gap){
@@ -551,19 +750,24 @@ function addFm_(lane, ids, w, label, x0, gap){
   return mvAdd({ el:d, lane:lane.el, dir:lane.dir, v:lane.v, tag:"depot", x:x0, gap:gap });
 }
 function buildScene_(){
-  var sc = q("scene"); sc.innerHTML = ""; mvClear("depot");
+  var sc = q("scene"); sc.innerHTML = ""; mvClear("depot"); depStop_();
   var n = madeN_();
   q("depotN").textContent = n + "りょう";
   q("depotAll").textContent = DEPOT.all ? "🏘 まちを はしる" : "🚂 ぜんぶ つなぐ";
   q("depotAll").style.display = n ? "" : "none";
-  sc.insertAdjacentHTML("beforeend", '<div class="sky">' + SKY_SVG + '</div>');
-  var defs = [ {top:50, kind:"rail", dir:-1, v:46}, {top:63, kind:"rail", dir:1, v:34}, {top:76, kind:"rail", dir:-1, v:56}, {top:89, kind:"road", dir:1, v:40} ];
-  var lanes = defs.map(function(d){ var l = document.createElement("div"); l.className = "lane " + d.kind; l.style.top = d.top + "%";
+  var W = sc.clientWidth || 390, H = sc.clientHeight || 600;
+  DK = Math.max(1, Math.min(1.9, W / 430, H / 308));
+  // だんの あいだは でんしゃの ものさしで きめる(スマホで ひろがりすぎない)。どうろを 下から 11% に おき、そこから 上へ つむ
+  var gap = Math.min(H * 0.13, 66 * DK), tRoad = H * 0.89, tops = [tRoad - 3 * gap, tRoad - 2 * gap, tRoad - gap, tRoad], skyH = tops[0] - 16 * DK;
+  sc.style.setProperty("--k", DK.toFixed(3));
+  var s = 1.15 * DK, lay = skyLayout_(W, skyH, s);
+  sc.insertAdjacentHTML("beforeend", '<div class="sky" style="height:' + skyH.toFixed(1) + 'px">' + skySvg_(lay) + '</div>');
+  var defs = [ {kind:"rail", dir:-1, v:46}, {kind:"rail", dir:-1, v:34}, {kind:"rail", dir:-1, v:56}, {kind:"road", dir:1, v:40} ];
+  var lanes = defs.map(function(d, i){ var l = document.createElement("div"); l.className = "lane " + d.kind; l.style.top = tops[i].toFixed(1) + "px";
     l.innerHTML = '<div class="track"></div>'; sc.appendChild(l); return { el:l, dir:d.dir, v:d.v, kind:d.kind }; });
   if (!n){ sc.insertAdjacentHTML("beforeend", '<div class="sempty">まだ でんしゃが ないよ。<br>こうぼうで つくろう!</div>'); return; }
-  var W = sc.clientWidth || 390;
   if (DEPOT.all){
-    addFm_({ el:lanes[1].el, dir:-1, v:64 }, K.made.slice(), 56, "ぜんぶ つないだ " + n + "りょう!", W + 20, 40);   // 右から入って左へ
+    addFm_({ el:lanes[1].el, dir:-1, v:64 * DK }, K.made.slice(), Math.round(56 * DK), "ぜんぶ つないだ " + n + "りょう!", W + 20, 40);   // 右から入って左へ
     mvStart(); depotToast_(n + "りょう へんせい しゅっぱつ!"); return;
   }
   // 種類ごとに 8りょうまでの へんせいに 分ける。でんしゃ=せんろ(3本) / くるま=どうろ(1だいずつ) / リボン・ケーキ=まちの かざり
@@ -576,17 +780,19 @@ function buildScene_(){
     else deco[id] = by[id].length; });
   var perLane = [[], [], [], []];
   fms.forEach(function(f){ if (f.t.type === "car") perLane[3].push(f); else { var k = [0,1,2].sort(function(a,b){ return perLane[a].length - perLane[b].length; })[0]; perLane[k].push(f); } });
-  perLane.forEach(function(list, li){
-    var lane = lanes[li], gap = (li === 3) ? 30 : 60, off = 0, movers = [], maxw = 0;
-    list.forEach(function(f){
-      var w = f.t.type === "car" ? 46 : 56;
-      var label = f.t.name + " " + f.ids.length + (f.t.type === "car" ? "だい" : "りょう");
-      var m = addFm_(lane, f.ids, w, label, off, gap);
+  depotRail_(sc, W, H, skyH, lay, s, lanes, perLane, tops);
+  // どうろ(くるま)は これまでどおり
+  (function(){
+    var lane = lanes[3], gap = Math.round(30 * DK), off = 0, movers = [], maxw = 0;
+    lane.v = lane.v * DK;
+    perLane[3].forEach(function(f){
+      var label = f.t.name + " " + f.ids.length + "だい";
+      var m = addFm_(lane, f.ids, Math.round(46 * DK), label, off, gap);
       off += m.w + gap; maxw = Math.max(maxw, m.w); movers.push(m);
     });
-    var L = Math.max(W + maxw + gap * 2, off);   // 1周の長さ = 全部を並べた長さ(重ならない)か 画面幅+最長
+    var L = Math.max(W + maxw + gap * 2, off);
     movers.forEach(function(m){ m.L = L; });
-  });
+  })();
   var dk = Object.keys(deco);
   if (dk.length){
     var h = '<div id="deco">';
